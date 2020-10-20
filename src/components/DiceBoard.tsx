@@ -15,29 +15,32 @@ export class DiceBoard extends React.Component<DiceBoardProps> {
 
     /* The 4 dice in a 2x2 square */
     const dice = (
-      <div key={1}>
-        <div>
+      <div className="diceContainer" key={0}>
+        <div className="diceRow">
           {this.props.G.diceValues.slice(0, 2).map((value, i) => {
             return <Dice value={value} key={i} />;
           })}
         </div>
-        <div>
+        <div className="diceRow">
           {this.props.G.diceValues.slice(-2).map((value, i) => {
             return <Dice value={value} key={i} />;
           })}
         </div>
+      </div>
+    );
+
+    const buttons = (
+      <div key={1}>
         <div>
-          {
-            /* TODO won't work for multiplayer */
-            stage === "rolling" && (
-              <button
-                onClick={this.props.moves.rollDice}
-                className="btn btn-success"
-              >
-                Roll
-              </button>
-            )
-          }
+          <button
+            onClick={this.props.moves.rollDice}
+            className="btn btn-success"
+          >
+            Roll
+          </button>
+          <button onClick={this.props.moves.stop} className="btn btn-success">
+            Stop
+          </button>
         </div>
       </div>
     );
@@ -45,18 +48,24 @@ export class DiceBoard extends React.Component<DiceBoardProps> {
     const possibilities = this.props.G.diceSumOptions.map((sumsList, i) => {
       return sumsList.map((sums, j) => {
         return (
-          <button
-            type="button"
-            className="btn btn-success sums"
-            key={i}
-            onClick={() => this.props.moves.pickSumOption(i, j)}
-          >
-            {sums.map(String).join(" ")}
-          </button>
+          sums.length > 0 && (
+            <button
+              type="button"
+              className="btn btn-success sums"
+              key={`${i},${j}`}
+              onClick={() => this.props.moves.pickSumOption(i, j)}
+            >
+              {sums.map(String).join(" ")}
+            </button>
+          )
         );
       });
     });
 
-    return <div id="diceBoard">{[dice, possibilities]}</div>;
+    return (
+      <div id="diceBoard">
+        {[dice, stage === "rolling" ? buttons : possibilities]}
+      </div>
+    );
   }
 }

@@ -7,9 +7,9 @@ interface DiceProps {
 export class Dice extends React.Component<DiceProps> {
   render() {
     return (
-      <button type="button" className="btn btn-dark dice">
+      <div className="bg-primary dice">
         {this.props.value}
-      </button>
+      </div>
     );
   }
 }

@@ -12,10 +12,30 @@ code {
     monospace;
 }
 
-.dice {
+button {
   margin: 2px;
+}
+
+.dice {
   width: 50px;
   height: 50px;
+  color: white;
+
+  display : flex;
+  align-items : center;
+  justify-content: center;
+
+  font-weight: bold;
+  box-shadow: 1px 1px 1px black, 2px 2px 2px black;
+  border-radius: 4px;
+
+  margin: 10px;
+}
+
+.diceRow{
+  display : flex;
+  align-items : center;
+  justify-content: center;
 }
 
 .sums {
@@ -28,9 +48,6 @@ table.mountain {
   width: auto;
   margin: 0px auto;
   padding: 0px;
-  border-spacing:0px;
-
-  /* border-collapse: collapse; */
 }
 
 table.mountain td {
@@ -38,10 +55,6 @@ table.mountain td {
   margin: 0;
   padding: 0;
   text-align: center;
-}
-
-table.mountain tr {
-  /* height: 35px; */
 }
 
 #diceBoard {
@@ -73,20 +86,20 @@ table.mountain tr {
   display:inline;
   position: relative;
   margin: -4px;
-   /* -webkit-text-stroke: 1px white; */
-   text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black;
-  /* left: -10px; */
-  /* left: -2px; */
+  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black;
 }
 
 .climberGroup {
   position: relative;
   height: 0px;
   top: -24px;
-  /* display:inline; */
-  /* left: -20px; */
 }
 
-/* table, td, tr, div { */
+.info {
+  height: 50px;
+}
+
+/* * { */
 /*   border: 1px solid red; */
 /* } */
+

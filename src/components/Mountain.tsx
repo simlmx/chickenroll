@@ -19,11 +19,19 @@ export class Mountain extends React.Component<MountainProps> {
 
         if (row === 0) {
           // Below row 0 we write the dice sum.
-          content = <div className="badge badge-dark">{col}</div>;
+          content = (
+            <div className="badge badge-dark" key={0}>
+              {col}
+            </div>
+          );
         } else if (row === totalNumSteps) {
-          content = <div className="badge badge-dark">★</div>;
+          content = (
+            <div className="badge badge-dark" key={0}>
+              ★
+            </div>
+          );
         } else if (row < totalNumSteps) {
-          content = <div>○</div>;
+          content = <div key={0}>○</div>;
         } else {
           content = "";
         }
@@ -36,7 +44,10 @@ export class Mountain extends React.Component<MountainProps> {
             Object.entries(positions).forEach(([diceSumStr, numSteps]) => {
               const diceSum = parseInt(diceSumStr);
               if (diceSum === col && numSteps === row) {
-                const opt = { className: `color${playerId} climber` };
+                const opt = {
+                  className: `color${playerId} climber`,
+                  key: playerId,
+                };
                 climbers.push(<div {...opt}>●</div>);
               }
             });
@@ -44,11 +55,20 @@ export class Mountain extends React.Component<MountainProps> {
         );
 
         if (currentIsThere) {
-          climbers.push(<div className="climber">●</div>);
+          climbers.push(
+            <div className="climber" key={-1}>
+              ●
+            </div>
+          );
         }
 
         if (climbers.length > 0) {
-          content = [content, <div className="climberGroup">{climbers}</div>];
+          content = [
+            content,
+            <div className="climberGroup" key={1}>
+              {climbers}
+            </div>,
+          ];
         }
 
         cols.push(

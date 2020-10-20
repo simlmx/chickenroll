@@ -5,7 +5,15 @@ import { Mountain } from "./Mountain";
 
 export class CantStopBoard extends React.Component<any> {
   render() {
+    const info = this.props.G.info;
+    const { level, message } = info || { message: "", level: "white" };
+    const infoOpts = {
+      className: `alert alert-${level} text-center info`,
+    };
     return [
+      <div {...infoOpts} key={0} role='alert'>
+        {message}
+      </div>,
       <DiceBoard
         G={this.props.G}
         moves={this.props.moves}
