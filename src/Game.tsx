@@ -96,7 +96,7 @@ export const CantStop = {
               const diceSum = parseInt(diceSumStr);
               G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
               if (step === sumSteps(diceSum)) {
-                G.blockedSums[diceSum] = ctx.currentPlayer;
+                G.blockedSums[diceSum] = parseInt(ctx.currentPlayer);
                 // Remove all the checkpoints for that one
                 for (let i=0; i < ctx.numPlayers; ++i) {
                   delete G.checkpointPositions[i][diceSum];

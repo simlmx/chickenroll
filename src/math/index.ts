@@ -36,7 +36,7 @@ export function getSumOptions(
   // How many space left for each current climber.
   let currentClimberSpace = new Map<number, number>();
 
-  let updatedBlockedSums = new Set(Object.keys(blockedSums).map(parseInt));
+  let updatedBlockedSums = new Set(Object.keys(blockedSums).map((x) => parseInt(x)));
 
   Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
     const diceSum = parseInt(diceSumStr);
