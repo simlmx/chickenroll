@@ -4,6 +4,7 @@ import { sumSteps } from "../math";
 interface MountainProps {
   currentPositions: { [key: number]: number };
   checkpointPositions: object;
+  blockedSums: { [key: number]: number };
 }
 
 export class Mountain extends React.Component<MountainProps> {
@@ -16,22 +17,33 @@ export class Mountain extends React.Component<MountainProps> {
 
         const totalNumSteps = sumSteps(col);
         const currentIsThere = this.props.currentPositions[col] === row;
+        const blockedBy = this.props.blockedSums[col];
 
         if (row === 0) {
           // Below row 0 we write the dice sum.
+          const opts = { className: "badge badge-dark" };
+          if (blockedBy != null) {
+            opts.className += ` bgcolor${blockedBy}`;
+          }
           content = (
-            <div className="badge badge-dark" key={0}>
+            <div {...opts} key={0}>
               {col}
             </div>
           );
         } else if (row === totalNumSteps) {
+          const opts = { className: "badge badge-dark" };
+          if (blockedBy != null) {
+            opts.className += ` bgcolor${blockedBy}`;
+          }
+
           content = (
-            <div className="badge badge-dark" key={0}>
+            <div {...opts} key={0}>
               ★
             </div>
           );
         } else if (row < totalNumSteps) {
-          content = <div key={0}>○</div>;
+          const opts = blockedBy != null ? { className: `color${blockedBy}` } : {};
+          content = <div {...opts} key={0}>○</div>;
         } else {
           content = "";
         }
@@ -56,7 +68,7 @@ export class Mountain extends React.Component<MountainProps> {
 
         if (currentIsThere) {
           climbers.push(
-            <div className="climber" key={-1}>
+            <div className="climber currentClimber" key={-1}>
               ●
             </div>
           );

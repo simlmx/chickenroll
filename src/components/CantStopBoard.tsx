@@ -23,6 +23,7 @@ export class CantStopBoard extends React.Component<any> {
       <Mountain
         checkpointPositions={this.props.G.checkpointPositions}
         currentPositions={this.props.G.currentPositions}
+        blockedSums={this.props.G.blockedSums}
         key={2}
       />,
     ];

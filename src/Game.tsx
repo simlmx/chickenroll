@@ -1,5 +1,5 @@
 import { Stage } from "boardgame.io/core";
-import { getSumOptions } from "./math";
+import { getSumOptions, sumSteps } from "./math";
 
 interface Info {
   message: string;
@@ -18,36 +18,48 @@ interface GameType {
 export const CantStop = {
   setup(ctx): GameType {
     return {
+      /*
+       * Rows are 1-indexed. This means that
+       * 0 == not on the board
+       * 1 == first space
+       * 3 == end spot for diceSum=2
+       */
       diceValues: [1, 2, 3, 4],
       // State of the 3 current climbers.
       currentPositions: {},
       checkpointPositions: {
         0: {
           3: 3,
-          5: 9,
+          7:11,
         },
         1: {
           3: 3,
           5: 4,
+          7: 1,
         },
         2: {
           3: 3,
+          7: 1,
         },
         3: {
-          3: 4,
+          3: 3,
           5: 4,
-          7: 5,
+          7: 1,
+        },
+        4: {
+          3: 3,
         },
       },
       diceSumOptions: [[], [], []],
       // TODO use it
       // sum -> player
-      blockedSums: {},
+      blockedSums: { 10: 0 },
       info: { message: "Good game!", level: "success" },
     };
   },
   turn: {
     onBegin: (G: GameType, ctx) => {
+      G.currentPositions = {};
       // At the beginning of the turn, the current player is in `rolling` mode. All
       // other players can't play.
       ctx.events.setActivePlayers({
@@ -65,17 +77,32 @@ export const CantStop = {
             G.diceSumOptions = getSumOptions(
               G.diceValues,
               G.currentPositions,
+              G.checkpointPositions[ctx.currentPlayer],
               G.blockedSums
             );
-            // Check if bust
-            const bust = G.diceSumOptions.every((sums) => sums[0].length === 0);
-            if (bust) {
+            // Check if busted.
+            const busted = G.diceSumOptions.every(
+              (sums) => sums[0].length === 0
+            );
+            if (busted) {
               G.info = { message: "Busted!", level: "danger" };
               ctx.events.endTurn();
             }
             ctx.events.endStage();
           },
           stop: (G: GameType, ctx) => {
+            // Save current positions as checkpoints.
+            Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
+              const diceSum = parseInt(diceSumStr);
+              G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
+              if (step === sumSteps(diceSum)) {
+                G.blockedSums[diceSum] = ctx.currentPlayer;
+                // Remove all the checkpoints for that one
+                for (let i=0; i < ctx.numPlayers; ++i) {
+                  delete G.checkpointPositions[i][diceSum];
+                }
+              }
+            });
             G.info = { message: "Stopped.", level: "success" };
             ctx.events.endTurn();
           },
@@ -91,7 +118,9 @@ export const CantStop = {
               if (G.currentPositions.hasOwnProperty(s)) {
                 G.currentPositions[s]++;
               } else {
-                G.currentPositions[s] = 1;
+                const checkpoint =
+                  G.checkpointPositions[ctx.currentPlayer][s] || 0;
+                G.currentPositions[s] = checkpoint + 1;
               }
             });
             ctx.events.endStage();

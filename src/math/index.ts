@@ -24,6 +24,7 @@ export const DICE_INDICES = [
 export function getSumOptions(
   diceValues: number[],
   currentPositions: { [key: number]: number },
+  checkpointPositions: { [key: number]: number },
   blockedSums: { [key: number]: number }
 ): number[][][] {
   if (diceValues.length !== 4) {
@@ -39,7 +40,7 @@ export function getSumOptions(
 
   Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
     const diceSum = parseInt(diceSumStr);
-    const space = sumSteps(diceSum) - currentStep - 1;
+    const space = sumSteps(diceSum) - currentStep;
 
     currentClimberSpace.set(diceSum, space);
 
@@ -76,7 +77,17 @@ export function getSumOptions(
         }
       } else {
         // We are not climbing it. We can play it if we have a climber left.
-        return numClimbersLeft > 0 ? [[diceSum, diceSum]] : [[]];
+        if (numClimbersLeft > 0) {
+          // But we need 2 spaces if we already have a checkpoint there to be able to
+          // play both. Otherwise we can only play one.
+          if (checkpointPositions[diceSum] === sumSteps(diceSum) - 1) {
+            return [[diceSum]];
+          } else {
+            return [[diceSum, diceSum]];
+          }
+        } else {
+          return [[]];
+        }
       }
     } else {
       // Both sums are different.
@@ -103,7 +114,7 @@ export function getSumOptions(
       // This happens when we have only one climber left, and if the two sums are new
       // sums that we are not already climbing.
       if (numClimbersLeft === 1 && !climbingAtLeastOne) {
-        return [[availableDiceSums[0]], [availableDiceSums[1]]];
+        return availableDiceSums.map(x => [x]);
       } else {
         return [availableDiceSums];
       }

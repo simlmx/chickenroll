@@ -3,6 +3,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  /* font-size: 18pt; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -25,6 +26,7 @@ button {
   align-items : center;
   justify-content: center;
 
+  font-size: 16pt;
   font-weight: bold;
   box-shadow: 1px 1px 1px black, 2px 2px 2px black;
   border-radius: 4px;
@@ -48,10 +50,11 @@ table.mountain {
   width: auto;
   margin: 0px auto;
   padding: 0px;
+  font-size: 16pt;
 }
 
 table.mountain td {
-  width: 35px;
+  width: 45px;
   margin: 0;
   padding: 0;
   text-align: center;
@@ -67,32 +70,56 @@ table.mountain td {
 }
 
 .color1 {
-  color: #cc79a7;
+  color: #0072b2;
 }
 
 .color2 {
- color: #0072b2;
-}
-
-.color3 {
   color: #f0e442;
 }
 
-.color4 {
+.color3 {
   color: #009e73;
+}
+
+.color4 {
+  color: #cc79a7;
+}
+
+.bgcolor0 {
+  background-color: #d55e00;
+}
+
+.bgcolor1 {
+  background-color: #0072b2;
+}
+
+.bgcolor2 {
+  background-color: #f0e442;
+}
+
+.bgcolor3 {
+  background-color: #009e73;
+}
+
+.bgcolor4 {
+  background-color: #cc79a7;
 }
 
 .climber {
   display:inline;
+  font-size: 20pt;
   position: relative;
-  margin: -4px;
-  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black;
+  margin: -7px;
+  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black, .5px .5px 5px #dddddd;
+}
+
+.currentClimber {
 }
 
 .climberGroup {
   position: relative;
   height: 0px;
-  top: -24px;
+  top: -38px;
 }
 
 .info {
