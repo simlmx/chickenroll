@@ -6,17 +6,24 @@ interface Info {
   level: "success" | "danger";
 }
 
-interface GameType {
+export interface GameType {
   diceValues: number[];
   currentPositions: { [key: number]: number };
   checkpointPositions: { [key: number]: { [key: number]: number } };
   diceSumOptions: number[][][];
   blockedSums: { [key: number]: number };
   info: Info | null;
+  scores: { [key: number]: number };
 }
 
-export const CantStop = {
+const CantStop = {
   setup(ctx): GameType {
+    const scores: { [key: number]: number } = {};
+    const checkpointPositions = {}
+    for (let i = 0; i < ctx.numPlayers; ++i) {
+      scores[i] = 0;
+      checkpointPositions[i] = {};
+    }
     return {
       /*
        * Rows are 1-indexed. This means that
@@ -27,34 +34,11 @@ export const CantStop = {
       diceValues: [1, 2, 3, 4],
       // State of the 3 current climbers.
       currentPositions: {},
-      checkpointPositions: {
-        0: {
-          3: 3,
-          7:11,
-        },
-        1: {
-          3: 3,
-          5: 4,
-          7: 1,
-        },
-        2: {
-          3: 3,
-          7: 1,
-        },
-        3: {
-          3: 3,
-          5: 4,
-          7: 1,
-        },
-        4: {
-          3: 3,
-        },
-      },
-      diceSumOptions: [[], [], []],
-      // TODO use it
-      // sum -> player
-      blockedSums: { 10: 0 },
+      checkpointPositions,
+      diceSumOptions: [[[]], [[]], [[]]],
+      blockedSums: {},
       info: { message: "Good game!", level: "success" },
+      scores,
     };
   },
   turn: {
@@ -81,9 +65,9 @@ export const CantStop = {
               G.blockedSums
             );
             // Check if busted.
-            const busted = G.diceSumOptions.every(
-              (sums) => sums[0].length === 0
-            );
+            const busted = G.diceSumOptions.every((sums) => {
+              return sums[0].length === 0;
+            });
             if (busted) {
               G.info = { message: "Busted!", level: "danger" };
               ctx.events.endTurn();
@@ -97,14 +81,27 @@ export const CantStop = {
               G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
               if (step === sumSteps(diceSum)) {
                 G.blockedSums[diceSum] = parseInt(ctx.currentPlayer);
+                G.scores[ctx.currentPlayer] += 1;
                 // Remove all the checkpoints for that one
-                for (let i=0; i < ctx.numPlayers; ++i) {
+                for (let i = 0; i < ctx.numPlayers; ++i) {
                   delete G.checkpointPositions[i][diceSum];
                 }
               }
             });
-            G.info = { message: "Stopped.", level: "success" };
-            ctx.events.endTurn();
+
+            // Check if we should end the game,
+            if (G.scores[ctx.currentPlayer] === 3) {
+              // Clean the board a bit.
+              G.currentPositions = {};
+              G.info = {
+                message: `Player ${ctx.currentPlayer} won!`,
+                level: "success",
+              };
+              ctx.events.endGame();
+            } else {
+              G.info = { message: "Stopped.", level: "success" };
+              ctx.events.endTurn();
+            }
           },
         },
         next: "moving",
@@ -131,3 +128,5 @@ export const CantStop = {
     },
   },
 };
+
+export default CantStop;

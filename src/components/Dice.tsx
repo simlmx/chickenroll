@@ -1,15 +1,11 @@
 import React from "react";
 
-interface DiceProps {
+interface DieProps {
   value: number;
 }
 
-export class Dice extends React.Component<DiceProps> {
+export class Die extends React.Component<DieProps> {
   render() {
-    return (
-      <div className="bg-primary dice">
-        {this.props.value}
-      </div>
-    );
+    return <div className="die">{this.props.value}</div>;
   }
 }

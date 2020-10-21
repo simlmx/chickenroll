@@ -68,7 +68,7 @@ export class Mountain extends React.Component<MountainProps> {
 
         if (currentIsThere) {
           climbers.push(
-            <div className="climber currentClimber" key={-1}>
+            <div className="climber" key={-1}>
               ●
             </div>
           );

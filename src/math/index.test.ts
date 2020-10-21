@@ -16,6 +16,11 @@ describe("testGetSumOptions", () => {
     [[1, 2, 3, 4], { 7: 12, 2:1, 3:1}, {1:2, 3:4}, {}, [[[3, 7]], [[]], [[]]]],
     [[5, 3, 3, 5], {7: 1, 12: 1}, {3:3}, {10: 0}, [[[8, 8]], [[8, 8]], [[6]]]],
     [[4, 6, 5, 5], {}, {}, {10: 0, 9:0, 11:0}, [[[]], [[]], [[]]]],
+    //
+    // * First sums are different
+    // * Not climbing those
+    // * 1 climber left
+    [[3, 3, 4, 4], {2:1, 3:1}, {}, {6: 0, 8: 0}, [[[]], [[7, 7]], [[7, 7]]]],
 
   ]).it("case '%s %s %s %s'", (diceValues, climberPositions, checkpointPositions, blockedSums, expected) => {
     expect(getSumOptions(diceValues, climberPositions, checkpointPositions, blockedSums)).toEqual(

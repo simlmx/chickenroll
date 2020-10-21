@@ -2,6 +2,7 @@ import React from "react";
 
 import { DiceBoard } from "./DiceBoard";
 import { Mountain } from "./Mountain";
+import { ScoreBoard } from "./ScoreBoard";
 
 export class CantStopBoard extends React.Component<any> {
   render() {
@@ -10,22 +11,36 @@ export class CantStopBoard extends React.Component<any> {
     const infoOpts = {
       className: `alert alert-${level} text-center info`,
     };
-    return [
-      <div {...infoOpts} key={0} role='alert'>
-        {message}
-      </div>,
-      <DiceBoard
-        G={this.props.G}
-        moves={this.props.moves}
-        ctx={this.props.ctx}
-        key={1}
-      />,
-      <Mountain
-        checkpointPositions={this.props.G.checkpointPositions}
-        currentPositions={this.props.G.currentPositions}
-        blockedSums={this.props.G.blockedSums}
-        key={2}
-      />,
-    ];
+    const playerBannerOpts = {
+      className: `playerBanner bgcolor${this.props.playerID}`,
+    };
+    return (
+      <div className="cantStopBoard">
+        <div {...infoOpts} role="alert">
+          {message}
+        </div>
+        <div {...playerBannerOpts}></div>
+        <div className="upperSection">
+          <div className="upperLeft">
+            <ScoreBoard scores={this.props.G.scores} />
+          </div>
+          <div className="upperCenter">
+            <DiceBoard
+              G={this.props.G}
+              moves={this.props.moves}
+              ctx={this.props.ctx}
+              playerID={this.props.playerID}
+            />
+          </div>
+        </div>
+        <div>
+          <Mountain
+            checkpointPositions={this.props.G.checkpointPositions}
+            currentPositions={this.props.G.currentPositions}
+            blockedSums={this.props.G.blockedSums}
+          />
+        </div>
+      </div>
+    );
   }
 }

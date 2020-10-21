@@ -52,9 +52,9 @@ export function getSumOptions(
   });
 
   // First compute all the dice sums.
-  const allDiceSums = DICE_INDICES.map((group) => {
+  const allDiceSums = DICE_INDICES.map((group): number[][] => {
     // Compute the 2 sums.
-    let diceSums = group.map((twoDiceIndices) => {
+    let diceSums = group.map((twoDiceIndices): number => {
       return twoDiceIndices.map((i) => diceValues[i]).reduce((a, b) => a + b);
     });
 
@@ -113,8 +113,8 @@ export function getSumOptions(
       // at the same time*.
       // This happens when we have only one climber left, and if the two sums are new
       // sums that we are not already climbing.
-      if (numClimbersLeft === 1 && !climbingAtLeastOne) {
-        return availableDiceSums.map(x => [x]);
+      if (numClimbersLeft === 1 && !climbingAtLeastOne && availableDiceSums.length > 0) {
+        return availableDiceSums.map((x): number[] => [x]);
       } else {
         return [availableDiceSums];
       }
