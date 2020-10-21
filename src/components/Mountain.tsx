@@ -42,8 +42,13 @@ export class Mountain extends React.Component<MountainProps> {
             </div>
           );
         } else if (row < totalNumSteps) {
-          const opts = blockedBy != null ? { className: `color${blockedBy}` } : {};
-          content = <div {...opts} key={0}>○</div>;
+          const opts =
+            blockedBy != null ? { className: `color${blockedBy}` } : {};
+          content = (
+            <div {...opts} key={0}>
+              ○
+            </div>
+          );
         } else {
           content = "";
         }

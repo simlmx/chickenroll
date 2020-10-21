@@ -32,7 +32,7 @@ button {
   box-shadow: 1px 1px 1px black, 2px 2px 2px black;
   border-radius: 4px;
 
-  margin: 10px;
+  margin: 4px;
 }
 
 .diceRow{
@@ -112,7 +112,7 @@ table.mountain td {
   display:inline;
   font-size: 20pt;
   position: relative;
-  margin: -7px;
+  margin: -8px;
   text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black, .5px .5px 5px #dddddd;
 }
 
@@ -146,18 +146,21 @@ table.mountain td {
 }
 
 .upperSection {
-  display: inline-block;
+  display: flex;
   width: 100%;
 }
 
 .upperLeft {
-  float: left;
+  flex:1;
+}
+.upperRight {
+  flex:1;
+  display: flex;
+  align-items : center;
 }
 
 .upperCenter {
-  float:left;
-  /* To center the dice */
-  margin-left: 137px;
+  padding: 8px;
 }
 
 .playerBanner {
@@ -165,5 +168,5 @@ table.mountain td {
 }
 
 /* * { */
-/*   border: 1px solid red; */
+  /* border: 1px solid red; */
 /* } */

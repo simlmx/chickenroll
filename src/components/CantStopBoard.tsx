@@ -3,6 +3,7 @@ import React from "react";
 import { DiceBoard } from "./DiceBoard";
 import { Mountain } from "./Mountain";
 import { ScoreBoard } from "./ScoreBoard";
+import MoveButtons from "./MoveButtons";
 
 export class CantStopBoard extends React.Component<any> {
   render() {
@@ -14,6 +15,8 @@ export class CantStopBoard extends React.Component<any> {
     const playerBannerOpts = {
       className: `playerBanner bgcolor${this.props.playerID}`,
     };
+    const itsMe = this.props.playerID === this.props.ctx.currentPlayer;
+
     return (
       <div className="cantStopBoard">
         <div {...infoOpts} role="alert">
@@ -25,12 +28,12 @@ export class CantStopBoard extends React.Component<any> {
             <ScoreBoard scores={this.props.G.scores} />
           </div>
           <div className="upperCenter">
-            <DiceBoard
-              G={this.props.G}
-              moves={this.props.moves}
-              ctx={this.props.ctx}
-              playerID={this.props.playerID}
-            />
+            <DiceBoard diceValues={this.props.G.diceValues} />
+          </div>
+          <div className="upperRight">
+            {itsMe ? (
+              <MoveButtons moves={this.props.moves} ctx={this.props.ctx} G={this.props.G} />
+            ) : null}
           </div>
         </div>
         <div>

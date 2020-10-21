@@ -6,15 +6,17 @@ import { Local } from "boardgame.io/multiplayer";
 
 const CantStopClient = Client({
   game: CantStop,
-  numPlayers: 2,
+  numPlayers: 3,
   board: CantStopBoard,
   multiplayer: Local(),
+  debug: false,
 });
 
 const App = () => (
   <div className="clients">
     <CantStopClient playerID="0" />
     <CantStopClient playerID="1" />
+    <CantStopClient playerID="2" />
   </div>
 );
 
