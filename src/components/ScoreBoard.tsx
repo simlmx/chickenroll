@@ -22,9 +22,7 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
                 </td>
               );
             } else {
-              return (
-                <td key={i}></td>
-              );
+              return <td key={i}></td>;
             }
           });
         return <tr key={playerID}>{tds}</tr>;

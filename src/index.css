@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   /* font-size: 18pt; */
   -webkit-font-smoothing: antialiased;
@@ -9,7 +9,7 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -23,8 +23,8 @@ button {
   color: #222222;
   background-color: lightgrey;
 
-  display : flex;
-  align-items : center;
+  display: flex;
+  align-items: center;
   justify-content: center;
 
   font-size: 16pt;
@@ -35,16 +35,15 @@ button {
   margin: 4px;
 }
 
-.diceRow{
-  display : flex;
-  align-items : center;
+.diceRow {
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
 .sums {
   margin: 2px;
   word-spacing: 10px;
-
 }
 
 table.mountain {
@@ -63,8 +62,8 @@ table.mountain td {
 
 .diceBoard {
   text-align: center;
-  display:flex;
-  align-items : center;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
@@ -109,11 +108,12 @@ table.mountain td {
 }
 
 .climber {
-  display:inline;
+  display: inline;
   font-size: 20pt;
   position: relative;
   margin: -8px;
-  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black, .5px .5px 5px #dddddd;
+  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black,
+    0.5px 0.5px 5px #dddddd;
 }
 
 .scoreBoardPlayer {
@@ -138,7 +138,7 @@ table.mountain td {
 }
 
 .clients {
-  display:flex;
+  display: flex;
 }
 
 .cantStopBoard {
@@ -151,12 +151,12 @@ table.mountain td {
 }
 
 .upperLeft {
-  flex:1;
+  flex: 1;
 }
 .upperRight {
-  flex:1;
+  flex: 1;
   display: flex;
-  align-items : center;
+  align-items: center;
 }
 
 .upperCenter {
@@ -168,5 +168,5 @@ table.mountain td {
 }
 
 /* * { */
-  /* border: 1px solid red; */
+/* border: 1px solid red; */
 /* } */

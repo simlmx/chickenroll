@@ -30,7 +30,12 @@ export class CantStopBoard extends React.Component<any> {
             <DiceBoard diceValues={this.props.G.diceValues} />
           </div>
           <div className="upperRight">
-            <MoveButtons moves={this.props.moves} ctx={this.props.ctx} G={this.props.G} playerID={this.props.playerID}/>
+            <MoveButtons
+              moves={this.props.moves}
+              ctx={this.props.ctx}
+              G={this.props.G}
+              playerID={this.props.playerID}
+            />
           </div>
         </div>
         <div>

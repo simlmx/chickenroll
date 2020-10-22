@@ -5,4 +5,4 @@ const server = Server({
   games: [CantStop],
 });
 
-server.run(8000);//, () => console.log("server running..."));
+server.run(8000); //, () => console.log("server running..."));

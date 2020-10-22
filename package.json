@@ -24,7 +24,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "serve": "yarn run tsc --project tsconfig-server.json && node -r esm build-server/server.js"
+    "serve": "yarn run tsc --project tsconfig-server.json && node -r esm build-server/server.js",
+    "clean": "yarn run prettier -w src *.json"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -36,7 +36,9 @@ export function getSumOptions(
   // How many space left for each current climber.
   let currentClimberSpace = new Map<number, number>();
 
-  let updatedBlockedSums = new Set(Object.keys(blockedSums).map((x) => parseInt(x)));
+  let updatedBlockedSums = new Set(
+    Object.keys(blockedSums).map((x) => parseInt(x))
+  );
 
   Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
     const diceSum = parseInt(diceSumStr);
@@ -113,7 +115,11 @@ export function getSumOptions(
       // at the same time*.
       // This happens when we have only one climber left, and if the two sums are new
       // sums that we are not already climbing.
-      if (numClimbersLeft === 1 && !climbingAtLeastOne && availableDiceSums.length > 0) {
+      if (
+        numClimbersLeft === 1 &&
+        !climbingAtLeastOne &&
+        availableDiceSums.length > 0
+      ) {
         return availableDiceSums.map((x): number[] => [x]);
       } else {
         return [availableDiceSums];
