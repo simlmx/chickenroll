@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Die } from "./Dice";
+import { Die } from "./Die";
 
 /* The 4 dice in a 2x2 square */
 class Dice extends React.Component<{ diceValues: number[] }> {
