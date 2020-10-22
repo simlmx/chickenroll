@@ -46,17 +46,15 @@ button {
   word-spacing: 10px;
 }
 
-table.mountain {
+.mountain {
   width: auto;
-  /* margin: 0px auto; */
   padding: 0px;
   font-size: 16pt;
 }
 
-table.mountain td {
-  width: 45px;
-  margin: 0;
-  padding: 0;
+.mountainCol {
+  min-width: 40px;
+  padding: 0px !important;
   text-align: center;
 }
 
@@ -107,15 +105,6 @@ table.mountain td {
   background-color: #cc79a7;
 }
 
-.climber {
-  display: inline;
-  font-size: 20pt;
-  position: relative;
-  margin: -8px;
-  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black,
-    0.5px 0.5px 5px #dddddd;
-}
-
 .scoreBoardPlayer {
   text-shadow: 1px 1px 2px #00000088, 0.5px 0.5px 1px #00000088;
   font-size: 15pt;
@@ -127,10 +116,18 @@ table.mountain td {
   margin: 0px;
 }
 
+.climber {
+  display: inline;
+  font-size: 20pt;
+  margin: -8px;
+  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black,
+    0.5px 0.5px 5px #dddddd;
+}
+
 .climberGroup {
   position: relative;
   height: 0px;
-  top: -38px;
+  top: -37px;
 }
 
 .info {

@@ -33,7 +33,7 @@ const CantStop = {
        * 3 == end spot for diceSum=2
        */
       diceValues: [1, 2, 3, 4],
-      // State of the 3 current climbers.
+      // State of the 3 current climbers. diceSum -> position.
       currentPositions: {},
       checkpointPositions,
       diceSumOptions: null,

@@ -1,6 +1,10 @@
 import React from "react";
 import { sumSteps } from "../math";
 
+const Climber = (props) => {
+  return <div className="climber">●</div>;
+};
+
 interface MountainProps {
   currentPositions: { [key: number]: number };
   checkpointPositions: object;
@@ -19,6 +23,8 @@ export class Mountain extends React.Component<MountainProps> {
         const currentIsThere = this.props.currentPositions[col] === row;
         const blockedBy = this.props.blockedSums[col];
 
+        let climbers: JSX.Element[] = [];
+
         if (row === 0) {
           // Below row 0 we write the dice sum.
           const opts = { className: "badge badge-dark" };
@@ -35,7 +41,6 @@ export class Mountain extends React.Component<MountainProps> {
           if (blockedBy != null) {
             opts.className += ` bgcolor${blockedBy}`;
           }
-
           content = (
             <div {...opts} key={0}>
               ★
@@ -49,11 +54,17 @@ export class Mountain extends React.Component<MountainProps> {
               ○
             </div>
           );
+        } else if ([13, 12, 11].includes(row) && col === 2) {
+          // We place the left climbers in the top left of the table.
+          const numClimbersLeft =
+            3 - Object.keys(this.props.currentPositions).length;
+          content = <div key={0}> ○ </div>;
+          if (row >= 14 - numClimbersLeft) {
+            climbers.push(<Climber key={-1} />);
+          }
         } else {
           content = "";
         }
-
-        let climbers: JSX.Element[] = [];
 
         // It's not efficient to do this every time by... javascript :shrug:
         Object.entries(this.props.checkpointPositions).forEach(
@@ -72,11 +83,7 @@ export class Mountain extends React.Component<MountainProps> {
         );
 
         if (currentIsThere) {
-          climbers.push(
-            <div className="climber" key={-1}>
-              ●
-            </div>
-          );
+          climbers.push(<Climber key={-1} />);
         }
 
         if (climbers.length > 0) {
