@@ -4,7 +4,7 @@ import CantStop from "./Game";
 import { CantStopBoard } from "./components/CantStopBoard";
 import { Local } from "boardgame.io/multiplayer";
 
-const numPlayers = 2;
+const numPlayers = 3;
 
 const CantStopClient = Client({
   game: CantStop,

@@ -15,7 +15,6 @@ export class CantStopBoard extends React.Component<any> {
     const playerBannerOpts = {
       className: `playerBanner bgcolor${this.props.playerID}`,
     };
-    const itsMe = this.props.playerID === this.props.ctx.currentPlayer;
 
     return (
       <div className="cantStopBoard">
@@ -31,9 +30,7 @@ export class CantStopBoard extends React.Component<any> {
             <DiceBoard diceValues={this.props.G.diceValues} />
           </div>
           <div className="upperRight">
-            {itsMe ? (
-              <MoveButtons moves={this.props.moves} ctx={this.props.ctx} G={this.props.G} />
-            ) : null}
+            <MoveButtons moves={this.props.moves} ctx={this.props.ctx} G={this.props.G} playerID={this.props.playerID}/>
           </div>
         </div>
         <div>

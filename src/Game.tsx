@@ -10,7 +10,8 @@ export interface GameType {
   diceValues: number[];
   currentPositions: { [key: number]: number };
   checkpointPositions: { [key: number]: { [key: number]: number } };
-  diceSumOptions: number[][][];
+  diceSumOptions: null | number[][][];
+  lastPickedDiceSumOption: null | number[];
   blockedSums: { [key: number]: number };
   info: Info | null;
   scores: { [key: number]: number };
@@ -35,7 +36,8 @@ const CantStop = {
       // State of the 3 current climbers.
       currentPositions: {},
       checkpointPositions,
-      diceSumOptions: [[[]], [[]], [[]]],
+      diceSumOptions: null,
+      lastPickedDiceSumOption: null,
       blockedSums: {},
       info: { message: "Good game!", level: "success" },
       scores,
@@ -58,6 +60,7 @@ const CantStop = {
             // After a roll we remove how the last player finished.
             G.info = null;
             G.diceValues = ctx.random.Die(6, 4);
+            G.lastPickedDiceSumOption = null;
             G.diceSumOptions = getSumOptions(
               G.diceValues,
               G.currentPositions,
@@ -75,6 +78,8 @@ const CantStop = {
             ctx.events.endStage();
           },
           stop: (G: GameType, ctx) => {
+            G.lastPickedDiceSumOption = null;
+            G.diceSumOptions = null;
             // Save current positions as checkpoints.
             Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
               const diceSum = parseInt(diceSumStr);
@@ -110,7 +115,12 @@ const CantStop = {
       moving: {
         moves: {
           pickSumOption: (G: GameType, ctx, i, j) => {
+            // Should not happen but makes typescript happy.
+            if (G.diceSumOptions == null) {
+              throw new Error("assert false");
+            }
             const sumOption = G.diceSumOptions[i][j];
+            G.lastPickedDiceSumOption = [i, j];
             sumOption.forEach((s) => {
               if (G.currentPositions.hasOwnProperty(s)) {
                 G.currentPositions[s]++;
