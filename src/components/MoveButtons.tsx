@@ -8,14 +8,17 @@ class ActionButtons extends React.Component<{ moves: any }> {
       <div>
         <div>
           <button
-            onClick={this.props.moves.rollDice}
+            onClick={() => this.props.moves.rollDice()}
             className="btn btn-success"
           >
             Roll
           </button>
         </div>
         <div>
-          <button onClick={this.props.moves.stop} className="btn btn-success">
+          <button
+            onClick={() => this.props.moves.stop()}
+            className="btn btn-success"
+          >
             Stop
           </button>
         </div>
