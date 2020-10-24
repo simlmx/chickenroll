@@ -22,7 +22,7 @@
     "_comment": "The first start and startLocal targets are very hacky!!",
     "start": "cp src/index.nonlocal.tsx src/index.tsx && react-scripts start",
     "startLocal": "cp src/index.local.tsx src/index.tsx && react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && yarn run tsc --project tsconfig-server.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "serve": "yarn run tsc --project tsconfig-server.json && node -r esm build-server/server.js",
