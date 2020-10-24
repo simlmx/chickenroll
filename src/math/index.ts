@@ -1,3 +1,5 @@
+import { DiceSum } from "../types";
+
 export const DICE_INDICES = [
   [
     [0, 1],
@@ -22,11 +24,11 @@ export const DICE_INDICES = [
  * - 3 or 7
  */
 export function getSumOptions(
-  diceValues: number[],
-  currentPositions: { [key: number]: number },
+  diceValues: DiceSum[],
+  currentPositions: { [key: string]: number },
   checkpointPositions: { [key: number]: number },
-  blockedSums: { [key: number]: number }
-): number[][][] {
+  blockedSums: { [key: number]: string }
+): DiceSum[][][] {
   if (diceValues.length !== 4) {
     throw new Error("Should have 4 values");
   }
@@ -34,7 +36,7 @@ export function getSumOptions(
   const numClimbersLeft = 3 - Object.keys(currentPositions).length;
 
   // How many space left for each current climber.
-  let currentClimberSpace = new Map<number, number>();
+  let currentClimberSpace = new Map<DiceSum, number>();
 
   let updatedBlockedSums = new Set(
     Object.keys(blockedSums).map((x) => parseInt(x))
@@ -54,11 +56,13 @@ export function getSumOptions(
   });
 
   // First compute all the dice sums.
-  const allDiceSums = DICE_INDICES.map((group): number[][] => {
+  const allDiceSums = DICE_INDICES.map((group): DiceSum[][] => {
     // Compute the 2 sums.
-    let diceSums = group.map((twoDiceIndices): number => {
-      return twoDiceIndices.map((i) => diceValues[i]).reduce((a, b) => a + b);
-    });
+    let diceSums = group.map(
+      (twoDiceIndices): DiceSum => {
+        return twoDiceIndices.map((i) => diceValues[i]).reduce((a, b) => a + b);
+      }
+    );
 
     if (diceSums[0] === diceSums[1]) {
       // If both of the sums are the same.
@@ -93,7 +97,7 @@ export function getSumOptions(
       }
     } else {
       // Both sums are different.
-      let availableDiceSums: number[] = [];
+      let availableDiceSums: DiceSum[] = [];
       let climbingAtLeastOne = false;
 
       diceSums.forEach((diceSum) => {
@@ -120,7 +124,7 @@ export function getSumOptions(
         !climbingAtLeastOne &&
         availableDiceSums.length > 0
       ) {
-        return availableDiceSums.map((x): number[] => [x]);
+        return availableDiceSums.map((x: DiceSum): DiceSum[] => [x]);
       } else {
         return [availableDiceSums];
       }

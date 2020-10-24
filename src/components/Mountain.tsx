@@ -1,7 +1,8 @@
 import React from "react";
 import { sumSteps } from "../math";
+import { PlayerID } from "../types";
 
-const Climber = (props: { playerID?: string }) => {
+const Climber = (props: { playerID?: PlayerID }) => {
   const opts = { className: "climber" };
   if (props.playerID != null) {
     opts.className += ` color${props.playerID}`;
@@ -9,10 +10,18 @@ const Climber = (props: { playerID?: string }) => {
   return <div {...opts}>⬤ </div>;
 };
 
+const ClimberPlaceholder = (props: { playerID?: PlayerID }) => {
+  const opts = { className: "climberPlaceholder" };
+  if (props.playerID != null) {
+    opts.className += `color${props.playerID}`;
+  }
+  return <div {...opts}>〇</div>;
+};
+
 interface MountainProps {
   currentPositions: { [key: number]: number };
   checkpointPositions: object;
-  blockedSums: { [key: number]: number };
+  blockedSums: { [key: number]: string };
 }
 
 export class Mountain extends React.Component<MountainProps> {
@@ -46,15 +55,16 @@ export class Mountain extends React.Component<MountainProps> {
             opts.className += ` color${blockedBy}`;
           }
           content = (
-            <div {...opts} key={0}>
-              ◯
-            </div>
+            <ClimberPlaceholder
+              playerID={blockedBy == null ? undefined : blockedBy}
+              key={0}
+            />
           );
         } else if ([13, 12, 11].includes(row) && col === 2) {
           // We place the left climbers in the top left of the table.
           const numClimbersLeft =
             3 - Object.keys(this.props.currentPositions).length;
-          content = <div key={0}> ○ </div>;
+          content = <ClimberPlaceholder key={0} />;
           if (row >= 14 - numClimbersLeft) {
             climbers.push(<Climber key={-1} />);
           }

@@ -1,5 +1,6 @@
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, sumSteps } from "./math";
+import { DiceSum } from "./types";
 
 interface Info {
   message: string;
@@ -11,10 +12,10 @@ type GameMode = "pass-and-play" | "remote";
 export interface GameType {
   diceValues: number[];
   currentPositions: { [key: number]: number };
-  checkpointPositions: { [key: number]: { [key: number]: number } };
-  diceSumOptions: null | number[][][];
+  checkpointPositions: { [key: string]: { [key: number]: number } };
+  diceSumOptions: null | DiceSum[][][];
   lastPickedDiceSumOption: null | number[];
-  blockedSums: { [key: number]: number };
+  blockedSums: { [key: number]: string };
   info: Info | null;
   scores: { [key: number]: number };
   // Game mode without the need of a server.
@@ -48,10 +49,12 @@ const CantStop = {
       scores[i] = 0;
       checkpointPositions[i] = {};
     }
+    //Those are for quick debugging
     /*
-    checkpointPositions["0"] = { 7: 1 };
-    checkpointPositions["1"] = { 7: 1 };
-    checkpointPositions["2"] = { 7: 1 };
+    checkpointPositions["0"] = { 7: 1, 8:1 };
+    checkpointPositions["1"] = { 7: 1, 8:1, 9:2 };
+    checkpointPositions["2"] = { 7: 1, 8:1, 9:2 };
+    checkpointPositions["3"] = { 7: 1, 8:1, 9:2 };
     */
     return {
       /*
@@ -109,7 +112,7 @@ const CantStop = {
               const diceSum = parseInt(diceSumStr);
               G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
               if (step === sumSteps(diceSum)) {
-                G.blockedSums[diceSum] = parseInt(ctx.currentPlayer);
+                G.blockedSums[diceSum] = ctx.currentPlayer;
                 G.scores[ctx.currentPlayer] += 1;
                 // Remove all the checkpoints for that one
                 for (let i = 0; i < ctx.numPlayers; ++i) {

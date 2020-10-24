@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: helvetica, sans-serif;
-  /* font-size: 18pt; */
+  font-size: 16pt;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -117,21 +117,27 @@ button {
 .climber {
   display: inline;
   font-size: 14pt;
-  margin: -10px;
   text-shadow: 1px 1px 2px black, 1px 1px 1px black, 1px 1px 1px #dddddd;
+  width: 7px;
 }
 
 .climberGroup {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+
   position: relative;
-  height: 0px;
   top: -34px;
+  left: -9px;
+  height: 0px;
 }
 
 .climberPlaceholder {
   font-weight: bold;
   font-size: 12pt;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 4pt;
+  padding-bottom: 3pt;
+  color: grey;
 }
 
 .colNumbers {
