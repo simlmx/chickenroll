@@ -111,7 +111,7 @@ button {
 }
 
 .scoreBoardPlayer {
-  text-shadow: 1px 1px 2px #00000088, 0.5px 0.5px 1px #00000088;
+  text-shadow: 1px 1px 2px #00000088, 1px 1px 1px #00000088;
   font-size: 15pt;
   width: 20px;
 }
@@ -125,8 +125,8 @@ button {
   display: inline;
   font-size: 20pt;
   margin: -8px;
-  text-shadow: 0.5px 0.5px 2px black, 0.5px 0.5px 1px black,
-    0.5px 0.5px 5px #dddddd;
+  text-shadow: 1px 1px 2px black, 1px 1px 1px black,
+    1px 1px 1px #dddddd;
 }
 
 .climberGroup {
