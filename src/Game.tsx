@@ -6,6 +6,8 @@ interface Info {
   level: "success" | "danger";
 }
 
+type GameMode = "pass-and-play" | "remote";
+
 export interface GameType {
   diceValues: number[];
   currentPositions: { [key: number]: number };
@@ -15,17 +17,42 @@ export interface GameType {
   blockedSums: { [key: number]: number };
   info: Info | null;
   scores: { [key: number]: number };
+  // Game mode without the need of a server.
+  passAndPlay: boolean;
 }
+
+export interface SetupDataType {
+  passAndPlay: boolean;
+}
+
+/*
+ * Go to a given stage but taking into account the passAndPlay mode.
+ */
+const gotoStage = (G: GameType, ctx, newStage: string): void => {
+  const activePlayers = G.passAndPlay
+    ? { all: newStage }
+    : { currentPlayer: newStage, others: Stage.NULL };
+  ctx.events.setActivePlayers(activePlayers);
+};
 
 const CantStop = {
   name: "cantstop",
-  setup(ctx): GameType {
+  setup(ctx, setupData: SetupDataType): GameType {
+    let passAndPlay = true;
+    if (setupData?.passAndPlay != null) {
+      passAndPlay = setupData.passAndPlay;
+    }
     const scores: { [key: number]: number } = {};
     const checkpointPositions = {};
     for (let i = 0; i < ctx.numPlayers; ++i) {
       scores[i] = 0;
       checkpointPositions[i] = {};
     }
+    /*
+    checkpointPositions["0"] = { 7: 1 };
+    checkpointPositions["1"] = { 7: 1 };
+    checkpointPositions["2"] = { 7: 1 };
+    */
     return {
       /*
        * Rows are 1-indexed. This means that
@@ -42,17 +69,13 @@ const CantStop = {
       blockedSums: {},
       info: { message: "Good game!", level: "success" },
       scores,
+      passAndPlay,
     };
   },
   turn: {
     onBegin: (G: GameType, ctx) => {
       G.currentPositions = {};
-      // At the beginning of the turn, the current player is in `rolling` mode. All
-      // other players can't play.
-      ctx.events.setActivePlayers({
-        currentPlayer: "rolling",
-        others: Stage.NULL,
-      });
+      gotoStage(G, ctx, "rolling");
     },
     stages: {
       rolling: {
@@ -76,7 +99,7 @@ const CantStop = {
               G.info = { message: "Busted!", level: "danger" };
               ctx.events.endTurn();
             }
-            ctx.events.endStage();
+            gotoStage(G, ctx, "moving");
           },
           stop: (G: GameType, ctx) => {
             G.lastPickedDiceSumOption = null;
@@ -110,8 +133,6 @@ const CantStop = {
             }
           },
         },
-        next: "moving",
-        start: true,
       },
       moving: {
         moves: {
@@ -131,10 +152,9 @@ const CantStop = {
                 G.currentPositions[s] = checkpoint + 1;
               }
             });
-            ctx.events.endStage();
+            gotoStage(G, ctx, "rolling");
           },
         },
-        next: "rolling",
       },
     },
   },

@@ -3,7 +3,7 @@ import CantStop from "./Game";
 import { CantStopBoard } from "./components/CantStopBoard";
 import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
-import { SocketIO } from "boardgame.io/multiplayer";
+import { SocketIO, Local } from "boardgame.io/multiplayer";
 
 const { protocol, hostname, port } = window.location;
 
@@ -19,6 +19,7 @@ const CantStopClient = Client({
   debug: false,
 });
 
+/*
 class Choices extends React.Component<{ setId: any }> {
   render() {
     return (
@@ -55,9 +56,14 @@ class Choices extends React.Component<{ setId: any }> {
     );
   }
 }
+*/
 
 class MainMenu extends React.Component<
-  { onCreate: () => void; onJoin: (string) => void },
+  {
+    onCreate: () => void;
+    onJoin: (string) => void;
+    onCreatePassAndPlay: () => void;
+  },
   { matchID: string }
 > {
   constructor(props) {
@@ -70,14 +76,21 @@ class MainMenu extends React.Component<
     return (
       <div>
         <div>
-          <button onClick={() => this.props.onCreate()}>Create a game</button>
+          <button onClick={() => this.props.onCreatePassAndPlay()}>
+            Create a pass-and-play match
+          </button>
+        </div>
+        <div>
+          <button onClick={() => this.props.onCreate()}>
+            Create a new match
+          </button>
         </div>
         <div>
           <input
             onChange={(event) => this.setState({ matchID: event.target.value })}
           />
           <button onClick={() => this.props.onJoin(this.state.matchID)}>
-            Join a game
+            Join a match
           </button>
         </div>
       </div>
@@ -95,6 +108,7 @@ interface AppState {
     playerCredentials: string;
     playerID: string;
   };
+  passAndPlay: boolean;
 }
 
 class App extends React.Component<{}, AppState> {
@@ -104,6 +118,7 @@ class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       playerName: "",
+      passAndPlay: false,
     };
     this.client = new LobbyClient({ server: SERVER });
   }
@@ -128,9 +143,16 @@ class App extends React.Component<{}, AppState> {
       // This is the maximum number of players. We will adjust the turns if less players
       // join.
       numPlayers,
+      setupData: {
+        passAndPlay: false,
+      },
     });
     await this.joinMatch(matchID);
     this.refreshMatches();
+  }
+
+  createPassAndPlayMatch() {
+    this.setState({ passAndPlay: true, currentMatch: undefined });
   }
 
   async joinMatch(matchID: string): Promise<void> {
@@ -174,7 +196,23 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    if (this.state.currentMatch == null) {
+    if (this.state.passAndPlay) {
+      const CantStopClient = Client({
+        game: CantStop,
+        numPlayers,
+        board: CantStopBoard,
+        multiplayer: Local(),
+        debug: false,
+      });
+
+      return (
+        <div>
+          {/* We use playerID=0 but we will let all the players play for everyone,
+            because we are assuming players are passing the device around */}
+          <CantStopClient playerID="0" />
+        </div>
+      );
+    } else if (this.state.currentMatch == null) {
       return (
         <div>
           <div>
@@ -184,6 +222,7 @@ class App extends React.Component<{}, AppState> {
           </div>
           <MainMenu
             onCreate={() => this.createMatch()}
+            onCreatePassAndPlay={() => this.createPassAndPlayMatch()}
             onJoin={(matchID: string) => this.joinMatch(matchID)}
           />
         </div>
@@ -200,7 +239,7 @@ class App extends React.Component<{}, AppState> {
             matchID={matchID}
             credentials={playerCredentials}
           />
-          <button
+          {/*<button
             onClick={() => {
               this.client.leaveMatch("cantstop", matchID, {
                 playerID,
@@ -209,23 +248,11 @@ class App extends React.Component<{}, AppState> {
             }}
           >
             Leave Match
-          </button>
+            </button>*/}
         </div>
       );
     }
   }
 }
-
-/*
-    if (this.state.choice == null) {
-      return <Choices setId={(id) => this.setState({ choice: id })} />;
-    } else {
-      return (
-        <div className="clients">
-          <CantStopClient playerID={this.state.choice} />
-        </div>
-      );
-    }
-    */
 
 export default App;

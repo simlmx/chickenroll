@@ -8,12 +8,15 @@ import MoveButtons from "./MoveButtons";
 export class CantStopBoard extends React.Component<any> {
   render() {
     const info = this.props.G.info;
+    const playerID = this.props.G.passAndPlay
+      ? this.props.ctx.currentPlayer
+      : this.props.playerID;
     const { level, message } = info || { message: "", level: "white" };
     const infoOpts = {
       className: `alert alert-${level} text-center info`,
     };
     const playerBannerOpts = {
-      className: `playerBanner bgcolor${this.props.playerID}`,
+      className: `playerBanner bgcolor${playerID}`,
     };
 
     return (
@@ -34,7 +37,7 @@ export class CantStopBoard extends React.Component<any> {
               moves={this.props.moves}
               ctx={this.props.ctx}
               G={this.props.G}
-              playerID={this.props.playerID}
+              playerID={playerID}
             />
           </div>
         </div>

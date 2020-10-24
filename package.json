@@ -19,7 +19,7 @@
     "typescript": "~3.8"
   },
   "scripts": {
-    "_start": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build && yarn run tsc --project tsconfig-server.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
