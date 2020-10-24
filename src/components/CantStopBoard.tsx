@@ -38,7 +38,7 @@ export class CantStopBoard extends React.Component<any> {
             />
           </div>
         </div>
-        <div className='mountainContainer'>
+        <div className="mountainContainer">
           <Mountain
             checkpointPositions={this.props.G.checkpointPositions}
             currentPositions={this.props.G.currentPositions}

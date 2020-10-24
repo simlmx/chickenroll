@@ -2,13 +2,11 @@ import React from "react";
 import CantStop from "./Game";
 import { CantStopBoard } from "./components/CantStopBoard";
 import { LobbyClient } from "boardgame.io/client";
-import { LobbyAPI } from "boardgame.io";
 import { Client } from "boardgame.io/react";
 import { SocketIO } from "boardgame.io/multiplayer";
 
 const { protocol, hostname, port } = window.location;
 
-console.log(port);
 const SERVER = `${protocol}//${hostname}:${port}`;
 
 const numPlayers = 2;
@@ -135,9 +133,7 @@ class App extends React.Component<{}, AppState> {
     this.refreshMatches();
   }
 
-  async joinMatch(
-    matchID: string
-  ): Promise<void> {
+  async joinMatch(matchID: string): Promise<void> {
     // Get the game to know how many players have joined already.
     let match;
     try {
@@ -193,20 +189,22 @@ class App extends React.Component<{}, AppState> {
         </div>
       );
     } else {
-      const matchID = this.state.currentMatch.matchID;
-      const playerID = this.state.currentMatch.playerID;
-      const credentials = this.state.currentMatch.playerCredentials;
+      const { matchID, playerID, playerCredentials } = this.state.currentMatch;
       return (
         <div>
           <div> Match code: {matchID}</div>
           <div> player ID: {playerID}</div>
           {/* TODO add some "are you sure?" */}
-          <CantStopClient playerID={playerID}/>
+          <CantStopClient
+            playerID={playerID}
+            matchID={matchID}
+            credentials={playerCredentials}
+          />
           <button
             onClick={() => {
               this.client.leaveMatch("cantstop", matchID, {
                 playerID,
-                credentials,
+                credentials: playerCredentials,
               });
             }}
           >
@@ -229,4 +227,5 @@ class App extends React.Component<{}, AppState> {
       );
     }
     */
+
 export default App;
