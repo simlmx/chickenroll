@@ -9,6 +9,7 @@ const { protocol, hostname, port } = window.location;
 
 const SERVER = `${protocol}//${hostname}:${port}`;
 
+const MAX_PLAYERS = 4;
 const numPlayers = 2;
 
 const CantStopClient = Client({
@@ -62,7 +63,7 @@ class MainMenu extends React.Component<
   {
     onCreate: () => void;
     onJoin: (string) => void;
-    onCreatePassAndPlay: () => void;
+    onCreatePassAndPlay: (number) => void;
   },
   { matchID: string }
 > {
@@ -75,21 +76,39 @@ class MainMenu extends React.Component<
   render() {
     return (
       <div>
+        <h1>Play on one device</h1>
         <div>
-          <button onClick={() => this.props.onCreatePassAndPlay()}>
-            Create a pass-and-play match
-          </button>
+          Choose the number of players:
+          {Array(MAX_PLAYERS)
+            .fill(null)
+            .map((_, i) => (
+              <button
+                className="btn btn-primary"
+                onClick={() => this.props.onCreatePassAndPlay(i + 1)}
+                key={i}
+              >
+                {i + 1}
+              </button>
+            ))}
         </div>
+        <h1> Play over the internet </h1>
         <div>
-          <button onClick={() => this.props.onCreate()}>
+          <button
+            className="btn btn-primary"
+            onClick={() => this.props.onCreate()}
+          >
             Create a new match
           </button>
         </div>
         <div>
           <input
             onChange={(event) => this.setState({ matchID: event.target.value })}
+            placeholder="Enter the code here"
           />
-          <button onClick={() => this.props.onJoin(this.state.matchID)}>
+          <button
+            className="btn btn-primary"
+            onClick={() => this.props.onJoin(this.state.matchID)}
+          >
             Join a match
           </button>
         </div>
@@ -109,6 +128,7 @@ interface AppState {
     playerID: string;
   };
   passAndPlay: boolean;
+  passAndPlayerNumPlayers: number;
 }
 
 class App extends React.Component<{}, AppState> {
@@ -119,6 +139,7 @@ class App extends React.Component<{}, AppState> {
     this.state = {
       playerName: "",
       passAndPlay: false,
+      passAndPlayerNumPlayers: 3,
     };
     this.client = new LobbyClient({ server: SERVER });
   }
@@ -151,8 +172,12 @@ class App extends React.Component<{}, AppState> {
     this.refreshMatches();
   }
 
-  createPassAndPlayMatch() {
-    this.setState({ passAndPlay: true, currentMatch: undefined });
+  createPassAndPlayMatch(numPlayers: number) {
+    this.setState({
+      passAndPlay: true,
+      passAndPlayerNumPlayers: numPlayers,
+      currentMatch: undefined,
+    });
   }
 
   async joinMatch(matchID: string): Promise<void> {
@@ -199,7 +224,7 @@ class App extends React.Component<{}, AppState> {
     if (this.state.passAndPlay) {
       const CantStopClient = Client({
         game: CantStop,
-        numPlayers,
+        numPlayers: this.state.passAndPlayerNumPlayers,
         board: CantStopBoard,
         multiplayer: Local(),
         debug: false,
@@ -217,12 +242,14 @@ class App extends React.Component<{}, AppState> {
         <div>
           <div>
             {this.state.matches == null
-              ? "Loading..."
+              ? ""
               : `There are ${this.state.matches.length} games.`}
           </div>
           <MainMenu
             onCreate={() => this.createMatch()}
-            onCreatePassAndPlay={() => this.createPassAndPlayMatch()}
+            onCreatePassAndPlay={(numPlayers) =>
+              this.createPassAndPlayMatch(numPlayers)
+            }
             onJoin={(matchID: string) => this.joinMatch(matchID)}
           />
         </div>
