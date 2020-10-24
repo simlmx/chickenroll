@@ -10,15 +10,6 @@ const { protocol, hostname, port } = window.location;
 const SERVER = `${protocol}//${hostname}:${port}`;
 
 const MAX_PLAYERS = 4;
-const numPlayers = 2;
-
-const CantStopClient = Client({
-  game: CantStop,
-  numPlayers,
-  board: CantStopBoard,
-  multiplayer: SocketIO({ server: SERVER }),
-  debug: false,
-});
 
 /*
 class Choices extends React.Component<{ setId: any }> {
@@ -120,14 +111,13 @@ class MainMenu extends React.Component<
 interface AppState {
   choice?: string;
   playerName: string;
-  matches?: any[];
   // Current joined match
   currentMatch?: {
     matchID: string;
     playerCredentials: string;
     playerID: string;
   };
-  passAndPlay: boolean;
+  passAndPlayMatch?: any;
   passAndPlayerNumPlayers: number;
 }
 
@@ -138,44 +128,34 @@ class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       playerName: "",
-      passAndPlay: false,
       passAndPlayerNumPlayers: 3,
     };
     this.client = new LobbyClient({ server: SERVER });
-  }
-
-  async refreshMatches(): Promise<void> {
-    const { matches } = await this.client.listMatches("cantstop");
-    this.setState({ matches });
-  }
-
-  componentDidMount() {
-    this.refreshMatches();
-    setInterval(async () => {
-      // TODO Just stop the interval when inside a game.
-      if (this.state.currentMatch != null) {
-        this.refreshMatches();
-      }
-    }, 2000);
   }
 
   async createMatch(): Promise<void> {
     const { matchID } = await this.client.createMatch("cantstop", {
       // This is the maximum number of players. We will adjust the turns if less players
       // join.
-      numPlayers,
+      numPlayers: MAX_PLAYERS,
       setupData: {
         passAndPlay: false,
       },
     });
     await this.joinMatch(matchID);
-    this.refreshMatches();
   }
 
   createPassAndPlayMatch(numPlayers: number) {
+    const CantStopClient = Client({
+      game: CantStop,
+      numPlayers: this.state.passAndPlayerNumPlayers,
+      board: CantStopBoard,
+      multiplayer: Local(),
+      debug: false,
+    });
+
     this.setState({
-      passAndPlay: true,
-      passAndPlayerNumPlayers: numPlayers,
+      passAndPlayMatch: CantStopClient,
       currentMatch: undefined,
     });
   }
@@ -217,44 +197,52 @@ class App extends React.Component<{}, AppState> {
 
     // If we get here it means we successfully joined the match.
     const { playerCredentials } = resp;
-    this.setState({ currentMatch: { matchID, playerCredentials, playerID } });
+    this.setState({
+      currentMatch: { matchID, playerCredentials, playerID },
+      passAndPlayMatch: undefined,
+    });
   }
 
   render() {
-    if (this.state.passAndPlay) {
-      const CantStopClient = Client({
-        game: CantStop,
-        numPlayers: this.state.passAndPlayerNumPlayers,
-        board: CantStopBoard,
-        multiplayer: Local(),
-        debug: false,
-      });
-
+    if (this.state.passAndPlayMatch != null) {
       return (
         <div>
           {/* We use playerID=0 but we will let all the players play for everyone,
             because we are assuming players are passing the device around */}
-          <CantStopClient playerID="0" />
+          <this.state.passAndPlayMatch playerID="0" />
+          <div className="quitMatchContainer">
+            <button
+              className="btn btn-danger"
+              onClick={() =>
+                this.setState({
+                  passAndPlayMatch: undefined,
+                })
+              }
+            >
+              Quit match
+            </button>
+          </div>
         </div>
       );
     } else if (this.state.currentMatch == null) {
       return (
-        <div>
-          <div>
-            {this.state.matches == null
-              ? ""
-              : `There are ${this.state.matches.length} games.`}
-          </div>
-          <MainMenu
-            onCreate={() => this.createMatch()}
-            onCreatePassAndPlay={(numPlayers) =>
-              this.createPassAndPlayMatch(numPlayers)
-            }
-            onJoin={(matchID: string) => this.joinMatch(matchID)}
-          />
-        </div>
+        <MainMenu
+          onCreate={() => this.createMatch()}
+          onCreatePassAndPlay={(numPlayers) =>
+            this.createPassAndPlayMatch(numPlayers)
+          }
+          onJoin={(matchID: string) => this.joinMatch(matchID)}
+        />
       );
     } else {
+      const CantStopClient = Client({
+        game: CantStop,
+        numPlayers: MAX_PLAYERS,
+        board: CantStopBoard,
+        multiplayer: SocketIO({ server: SERVER }),
+        debug: false,
+      });
+
       const { matchID, playerID, playerCredentials } = this.state.currentMatch;
       return (
         <div>

@@ -7,7 +7,7 @@ const Climber = (props: { playerID?: PlayerID }) => {
   if (props.playerID != null) {
     opts.className += ` color${props.playerID}`;
   }
-  return <div {...opts}>⬤ </div>;
+  return <div {...opts}>• </div>;
 };
 
 const ClimberPlaceholder = (props: { playerID?: PlayerID }) => {
@@ -15,7 +15,11 @@ const ClimberPlaceholder = (props: { playerID?: PlayerID }) => {
   if (props.playerID != null) {
     opts.className += `color${props.playerID}`;
   }
-  return <div {...opts}>〇</div>;
+  return (
+    <div className="climberPlaceholderWrap">
+      <div {...opts}>〇</div>
+    </div>
+  );
 };
 
 interface MountainProps {
@@ -89,12 +93,16 @@ export class Mountain extends React.Component<MountainProps> {
         }
 
         if (climbers.length > 0) {
-          content = [
-            content,
-            <div className="climberGroup" key={1}>
-              {climbers}
-            </div>,
-          ];
+          content = (
+            <div className="mountainCell">
+              <div className="climberGroupBackground">{content}</div>
+              <div className="climberGroup" key={1}>
+                {climbers}
+              </div>
+            </div>
+          );
+        } else {
+          content = <div className="mountainCell"> {content} </div>;
         }
 
         cols.push(

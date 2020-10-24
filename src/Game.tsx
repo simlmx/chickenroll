@@ -51,10 +51,10 @@ const CantStop = {
     }
     //Those are for quick debugging
     /*
-    checkpointPositions["0"] = { 7: 1, 8:1 };
-    checkpointPositions["1"] = { 7: 1, 8:1, 9:2 };
-    checkpointPositions["2"] = { 7: 1, 8:1, 9:2 };
-    checkpointPositions["3"] = { 7: 1, 8:1, 9:2 };
+    checkpointPositions["0"] = { 7: 1, 8: 1 };
+    checkpointPositions["1"] = { 7: 1, 8: 1, 9: 2 };
+    checkpointPositions["2"] = { 7: 1, 8: 1, 9: 2 };
+    checkpointPositions["3"] = { 7: 1, 8: 1, 9: 2 };
     */
     return {
       /*
