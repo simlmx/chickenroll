@@ -127,7 +127,7 @@ class App extends React.Component<{}, AppState> {
     const { matchID } = await this.client.createMatch("cantstop", {
       // This is the maximum number of players. We will adjust the turns if less players
       // join.
-      numPlayers: 4,
+      numPlayers,
     });
     await this.joinMatch(matchID);
     this.refreshMatches();
