@@ -1,0 +1,307 @@
+/*import React from "react";
+import { Client } from "boardgame.io/react";
+import CantStop from "./Game";
+import { CantStopBoard } from "./components/CantStopBoard";
+import { SocketIO } from "boardgame.io/multiplayer";*/
+
+import React from "react";
+import { Lobby } from "boardgame.io/react";
+import CantStop from "./Game";
+import { CantStopBoard } from "./components/CantStopBoard";
+
+const { protocol, hostname, port } = window.location;
+const server = `${protocol}//${hostname}:8000`;
+const importedGames = [{ game: CantStop, board: CantStopBoard }];
+
+
+const Match = (props) => {
+  return (
+    <div>
+      <div>match id: {props.matchID}</div>
+      {/*<div>game : {props.gameName}</div>
+      <div>Players: {Object.values(props.players)}</div>
+      <div>playerName: {props.playerName}</div>
+      <div>create At: {props.createdAt}</div>
+      <div>updated At: {props.updatedAt}</div>
+      */}
+    </div>
+  );
+};
+
+class CreateGame extends React.Component<
+  { onClick: any },
+  { numPlayers: number | null }
+> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      numPlayers: 2,
+    };
+  }
+
+  render() {
+    return (
+      <div>
+        <div>
+          Number of players:
+          {/*value={this.state.numPlayers || ""}*/}
+          <input
+            type="text"
+            onChange={(event) =>
+              this.setState({
+                numPlayers: event.target.value
+                  ? parseInt(event.target.value)
+                  : null,
+              })
+            }
+          />
+        </div>
+        {this.state.numPlayers != null && (
+          <button onClick={() => this.props.onClick(this.state.numPlayers)}>
+            Create Game
+          </button>
+        )}
+      </div>
+    );
+  }
+}
+
+type RunningMatch = {
+  app: any; //ReturnType<typeof Client>;
+  matchID: string;
+  playerID: string;
+  credentials?: string;
+};
+
+interface RendererArgs {
+  errorMsg: string;
+  // gameComponents: GameComponent[];
+  //matches: LobbyAPI.MatchList["matches"];
+  matches: any;
+  //phase: LobbyPhases;
+  phase: string;
+  playerName: string;
+  runningMatch?: RunningMatch;
+  handleEnterLobby: (playerName: string) => void;
+  handleExitLobby: () => Promise<void>;
+  handleCreateMatch: (gameName: string, numPlayers: number) => Promise<void>;
+  handleJoinMatch: (
+    gameName: string,
+    matchID: string,
+    playerID: string
+  ) => Promise<void>;
+  handleLeaveMatch: (gameName: string, matchID: string) => Promise<void>;
+  handleExitMatch: () => void;
+  handleRefreshMatches: () => Promise<void>;
+  //handleStartMatch: (gameName: string, matchOpts: MatchOpts) => void;
+}
+
+class MyLobby extends React.Component<
+  RendererArgs,
+  { gameId: string | null; playerId: string | null }
+> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      gameId: null,
+      playerId: null,
+    };
+  }
+
+  // rendu ici
+  // pourquoi on passe numPlayers avec start Game si elle a deja ete cree avec
+  // numPlauers aussi
+   numPlayers: number;
+   matchID: string;
+   playerID?: string;
+
+  startMatch() {
+    this.props.handleStartMatch('cantstop', {
+    });
+  }
+
+  render() {
+    //if (this.props.phase === "enter" || this.props.phase === "list") {
+    return (
+      <div>
+        <div>
+          <CreateGame
+            onClick={(numberPlayers: number) =>
+              this.props.handleCreateMatch("cantstop", numberPlayers)
+            }
+          />
+        </div>
+        <div>{this.props.playerName}</div>
+        <div>
+          {this.props.matches.map((x, i) => (
+            <Match key={i} {...x} />
+          ))}
+        </div>
+        <div>
+          GameId:
+          <input
+            onChange={(event) =>
+              this.setState({
+                gameId: event.target.value,
+              })
+            }
+          />
+          PlayerId:{" "}
+          <input
+            onChange={(event) =>
+              this.setState({
+                playerId: event.target.value,
+              })
+            }
+          />
+          {this.props.runningMatch && (
+            <runningMatch.app
+              matchID={runningMatch.matchID}
+              playerID={runningMatch.playerID}
+              credentials={runningMatch.credentials}
+            />
+          )}
+        </div>
+      </div>
+    );
+    // }
+  }
+}
+
+const renderer = (args: RendererArgs) => {
+  return <MyLobby {...args} />;
+};
+
+/*const renderer = (options) => {
+  return (
+    <div id="lobby-view" style={{ padding: 50 }}>
+      <div className={this._getPhaseVisibility(LobbyPhases.ENTER)}>
+        <LobbyLoginForm
+          key={playerName}
+          playerName={playerName}
+          onEnter={this._enterLobby}
+        />
+      </div>
+
+      <div className={this._getPhaseVisibility(LobbyPhases.LIST)}>
+        <p>Welcome, {playerName}</p>
+
+        <div className="phase-title" id="match-creation">
+          <span>Create a match:</span>
+          <LobbyCreateMatchForm
+            games={gameComponents}
+            createMatch={this._createMatch}
+          />
+        </div>
+        <p className="phase-title">Join a match:</p>
+        <div id="instances">
+          <table>
+            <tbody>
+              {this.renderMatches(this.connection.matches, playerName)}
+            </tbody>
+          </table>
+          <span className="error-msg">
+            {errorMsg}
+            <br />
+          </span>
+        </div>
+        <p className="phase-title">
+          Matches that become empty are automatically deleted.
+        </p>
+      </div>
+
+      <div className={this._getPhaseVisibility(LobbyPhases.PLAY)}>
+        {runningMatch && (
+          <runningMatch.app
+            matchID={runningMatch.matchID}
+            playerID={runningMatch.playerID}
+            credentials={runningMatch.credentials}
+          />
+        )}
+        <div className="buttons" id="match-exit">
+          <button onClick={this._exitMatch}>Exit match</button>
+        </div>
+      </div>
+
+      <div className="buttons" id="lobby-exit">
+        <button onClick={this._exitLobby}>Exit lobby</button>
+      </div>
+    </div>
+  );
+};
+*/
+export default () => (
+  <Lobby
+    gameServer={server}
+    lobbyServer={server}
+    gameComponents={importedGames}
+    renderer={renderer}
+  />
+);
+
+/*const numPlayers = 2;
+
+const CantStopClient = Client({
+  game: CantStop,
+  numPlayers: numPlayers,
+  board: CantStopBoard,
+  multiplayer: SocketIO({ server: "localhost:8000" }),
+  debug: false,
+});
+
+class Choices extends React.Component<{ setId: any }> {
+  render() {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => this.props.setId("0")}
+            className="btn bgcolor0"
+          >
+            0
+          </button>
+          <button
+            onClick={() => this.props.setId("1")}
+            className="btn bgcolor1"
+          >
+            1
+          </button>
+        </div>
+        <div>
+          <button
+            onClick={() => this.props.setId("2")}
+            className="btn bgcolor2"
+          >
+            2
+          </button>
+          <button
+            onClick={() => this.props.setId("3")}
+            className="btn bgcolor3"
+          >
+            3
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+class App extends React.Component<{}, { choice: string | null }> {
+  constructor(props) {
+    super(props);
+    this.state = { choice: null };
+  }
+  render() {
+    if (this.state.choice == null) {
+      return <Choices setId={(id) => this.setState({ choice: id })} />;
+    } else {
+      return (
+        <div className="clients">
+          <CantStopClient playerID={this.state.choice} />
+        </div>
+      );
+    }
+  }
+}
+export default App;
+*/

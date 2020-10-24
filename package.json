@@ -11,6 +11,7 @@
     "@types/react-dom": "^16.9.0",
     "boardgame.io": "^0.41.1",
     "esm": "^3.2.25",
+    "koa-static": "^5.0.0",
     "node-persist": "^3.1.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",

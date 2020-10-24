@@ -18,6 +18,7 @@ export interface GameType {
 }
 
 const CantStop = {
+  name:"cantstop",
   setup(ctx): GameType {
     const scores: { [key: number]: number } = {};
     const checkpointPositions = {};
