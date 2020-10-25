@@ -118,7 +118,6 @@ interface AppState {
     playerID: string;
   };
   passAndPlayMatch?: any;
-  passAndPlayerNumPlayers: number;
 }
 
 class App extends React.Component<{}, AppState> {
@@ -128,7 +127,6 @@ class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       playerName: "",
-      passAndPlayerNumPlayers: 3,
     };
     this.client = new LobbyClient({ server: SERVER });
   }
@@ -148,7 +146,7 @@ class App extends React.Component<{}, AppState> {
   createPassAndPlayMatch(numPlayers: number) {
     const CantStopClient = Client({
       game: CantStop,
-      numPlayers: this.state.passAndPlayerNumPlayers,
+      numPlayers: numPlayers,
       board: CantStopBoard,
       multiplayer: Local(),
       debug: false,
