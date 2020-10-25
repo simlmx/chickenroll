@@ -11,7 +11,6 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8000;
 
 // Build path relative to the server.js file
 const frontEndAppBuildPath = path.resolve(__dirname, "../build");
-console.log(frontEndAppBuildPath);
 server.app.use(serve(frontEndAppBuildPath));
 
 server.run(PORT, () => {

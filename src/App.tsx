@@ -4,6 +4,8 @@ import { CantStopBoard } from "./components/CantStopBoard";
 import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
 import { SocketIO, Local } from "boardgame.io/multiplayer";
+// import { Debug } from 'boardgame.io/debug';
+
 
 const { protocol, hostname, port } = window.location;
 
@@ -238,7 +240,7 @@ class App extends React.Component<{}, AppState> {
         numPlayers: MAX_PLAYERS,
         board: CantStopBoard,
         multiplayer: SocketIO({ server: SERVER }),
-        debug: false,
+        // debug: { impl: Debug },
       });
 
       const { matchID, playerID, playerCredentials } = this.state.currentMatch;

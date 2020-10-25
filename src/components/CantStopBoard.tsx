@@ -3,14 +3,27 @@ import React from "react";
 import { DiceBoard } from "./DiceBoard";
 import { Mountain } from "./Mountain";
 import { ScoreBoard } from "./ScoreBoard";
+import GameSetup from "./GameSetup";
 import MoveButtons from "./MoveButtons";
 
 export class CantStopBoard extends React.Component<any> {
   render() {
-    const info = this.props.G.info;
     const playerID = this.props.G.passAndPlay
       ? this.props.ctx.currentPlayer
       : this.props.playerID;
+    const phase = this.props.ctx.phase;
+
+    if (phase === "setup") {
+      return (
+        <GameSetup
+          playerNames={this.props.G.playerNames}
+          playerID={this.props.playerID}
+          moves={this.props.moves}
+        />
+      );
+    }
+
+    const info = this.props.G.info;
     const { level, message } = info || { message: "", level: "white" };
     const infoOpts = {
       className: `alert alert-${level} text-center info`,
