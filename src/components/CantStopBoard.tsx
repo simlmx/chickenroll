@@ -42,7 +42,11 @@ export class CantStopBoard extends React.Component<any> {
         <div {...playerBannerOpts}></div>
         <div className="upperSection">
           <div className="upperLeft">
-            <ScoreBoard scores={this.props.G.scores} />
+            <ScoreBoard
+              scores={this.props.G.scores}
+              playerNames={this.props.G.playerNames}
+              currentPlayer={this.props.ctx.currentPlayer}
+            />
           </div>
           <div className="upperCenter">
             <DiceBoard diceValues={this.props.G.diceValues} />

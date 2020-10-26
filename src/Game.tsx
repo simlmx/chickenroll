@@ -160,11 +160,29 @@ const CantStop = {
       scores[i] = 0;
       checkpointPositions[i] = {};
     }
+
+    const playerNames = {};
+    // For pass-and-play games we set default player names.
+    if (passAndPlay) {
+      for (let i = 0; i < ctx.numPlayers; ++i) {
+        playerNames[i.toString()] = `Player ${i + 1}`;
+      }
+    }
+    const blockedSums = {};
+
     //Those are for quick debugging
-    // checkpointPositions["0"] = { 7: 1, 8: 1 };
-    // checkpointPositions["1"] = { 7: 1, 8: 1, 9: 2 };
-    // checkpointPositions["2"] = { 7: 1, 8: 1, 9: 2 };
-    // checkpointPositions["3"] = { 7: 1, 8: 1, 9: 2 };
+    /*
+    checkpointPositions["0"] = { 7: 1, 8: 1 };
+    checkpointPositions["1"] = { 7: 1, 8: 1, 9: 2 };
+    checkpointPositions["2"] = { 7: 1, 8: 1, 9: 2 };
+    checkpointPositions["3"] = { 7: 1, 8: 1, 9: 2 };
+    scores["1"] = 2;
+    scores["2"] = 1;
+    playerNames["1"] = "Salut simon cest long";
+    blockedSums[3] = '1';
+    blockedSums[5] = '2';
+    */
+
     return {
       /*
        * Rows are 1-indexed. This means that
@@ -178,11 +196,11 @@ const CantStop = {
       checkpointPositions,
       diceSumOptions: null,
       lastPickedDiceSumOption: null,
-      blockedSums: {},
+      blockedSums,
       info: { message: "Good game!", level: "success" },
       scores,
       passAndPlay,
-      playerNames: {},
+      playerNames,
       numPlayers: ctx.numPlayers,
     };
   },

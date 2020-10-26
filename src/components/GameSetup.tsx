@@ -32,6 +32,7 @@ export class Player extends React.Component<PlayerProps, { myName: string }> {
                 }
                 placeholder="Enter your name"
                 autoFocus
+                maxLength={16}
               />
             </div>
             <div className="col">

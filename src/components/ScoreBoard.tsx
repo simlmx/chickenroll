@@ -1,36 +1,48 @@
 import React from "react";
+import { PlayerID } from "../types";
 
 interface ScoreBoardProps {
   scores: { [number: string]: number };
+  playerNames: { [number: string]: number };
+  currentPlayer: PlayerID;
 }
 
 export class ScoreBoard extends React.Component<ScoreBoardProps> {
   render() {
-    const content = Object.entries(this.props.scores).map(
-      ([playerID, points]) => {
+    console.log(this.props.playerNames);
+    const content = Object.entries(this.props.playerNames).map(
+      ([playerID, name]) => {
+        const points = this.props.scores[playerID];
         const pointOpt = { className: `color${playerID} scoreBoardPlayer` };
         // 3 is the maximum number of points
-        const tds = Array(3)
+        const tds = Array(points)
           .fill(null)
-          .map((_, i) => {
-            if (points >= i + 1) {
-              return (
-                <td key={i}>
-                  <div {...pointOpt} key={playerID}>
-                    ★
-                  </div>
-                </td>
-              );
-            } else {
-              return <td key={i}></td>;
-            }
-          });
-        return <tr key={playerID}>{tds}</tr>;
+          .map((_, i) => (
+            <td key={i}>
+              <div {...pointOpt} key={playerID}>
+                ★
+              </div>
+            </td>
+          ));
+        let className = `scoreBoardPlayerName bgcolor${playerID}`;
+        if (playerID === this.props.currentPlayer) {
+          className += " scoreBoardPlayerNameCurrent";
+        }
+        return (
+          <tr key={playerID}>
+            <td>
+              <div className="scoreBoardPlayerNameContainer">
+                <div {...{ className }}>{name}</div>
+              </div>
+            </td>
+            {tds}
+          </tr>
+        );
       }
     );
 
     return (
-      <div>
+      <div className="scoreBoardContainer">
         <table className="scoreBoard">
           <tbody>{content}</tbody>
         </table>

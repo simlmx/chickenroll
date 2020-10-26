@@ -1,7 +1,10 @@
+* {
+  /* border: 1px solid red; */
+}
+
 body {
   margin: 0;
   font-family: arial, sans-serif;
-  font-size: 16pt;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -40,6 +43,7 @@ button {
 }
 
 .mountain {
+  font-family: arial, sans-serif;
   width: auto;
   padding: 0px;
   font-size: 16pt;
@@ -68,46 +72,11 @@ button {
   margin: 10px;
 }
 
-.color0 {
-  color: #d55e00;
+.scoreBoardContainer {
+  width: 220px;
 }
 
-.color1 {
-  color: #0072b2;
-}
-
-.color2 {
-  color: #009e73;
-}
-
-.color3 {
-  color: #f0e442;
-}
-
-.color4 {
-  color: #cc79a7;
-}
-
-.bgcolor0 {
-  background-color: #d55e00;
-}
-
-.bgcolor1 {
-  background-color: #0072b2;
-}
-
-.bgcolor2 {
-  background-color: #009e73;
-}
-
-.bgcolor3 {
-  background-color: #f0e442;
-}
-
-.bgcolor4 {
-  background-color: #cc79a7;
-}
-
+/* TODO rename those are stars (points) not players */
 .scoreBoardPlayer {
   text-shadow: 1px 1px 2px #00000088, 1px 1px 1px #00000088;
   font-size: 15pt;
@@ -117,6 +86,28 @@ button {
 .scoreBoard td {
   padding: 0px;
   margin: 0px;
+}
+
+.scoreBoardPlayerNameContainer {
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.scoreBoardPlayerName {
+  width: 130px;
+  font-size: 10pt;
+  border-radius: 9px;
+  padding: 1px;
+  padding-left: 6px;
+  padding-right: 6px;
+  color: white;
+  border: 3px solid white;
+}
+
+.scoreBoardPlayerNameCurrent {
+  border: 3px solid black;
 }
 
 .mountainCell {
@@ -171,8 +162,8 @@ button {
 
 .colNumbers {
   width: 32px;
-  font-size: 12pt;
-  margin: 0;
+  height: 22px;
+  font-size: 11pt;
 }
 
 .info {
@@ -196,6 +187,9 @@ button {
 
 .upperLeft {
   flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 .upperRight {
   flex: 1;
@@ -265,6 +259,43 @@ button {
   font-size: 12pt;
 }
 
-/* * { */
-/* border: 1px solid black !important; */
-/* } */
+.color0 {
+  color: #d55e00;
+}
+
+.color1 {
+  color: #0072b2;
+}
+
+.color2 {
+  color: #009e73;
+}
+
+.color3 {
+  color: #f0e442;
+}
+
+.color4 {
+  color: #cc79a7;
+}
+
+.bgcolor0 {
+  background-color: #d55e00;
+}
+
+.bgcolor1 {
+  background-color: #0072b2;
+}
+
+.bgcolor2 {
+  background-color: #009e73;
+}
+
+.bgcolor3 {
+  background-color: #f0e442;
+  color: black;
+}
+
+.bgcolor4 {
+  background-color: #cc79a7;
+}

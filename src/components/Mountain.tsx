@@ -11,13 +11,13 @@ const Climber = (props: { playerID?: PlayerID }) => {
 };
 
 const ClimberPlaceholder = (props: { playerID?: PlayerID }) => {
-  const opts = { className: "climberPlaceholder" };
+  let className = "climberPlaceholder";
   if (props.playerID != null) {
-    opts.className += `color${props.playerID}`;
+    className += ` color${props.playerID}`;
   }
   return (
     <div className="climberPlaceholderWrap">
-      <div {...opts}>〇</div>
+      <div {...{ className }}>〇</div>
     </div>
   );
 };
@@ -54,10 +54,6 @@ export class Mountain extends React.Component<MountainProps> {
             </div>
           );
         } else if (row < totalNumSteps) {
-          const opts = { className: "climberPlaceholder" };
-          if (blockedBy != null) {
-            opts.className += ` color${blockedBy}`;
-          }
           content = (
             <ClimberPlaceholder
               playerID={blockedBy == null ? undefined : blockedBy}
