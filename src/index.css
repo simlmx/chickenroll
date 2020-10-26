@@ -7,6 +7,7 @@ body {
   font-family: arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f7f6f2;
 }
 
 button {
@@ -93,17 +94,17 @@ button {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  margin:2px;
 }
 
 .scoreBoardPlayerName {
   width: 130px;
   font-size: 10pt;
   border-radius: 9px;
-  padding: 1px;
   padding-left: 6px;
   padding-right: 6px;
   color: white;
-  border: 3px solid white;
+  border: 3px solid transparent;
 }
 
 .scoreBoardPlayerNameCurrent {
