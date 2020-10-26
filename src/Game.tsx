@@ -108,7 +108,7 @@ const turn = {
             // Clean the board a bit.
             G.currentPositions = {};
             G.info = {
-              message: `Player ${ctx.currentPlayer} won!`,
+              message: `${G.playerNames[ctx.currentPlayer]} won!`,
               level: "success",
             };
             ctx.events.endGame();
@@ -178,9 +178,9 @@ const CantStop = {
     checkpointPositions["3"] = { 7: 1, 8: 1, 9: 2 };
     scores["1"] = 2;
     scores["2"] = 1;
-    playerNames["1"] = "Salut simon cest long";
-    blockedSums[3] = '1';
-    blockedSums[5] = '2';
+    playerNames["1"] = "simon lemieux 123";
+    blockedSums[3] = "1";
+    blockedSums[5] = "2";
     */
 
     return {
