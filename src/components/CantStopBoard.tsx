@@ -19,6 +19,8 @@ export class CantStopBoard extends React.Component<any> {
           playerNames={this.props.G.playerNames}
           playerID={this.props.playerID}
           moves={this.props.moves}
+          maxNumPlayers={this.props.ctx.numPlayers}
+          matchID={this.props.matchID}
         />
       );
     }

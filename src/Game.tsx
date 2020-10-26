@@ -1,6 +1,6 @@
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, sumSteps } from "./math";
-import { DiceSum, PlayerID } from "./types";
+import { DiceSum } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 
 interface Info {
@@ -23,7 +23,6 @@ export interface GameType {
   passAndPlay: boolean;
   // playerID -> name
   playerNames: { [key: string]: string };
-  //playerOrder: PlayerID[];
   // By default we'll set the game to the *maximum* number of players, but maybe less
   // people will join.
   numPlayers: number;
@@ -155,21 +154,17 @@ const CantStop = {
 
     const scores: { [key: number]: number } = {};
     const checkpointPositions = {};
-    const playerNames = {};
-    //const playerOrder: PlayerID[] = [];
+    // const playerNames = {};
 
     for (let i = 0; i < ctx.numPlayers; ++i) {
       scores[i] = 0;
       checkpointPositions[i] = {};
-      //playerOrder[i] = i.toString();
     }
     //Those are for quick debugging
-    /*
-    checkpointPositions["0"] = { 7: 1, 8: 1 };
-    checkpointPositions["1"] = { 7: 1, 8: 1, 9: 2 };
-    checkpointPositions["2"] = { 7: 1, 8: 1, 9: 2 };
-    checkpointPositions["3"] = { 7: 1, 8: 1, 9: 2 };
-    */
+    // checkpointPositions["0"] = { 7: 1, 8: 1 };
+    // checkpointPositions["1"] = { 7: 1, 8: 1, 9: 2 };
+    // checkpointPositions["2"] = { 7: 1, 8: 1, 9: 2 };
+    // checkpointPositions["3"] = { 7: 1, 8: 1, 9: 2 };
     return {
       /*
        * Rows are 1-indexed. This means that
@@ -187,9 +182,8 @@ const CantStop = {
       info: { message: "Good game!", level: "success" },
       scores,
       passAndPlay,
-      playerNames,
+      playerNames: {},
       numPlayers: ctx.numPlayers,
-      //playerOrder,
     };
   },
   phases: {
@@ -202,9 +196,9 @@ const CantStop = {
           // In pass-and-play mode we skip this phase.
           if (G.passAndPlay) {
             ctx.events.endPhase();
-          } else {
-            ctx.events.setActivePlayers({ all: "setup" });
+            return;
           }
+          ctx.events.setActivePlayers({ all: "setup" });
         },
         // There is only one stage, but we need it for all the players to be able to
         // interact in any order.

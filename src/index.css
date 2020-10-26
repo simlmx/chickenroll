@@ -211,6 +211,60 @@ button {
   height: 5px;
 }
 
-* {
-  /* border: 0px solid pink !important; */
+.gameSetupPlayer {
+  width: 400px;
+  border: 2px;
+  border-radius: 10px;
+
+  padding: 5px;
+  padding-left: 15px;
+  margin-bottom: 10px;
+
+  box-shadow: 1px 1px 2px black;
 }
+
+.gameSetupPlayerName {
+  color: white;
+  font-size: 20pt;
+}
+
+.gameSetupPlayerFree {
+  background-color: white;
+  border: 2px dotted grey;
+  opacity: 0.5;
+  color: grey;
+  text-align: center;
+  box-shadow: 0 0 0 white;
+}
+
+.gameSetupPlayerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.gameSetup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.matchIdContainer {
+  align-self: flex-start;
+  padding: 5px;
+  padding-top: 2px;
+  padding-bottom: 0px;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.matchId {
+  font-family: courier new;
+  font-size: 12pt;
+}
+
+/* * { */
+/* border: 1px solid black !important; */
+/* } */
