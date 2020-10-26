@@ -45,9 +45,10 @@ button {
 
 .mountain {
   font-family: arial, sans-serif;
-  width: auto;
   padding: 0px;
   font-size: 16pt;
+  margin: 0px !important;
+  width: auto !important;
 }
 
 .mountainCol {
@@ -58,7 +59,9 @@ button {
 
 .mountainContainer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .diceBoard {
@@ -94,7 +97,7 @@ button {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin:2px;
+  margin: 2px;
 }
 
 .scoreBoardPlayerName {
@@ -106,12 +109,12 @@ button {
   padding-right: 6px;
   color: white;
   border: 2px solid transparent;
-  opacity:.6;
+  opacity: 0.6;
 }
 
 .scoreBoardPlayerNameCurrent {
   border: 2px solid black;
-  opacity:1;
+  opacity: 1;
 }
 
 .mountainCell {
@@ -171,7 +174,11 @@ button {
 }
 
 .info {
+  font-size: 20pt;
   height: 50px;
+  width: 100%;
+  padding-top: 3px;
+  border-width: 3px;
 }
 
 .clients {
@@ -182,6 +189,7 @@ button {
   border-left: 2px dotted black;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .upperSection {
@@ -252,6 +260,10 @@ button {
   padding-bottom: 0px;
   font-size: 12pt;
   font-weight: bold;
+}
+
+.playAgainContainer {
+  align-self: flex-end;
 }
 
 .matchId {

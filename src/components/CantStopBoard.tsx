@@ -62,6 +62,16 @@ export class CantStopBoard extends React.Component<any> {
             currentPositions={this.props.G.currentPositions}
             blockedSums={this.props.G.blockedSums}
           />
+          <div className="playAgainContainer">
+            {this.props.ctx.phase === "gameover" && (
+              <button
+                onClick={() => this.props.moves.playAgain()}
+                className="btn btn-primary"
+              >
+                Play Again
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );

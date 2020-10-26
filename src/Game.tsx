@@ -8,6 +8,10 @@ interface Info {
   level: "success" | "danger";
 }
 
+export interface SetupDataType {
+  passAndPlay: boolean;
+}
+
 type GameMode = "pass-and-play" | "remote";
 
 export interface GameType {
@@ -26,10 +30,7 @@ export interface GameType {
   // By default we'll set the game to the *maximum* number of players, but maybe less
   // people will join.
   numPlayers: number;
-}
-
-export interface SetupDataType {
-  passAndPlay: boolean;
+  setupData: SetupDataType;
 }
 
 /*
@@ -111,7 +112,7 @@ const turn = {
               message: `${G.playerNames[ctx.currentPlayer]} won!`,
               level: "success",
             };
-            ctx.events.endGame();
+            ctx.events.endPhase();
           } else {
             G.info = { message: "Stopped.", level: "success" };
             ctx.events.endTurn();
@@ -144,66 +145,67 @@ const turn = {
   },
 };
 
+const setup = (ctx, setupData: SetupDataType): GameType => {
+  let passAndPlay = true;
+  if (setupData?.passAndPlay != null) {
+    passAndPlay = setupData.passAndPlay;
+  }
+
+  const scores: { [key: number]: number } = {};
+  const checkpointPositions = {};
+  // const playerNames = {};
+
+  for (let i = 0; i < ctx.numPlayers; ++i) {
+    scores[i] = 0;
+    checkpointPositions[i] = {};
+  }
+
+  const playerNames = {};
+  // For pass-and-play games we set default player names.
+  if (passAndPlay) {
+    for (let i = 0; i < ctx.numPlayers; ++i) {
+      playerNames[i.toString()] = `Player ${i + 1}`;
+    }
+  }
+  const blockedSums = {};
+
+  //Those are for quick debugging
+  // checkpointPositions["0"] = { 6: 10, 7: 12, 8: 7 };
+  // checkpointPositions["1"] = { 6: 10, 7: 12, 8: 10, 9: 2 };
+  // checkpointPositions["2"] = { 6: 10, 7: 12, 8: 10, 9: 2 };
+  //checkpointPositions["3"] = { 7: 12, 8: 7, 9: 2 };
+  //scores["1"] = 2;
+  //scores["2"] = 1;
+  //playerNames["1"] = "simon lemieux 123";
+  //blockedSums[3] = "1";
+  //blockedSums[5] = "2";
+
+  return {
+    /*
+     * Rows are 1-indexed. This means that
+     * 0 == not on the board
+     * 1 == first space
+     * 3 == end spot for diceSum=2
+     */
+    diceValues: [1, 2, 3, 4],
+    // State of the 3 current climbers. diceSum -> position.
+    currentPositions: {},
+    checkpointPositions,
+    diceSumOptions: null,
+    lastPickedDiceSumOption: null,
+    blockedSums,
+    info: { message: "Good game!", level: "success" },
+    scores,
+    passAndPlay,
+    playerNames,
+    numPlayers: ctx.numPlayers,
+    setupData,
+  };
+};
+
 const CantStop = {
   name: "cantstop",
-  setup(ctx, setupData: SetupDataType): GameType {
-    let passAndPlay = true;
-    if (setupData?.passAndPlay != null) {
-      passAndPlay = setupData.passAndPlay;
-    }
-
-    const scores: { [key: number]: number } = {};
-    const checkpointPositions = {};
-    // const playerNames = {};
-
-    for (let i = 0; i < ctx.numPlayers; ++i) {
-      scores[i] = 0;
-      checkpointPositions[i] = {};
-    }
-
-    const playerNames = {};
-    // For pass-and-play games we set default player names.
-    if (passAndPlay) {
-      for (let i = 0; i < ctx.numPlayers; ++i) {
-        playerNames[i.toString()] = `Player ${i + 1}`;
-      }
-    }
-    const blockedSums = {};
-
-    //Those are for quick debugging
-    /*
-    checkpointPositions["0"] = { 7: 1, 8: 1 };
-    checkpointPositions["1"] = { 7: 1, 8: 1, 9: 2 };
-    checkpointPositions["2"] = { 7: 1, 8: 1, 9: 2 };
-    checkpointPositions["3"] = { 7: 1, 8: 1, 9: 2 };
-    scores["1"] = 2;
-    scores["2"] = 1;
-    playerNames["1"] = "simon lemieux 123";
-    blockedSums[3] = "1";
-    blockedSums[5] = "2";
-    */
-
-    return {
-      /*
-       * Rows are 1-indexed. This means that
-       * 0 == not on the board
-       * 1 == first space
-       * 3 == end spot for diceSum=2
-       */
-      diceValues: [1, 2, 3, 4],
-      // State of the 3 current climbers. diceSum -> position.
-      currentPositions: {},
-      checkpointPositions,
-      diceSumOptions: null,
-      lastPickedDiceSumOption: null,
-      blockedSums,
-      info: { message: "Good game!", level: "success" },
-      scores,
-      passAndPlay,
-      playerNames,
-      numPlayers: ctx.numPlayers,
-    };
-  },
+  setup,
   phases: {
     // Phase where we wait for everyone to join, choose a name, colors, etc.
     setup: {
@@ -245,18 +247,36 @@ const CantStop = {
           },
         },
       },
-      /*      turn: {
-        onBegin: (G: GameType, ctx) => {
-          // Let's skip the setup for pass-and-play games.
-          if (G.passAndPlay) {
-            ctx.events.endPhase();
-          }
-          },*/
-      //  },
     },
     // Main phase where we actually play the game.
     main: {
       turn,
+      next: "gameover",
+    },
+    gameover: {
+      onBegin: (G, ctx) => {
+        ctx.events.setActivePlayers({ all: "gameover" });
+      },
+      moves: {
+        /* Reset the game to initial state */
+        playAgain: (G, ctx) => {
+          // We need to keep some of the fields that were entered during the game, in the "setup"
+          // phase.
+          const keepFields = ["playerNames", "numPlayers"];
+
+          // Create an object like G but with only the fields to keep.
+          const GKeep = Object.keys(G)
+            .filter((key) => keepFields.indexOf(key) >= 0)
+            .reduce((G2, key) => Object.assign(G2, { [key]: G[key] }), {});
+
+          Object.assign(G, setup(ctx, G.setupData), GKeep);
+
+          ctx.events.setPhase("main");
+        },
+      },
+      stages: {
+        gameover: {},
+      },
     },
   },
 };

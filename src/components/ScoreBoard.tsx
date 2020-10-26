@@ -9,7 +9,6 @@ interface ScoreBoardProps {
 
 export class ScoreBoard extends React.Component<ScoreBoardProps> {
   render() {
-    console.log(this.props.playerNames);
     const content = Object.entries(this.props.playerNames).map(
       ([playerID, name]) => {
         const points = this.props.scores[playerID];

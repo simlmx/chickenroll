@@ -151,6 +151,7 @@ class App extends React.Component<{}, AppState> {
       board: CantStopBoard,
       multiplayer: Local(),
       debug: false,
+      // debug: true,
     });
 
     this.setState({
