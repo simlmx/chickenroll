@@ -101,14 +101,17 @@ button {
   width: 130px;
   font-size: 10pt;
   border-radius: 9px;
+  padding: 1px;
   padding-left: 6px;
   padding-right: 6px;
   color: white;
-  border: 3px solid transparent;
+  border: 2px solid transparent;
+  opacity:.6;
 }
 
 .scoreBoardPlayerNameCurrent {
-  border: 3px solid black;
+  border: 2px solid black;
+  opacity:1;
 }
 
 .mountainCell {
