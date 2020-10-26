@@ -30,16 +30,12 @@ export class CantStopBoard extends React.Component<any> {
     const infoOpts = {
       className: `alert alert-${level} text-center info`,
     };
-    const playerBannerOpts = {
-      className: `playerBanner bgcolor${playerID}`,
-    };
 
     return (
       <div className="cantStopBoard">
         <div {...infoOpts} role="alert">
           {message}
         </div>
-        <div {...playerBannerOpts}></div>
         <div className="upperSection">
           <div className="upperLeft">
             <ScoreBoard
