@@ -17,20 +17,17 @@ button {
 .die {
   width: 50px;
   height: 50px;
-  background-color: #fafafa;
+  border-radius: 8px;
+  margin: 4px;
 
   box-shadow: 0px 0px 2px black, 1px 1px 1px black, 2px 2px 2px black,
     3px 3px 1px black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 16pt;
-  font-weight: bold;
-  border-radius: 8px;
   border: 1px solid black;
+}
 
-  margin: 4px;
+.dot {
+  stroke-width: 2px;
+  stroke: black;
 }
 
 .diceRow {
@@ -108,7 +105,6 @@ button {
   padding: 1px;
   padding-left: 6px;
   padding-right: 6px;
-  color: white;
   border: 2px solid transparent;
   opacity: 0.6;
 }
@@ -227,7 +223,6 @@ button {
 }
 
 .gameSetupPlayerName {
-  color: white;
   font-size: 20pt;
 }
 
@@ -293,14 +288,17 @@ button {
 }
 
 .bgcolor0 {
+  color: white;
   background-color: #d55e00;
 }
 
 .bgcolor1 {
+  color: white;
   background-color: #0072b2;
 }
 
 .bgcolor2 {
+  color: white;
   background-color: #009e73;
 }
 
@@ -310,5 +308,28 @@ button {
 }
 
 .bgcolor4 {
+  color: white;
   background-color: #cc79a7;
+}
+
+.dotColor0 {
+  fill: white;
+}
+
+.dotColor1 {
+  fill: white;
+}
+
+.dotColor2 {
+  fill: white;
+}
+
+.dotColor3 {
+  fill: black;
+  stroke-width: 0px;
+  stroke: black;
+}
+
+.dotColor4 {
+  fill: white;
 }

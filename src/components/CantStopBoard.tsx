@@ -45,7 +45,10 @@ export class CantStopBoard extends React.Component<any> {
             />
           </div>
           <div className="upperCenter">
-            <DiceBoard diceValues={this.props.G.diceValues} />
+            <DiceBoard
+              diceValues={this.props.G.diceValues}
+              currentPlayer={this.props.ctx.currentPlayer}
+            />
           </div>
           <div className="upperRight">
             <MoveButtons
