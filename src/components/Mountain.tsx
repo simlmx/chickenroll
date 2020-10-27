@@ -2,22 +2,24 @@ import React from "react";
 import { sumSteps } from "../math";
 import { PlayerID } from "../types";
 
-const Climber = (props: { playerID?: PlayerID }) => {
-  const opts = { className: "climber" };
+const Climber = (props: { playerID?: PlayerID; currentPlayer?: PlayerID }) => {
+  let className = "climber";
   if (props.playerID != null) {
-    opts.className += ` color${props.playerID}`;
+    className += ` bgcolor${props.playerID}`;
+  } else {
+    className += ` climberCurrent border${props.currentPlayer}`;
   }
-  return <div {...opts}>• </div>;
+  return <div {...{ className }}></div>;
 };
 
 const ClimberPlaceholder = (props: { playerID?: PlayerID }) => {
   let className = "climberPlaceholder";
   if (props.playerID != null) {
-    className += ` color${props.playerID}`;
+    className += ` bgcolor${props.playerID} climberPlaceholderBlocked`;
   }
   return (
     <div className="climberPlaceholderWrap">
-      <div {...{ className }}>〇</div>
+      <div {...{ className }}></div>
     </div>
   );
 };
@@ -26,6 +28,7 @@ interface MountainProps {
   currentPositions: { [key: number]: number };
   checkpointPositions: object;
   blockedSums: { [key: number]: string };
+  currentPlayer: PlayerID;
 }
 
 export class Mountain extends React.Component<MountainProps> {
@@ -66,7 +69,9 @@ export class Mountain extends React.Component<MountainProps> {
             3 - Object.keys(this.props.currentPositions).length;
           content = <ClimberPlaceholder key={0} />;
           if (row >= 14 - numClimbersLeft) {
-            climbers.push(<Climber key={-1} />);
+            climbers.push(
+              <Climber key={-1} currentPlayer={this.props.currentPlayer} />
+            );
           }
         } else {
           content = "";
@@ -85,7 +90,9 @@ export class Mountain extends React.Component<MountainProps> {
         );
 
         if (currentIsThere) {
-          climbers.push(<Climber key={-1} />);
+          climbers.push(
+            <Climber key={-1} currentPlayer={this.props.currentPlayer} />
+          );
         }
 
         if (climbers.length > 0) {

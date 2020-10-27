@@ -64,6 +64,7 @@ export class CantStopBoard extends React.Component<any> {
             checkpointPositions={this.props.G.checkpointPositions}
             currentPositions={this.props.G.currentPositions}
             blockedSums={this.props.G.blockedSums}
+            currentPlayer={this.props.ctx.currentPlayer}
           />
           <div className="playAgainContainer">
             {this.props.ctx.phase === "gameover" && (

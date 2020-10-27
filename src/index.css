@@ -80,7 +80,8 @@ button {
 
 /* TODO rename those are stars (points) not players */
 .scoreBoardPlayer {
-  text-shadow: 1px 1px 2px #00000088, 1px 1px 1px #00000088;
+  /* text-shadow: 2px 2px 3px black; */
+  /* text-shadow: 1px 1px 2px #00000088, 1px 1px 1px #00000088; */
   font-size: 15pt;
   width: 20px;
 }
@@ -106,12 +107,10 @@ button {
   padding-left: 6px;
   padding-right: 6px;
   border: 2px solid transparent;
-  opacity: 0.6;
 }
 
 .scoreBoardPlayerNameCurrent {
   border: 2px solid black;
-  opacity: 1;
 }
 
 .mountainCell {
@@ -126,12 +125,23 @@ button {
 }
 
 .climber {
-  font-size: 50pt;
-  text-shadow: 1px 1px 2px black, 1px 1px 1px black, 1px 1px 1px #dddddd;
-  margin-right: -15px;
-  margin-left: -15px;
+  height: 17px;
+  width: 17px;
+  box-shadow: 0px 0px 4px -1px black, 1px 2px 3px 0px black;
+  margin-right: -5px;
+  margin-left: -5px;
   z-index: 999;
   opacity: 1;
+
+  border-radius: 12px;
+}
+
+.climberCurrent {
+  height: 16px;
+  width: 16px;
+  background-color: black;
+  box-shadow: 0px 0px 1px 1px black, 1px 3px 4px 0px black;
+  border: 2px solid white;
 }
 
 .climberGroup {
@@ -139,7 +149,7 @@ button {
   align-items: center;
   justify-content: center;
 
-  margin-top: -31px;
+  margin-top: -30px;
 
   max-height: 30px;
   min-height: 30px;
@@ -151,17 +161,25 @@ button {
   font-weight: bold;
   font-size: 12pt;
   color: grey;
+
+  border-radius: 20px;
+  border: 2px solid grey;
+  width: 15px;
+  height: 15px;
+}
+
+.climberPlaceholderBlocked {
+  border: 0px;
 }
 
 .climberPlaceholderWrap {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-
   max-height: 30px;
   min-height: 30px;
   max-width: 39px;
   min-width: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .colNumbers {
@@ -332,4 +350,24 @@ button {
 
 .dotColor4 {
   fill: white;
+}
+
+.border0 {
+  border-color: #d55e00;
+}
+
+.border1 {
+  border-color: #0072b2;
+}
+
+.border2 {
+  border-color: #009e73;
+}
+
+.border3 {
+  border-color: #f0e442;
+}
+
+.border4 {
+  border-color: #cc79a7;
 }

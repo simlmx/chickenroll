@@ -173,12 +173,12 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // checkpointPositions["0"] = { 6: 10, 7: 12, 8: 7 };
   // checkpointPositions["1"] = { 6: 10, 7: 12, 8: 10, 9: 2 };
   // checkpointPositions["2"] = { 6: 10, 7: 12, 8: 10, 9: 2 };
-  //checkpointPositions["3"] = { 7: 12, 8: 7, 9: 2 };
-  //scores["1"] = 2;
-  //scores["2"] = 1;
-  //playerNames["1"] = "simon lemieux 123";
-  //blockedSums[3] = "1";
-  //blockedSums[5] = "2";
+  // checkpointPositions["3"] = { 7: 12, 8: 7, 9: 2 };
+  // scores["1"] = 2;
+  // scores["2"] = 1;
+  // playerNames["1"] = "simon lemieux 123";
+  // blockedSums[3] = "1";
+  // blockedSums[5] = "2";
 
   return {
     /*
