@@ -56,11 +56,11 @@ const turn = {
     next: (G: GameType, ctx) => (ctx.playOrderPos + 1) % G.numPlayers,
     playOrder: (G: GameType, ctx) => {
       // Take the actual number of players, and randomize amongst them.
-      let playerOrder = Array(G.numPlayers)
+      let playOrder = Array(G.numPlayers)
         .fill(null)
         .map((_, i) => i.toString());
-      playerOrder = ctx.random.Shuffle(playerOrder);
-      return playerOrder;
+      playOrder = ctx.random.Shuffle(playOrder);
+      return playOrder;
     },
   },
   stages: {
@@ -256,6 +256,15 @@ const CantStop = {
     gameover: {
       onBegin: (G, ctx) => {
         ctx.events.setActivePlayers({ all: "gameover" });
+      },
+      turn: {
+        // Make sure the order doesn't change when it's gameover. We'll change it at the
+        // beginning of a new game.
+        order: {
+          first: (G: GameType, ctx) => ctx.playOrderPos,
+          next: (G: GameType, ctx) => 0,
+          playOrder: (G: GameType, ctx) => ctx.playOrder,
+        },
       },
       moves: {
         /* Reset the game to initial state */

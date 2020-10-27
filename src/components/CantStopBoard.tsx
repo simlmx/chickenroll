@@ -42,6 +42,7 @@ export class CantStopBoard extends React.Component<any> {
               scores={this.props.G.scores}
               playerNames={this.props.G.playerNames}
               currentPlayer={this.props.ctx.currentPlayer}
+              playOrder={this.props.ctx.playOrder}
             />
           </div>
           <div className="upperCenter">
