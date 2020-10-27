@@ -105,7 +105,7 @@ const turn = {
           });
 
           // Check if we should end the game,
-          if (G.scores[ctx.currentPlayer] === 3) {
+          if (G.scores[ctx.currentPlayer] >= 3) {
             // Clean the board a bit.
             G.currentPositions = {};
             G.info = {
