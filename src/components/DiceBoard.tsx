@@ -6,19 +6,11 @@ import { Die } from "./Die";
 export class DiceBoard extends React.Component<{
   diceValues: number[];
   currentPlayer: string;
-  diceHighlightPairs: { [key: number]: number };
+  diceHighlight: boolean[];
   diceSplit?: number;
 }> {
   getDie(index: number) {
-    const {
-      diceValues,
-      currentPlayer,
-      diceHighlightPairs,
-      diceSplit,
-    } = this.props;
-    const thereIsSomeHighlight = Object.keys(diceHighlightPairs).length > 0;
-
-    const highlightPair = diceHighlightPairs[index];
+    const { diceValues, currentPlayer, diceHighlight, diceSplit } = this.props;
 
     // Hack for the diagonal dice split.
     let diceSplitStr;
@@ -32,8 +24,7 @@ export class DiceBoard extends React.Component<{
         value={diceValues[index]}
         currentPlayer={currentPlayer}
         key={index}
-        highlight={diceHighlightPairs[index]}
-        noHighlight={highlightPair == null && thereIsSomeHighlight}
+        highlight={diceHighlight[index]}
         split={diceSplitStr}
       />
     );

@@ -62,16 +62,14 @@ export class Mountain extends React.Component<MountainProps> {
       checkpointPositions,
       currentPlayer,
     } = this.props;
-    // If  we want to highlight, we'll compute where the new positions will be!
+    // If we want to highlight, we'll compute where the new positions will be!
     let highlightSums: number[] = [];
     if (mouseOverPossibility != null && diceSumOptions != null) {
       const { diceSplit, dicePairs } = mouseOverPossibility;
 
-      // const highlightSums: (null | number)[] = [];
-
       const diceSumOption = diceSumOptions[diceSplit];
       highlightSums = dicePairs
-        .map((i) => diceSumOption.sums[i])
+        .map((i) => diceSumOption.diceSums[i])
         .filter((x) => x != null) as number[];
 
       highlightSums.forEach((sum) => {

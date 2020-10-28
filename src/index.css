@@ -60,11 +60,6 @@ body {
   align-items: center;
 }
 
-.sums {
-  margin: 2px;
-  word-spacing: 10px;
-}
-
 .mountain {
   font-family: arial, sans-serif;
   padding: 0px;
@@ -426,14 +421,9 @@ body {
   border-color: #cc79a7;
 }
 
-.dieDiv {
-}
-
-/* top right bottom left*/
 .dieSplit0 {
   margin-left: 0px;
   margin-right: 0px;
-  /* margin: 6px 0px 6px 0px; */
 }
 
 .dieSplit1 {
@@ -444,58 +434,24 @@ body {
 .dieSplit20 {
   transform: translate(1px, 1px);
   margin: 0;
-  /* margin: 8px 0px 0px j8px; */
 }
 
 .dieSplit21 {
-  /* margin: 0px 0px 8px 8px; */
-  /* transform: translate(12, -8px); */
   transform: translate(5px, -5px);
   margin: 0;
-  /* transform: translate(4px, 4px); */
 }
 
 .dieSplit22 {
   margin: 0;
-  /* margin: 8px 8px 0px 0px; */
   transform: translate(-5px, 5px);
-  /* transform: translate(-4px, -px); */
 }
 .dieSplit23 {
-  /* transform: translate(-4px, -4px); */
-  /* transform: translate(-8px, 0px); */
   margin: 0;
   transform: translate(-1px, -1px);
-  /* margin: 0px 8px 8px 0px; */
-  /* margin-left: 8px; */
-  /* margin-top: 8px; */
-  /* align-self: flex-start; */
 }
 
-.dieHightlight0 {
+.dieHighlight {
   filter: brightness(1.2);
-  /* border: 1px solid white !important; */
-  /* background-color: white; */
-}
-
-.dieHightlight1 {
-  filter: brightness(1.2);
-  /* background-color: rgb(220, 250, 240); */
-  /* background-color: grey; */
-  /* border: 1px solid black !important; */
-}
-
-.dotHighlight0 {
-  /* fill: black; */
-}
-
-.dotHighlight1 {
-  /* fill: white; */
-}
-
-.dieNoHighlight {
-  /* filter: brightness(.9); */
-  /* opacity: .5 !important; */
 }
 
 .highlight {

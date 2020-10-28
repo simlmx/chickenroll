@@ -37,7 +37,7 @@ class ActionButtons extends React.Component<{
 /* Dice sum possibilities we can choose from */
 class Possibilities extends React.Component<{
   moves: any;
-  // We'll highlighted the last selected option
+  // We'll highlight the last selected option
   lastPickedDiceSumOption: null | number[];
   diceSumOptions?: SumOption[];
   itsMe: boolean;
@@ -50,15 +50,15 @@ class Possibilities extends React.Component<{
     return (
       <div className="possibilitiesWrap">
         {this.props.diceSumOptions != null &&
-          this.props.diceSumOptions.map((sumOption: SumOption, i) => {
+          this.props.diceSumOptions.map((sumOption: SumOption, i: number) => {
             // We make sure we have an array of arrays of sum.
             // [[7, 12]] means one button with 2 sums.
             // [[7, null]] means one button with 7.
             // [[7], [12]] means 2 different buttons.
             //
             const sumsList = sumOption?.split
-              ? sumOption.sums.map((x: DiceSum | null) => [x])
-              : [sumOption.sums];
+              ? sumOption.diceSums.map((x: DiceSum | null) => [x])
+              : [sumOption.diceSums];
             return (
               <div key={i}>
                 {sumsList.map((sums, j) => {

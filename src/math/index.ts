@@ -72,17 +72,17 @@ export function getSumOptions(
         const diceSum = diceSums[0];
         if (updatedBlockedSums.has(diceSum)) {
           // If the column is blocked, there are no options.
-          return { sums: [null, null] };
+          return { diceSums: [null, null] };
         }
         if (currentClimberSpace.has(diceSum)) {
           // Are we already climbing that "sum"?
           if (currentClimberSpace.get(diceSum) === 1) {
             // If the columns has one space left, we can choose the sum only once.
-            return { sums: [diceSum, null] };
+            return { diceSums: [diceSum, null] };
           } else {
             // Otherwise the column is not blocked and we have more than 1 space: we can
             // use both sums.
-            return { sums: [diceSum, diceSum] };
+            return { diceSums: [diceSum, diceSum] };
           }
         } else {
           // We are not climbing it. We can play it if we have a climber left.
@@ -90,12 +90,12 @@ export function getSumOptions(
             // But we need 2 spaces if we already have a checkpoint there to be able to
             // play both. Otherwise we can only play one.
             if (checkpointPositions[diceSum] === sumSteps(diceSum) - 1) {
-              return { sums: [diceSum, null] };
+              return { diceSums: [diceSum, null] };
             } else {
-              return { sums: [diceSum, diceSum] };
+              return { diceSums: [diceSum, diceSum] };
             }
           } else {
-            return { sums: [null, null] };
+            return { diceSums: [null, null] };
           }
         }
       } else {
@@ -130,7 +130,7 @@ export function getSumOptions(
         // This happens when we have only one climber left, and if the two sums are new
         // sums that we are not already climbing.
 
-        const sumOption: SumOption = { sums: newDiceSums };
+        const sumOption: SumOption = { diceSums: newDiceSums };
         if (numClimbersLeft === 1 && !climbingAtLeastOne && numNonNull === 2) {
           sumOption.split = true;
         }

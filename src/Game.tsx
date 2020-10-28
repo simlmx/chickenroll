@@ -79,7 +79,7 @@ const turn = {
           );
           // Check if busted.
           const busted = G.diceSumOptions.every((sumOption: SumOption) => {
-            return sumOption.sums.every((x) => x == null);
+            return sumOption.diceSums.every((x) => x == null);
           });
           if (busted) {
             G.info = { message: "Busted!", level: "danger" };
@@ -140,8 +140,7 @@ const turn = {
           }
           const sumOption = G.diceSumOptions[diceSplitIndex];
 
-          // FIXME changer sums pour diceSums pour pouvoir utiliser les deconstructors
-          let diceSums = sumOption.sums;
+          let { diceSums } = sumOption;
           if (sumOption?.split) {
             diceSums = [diceSums[choiceIndex]];
           }

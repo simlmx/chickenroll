@@ -47,19 +47,31 @@ export class CantStopBoard extends React.Component<
     };
   }
   render() {
-    const playerID = this.props.G.passAndPlay
-      ? this.props.ctx.currentPlayer
-      : this.props.playerID;
-    const phase = this.props.ctx.phase;
+    const { moves, matchID, ctx, G } = this.props;
+    const {
+      checkpointPositions,
+      currentPositions,
+      blockedSums,
+      diceSumOptions,
+      playerNames,
+      diceValues,
+      scores,
+    } = G;
+    const { currentPlayer, phase, numPlayers, playOrder } = ctx;
+    const { mouseOverPossibility } = this.state;
+
+    const playerID = G.passAndPlay ? currentPlayer : this.props.playerID;
 
     if (phase === "setup") {
       return (
         <GameSetup
-          playerNames={this.props.G.playerNames}
-          playerID={this.props.playerID}
-          moves={this.props.moves}
-          maxNumPlayers={this.props.ctx.numPlayers}
-          matchID={this.props.matchID}
+          {...{
+            playerNames,
+            playerID,
+            moves,
+            maxNumPlayers: numPlayers,
+            matchID,
+          }}
         />
       );
     }
@@ -70,18 +82,18 @@ export class CantStopBoard extends React.Component<
       className: `alert alert-${level} text-center info`,
     };
 
-    // Dice indedx -> 0/1 where 0 and 1 are the 2 groups.
-    let diceHighlightPairs: { [key: number]: number } = {};
-    let diceSplit2: number | undefined = undefined;
+    // Highlight or not for each die.
+    let diceHighlight: boolean[] = Array(4).fill(false);
+    let diceSplit: number | undefined = undefined;
     if (this.state.mouseOverPossibility != null) {
-      const { diceSplit, dicePairs } = this.state.mouseOverPossibility;
-      diceSplit2 = diceSplit;
+      diceSplit = this.state.mouseOverPossibility.diceSplit;
+      const { dicePairs } = this.state.mouseOverPossibility;
 
       const splitIndices: number[][] = DICE_INDICES[diceSplit];
 
       dicePairs.forEach((pairIndex, i) => {
         splitIndices[pairIndex].forEach((diceIndex) => {
-          diceHighlightPairs[diceIndex] = i;
+          diceHighlight[diceIndex] = true;
         });
       });
     }
@@ -94,26 +106,17 @@ export class CantStopBoard extends React.Component<
         <div className="upperSection">
           <div className="upperLeft">
             <ScoreBoard
-              scores={this.props.G.scores}
-              playerNames={this.props.G.playerNames}
-              currentPlayer={this.props.ctx.currentPlayer}
-              playOrder={this.props.ctx.playOrder}
+              {...{ scores, playerNames, currentPlayer, playOrder }}
             />
           </div>
           <div className="upperCenter">
             <DiceBoard
-              diceValues={this.props.G.diceValues}
-              currentPlayer={this.props.ctx.currentPlayer}
-              diceHighlightPairs={diceHighlightPairs}
-              diceSplit={diceSplit2}
+              {...{ diceValues, currentPlayer, diceHighlight, diceSplit }}
             />
           </div>
           <div className="upperRight">
             <MoveButtons
-              moves={this.props.moves}
-              ctx={this.props.ctx}
-              G={this.props.G}
-              playerID={playerID}
+              {...{ moves, ctx, G, playerID }}
               onMouseOver={(diceSplit, dicePairs) =>
                 this.setState({
                   mouseOverPossibility: { diceSplit, dicePairs },
@@ -127,12 +130,14 @@ export class CantStopBoard extends React.Component<
         </div>
         <div className="mountainContainer">
           <Mountain
-            checkpointPositions={this.props.G.checkpointPositions}
-            currentPositions={this.props.G.currentPositions}
-            blockedSums={this.props.G.blockedSums}
-            currentPlayer={this.props.ctx.currentPlayer}
-            diceSumOptions={this.props.G.diceSumOptions}
-            mouseOverPossibility={this.state.mouseOverPossibility}
+            {...{
+              checkpointPositions,
+              currentPositions,
+              blockedSums,
+              currentPlayer,
+              diceSumOptions,
+              mouseOverPossibility,
+            }}
           />
           <div className="playAgainContainer">
             {this.props.ctx.phase === "gameover" && (
