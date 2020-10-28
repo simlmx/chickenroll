@@ -22,10 +22,16 @@ const Climber = (props: {
   return <div {...{ className }}></div>;
 };
 
-const ClimberPlaceholder = (props: { playerID?: PlayerID }) => {
+const ClimberPlaceholder = (props: {
+  playerID?: PlayerID;
+  columnParity?: number;
+}) => {
   let className = "climberPlaceholder";
   if (props.playerID != null) {
     className += ` bgcolor${props.playerID} climberPlaceholderBlocked`;
+  }
+  if (props.columnParity != null) {
+    className += ` climberPlaceholderParity${props.columnParity}`;
   }
   return (
     <div className="climberPlaceholderWrap">
@@ -92,16 +98,19 @@ export class Mountain extends React.Component<MountainProps> {
         const blockedBy = this.props.blockedSums[col];
 
         let climbers: JSX.Element[] = [];
+        const columnParity = col % 2;
 
         if (row === 0 || row === totalNumSteps) {
           // Below row 0 we write the dice sum.
-          const opts = { className: "badge badge-dark colNumbers" };
+          let className = "badge colNumbers";
           if (blockedBy != null) {
-            opts.className += ` bgcolor${blockedBy}`;
+            className += ` bgcolor${blockedBy}`;
           }
+          // className += columnParity ? ' colNumbersOdd' : ' colNumbersEven';
+          className += ` colParity${columnParity}`;
           content = (
             <div className="colNumbersWrap">
-              <div {...opts} key={0}>
+              <div {...{ className }} key={0}>
                 {col}
               </div>
             </div>
@@ -111,6 +120,7 @@ export class Mountain extends React.Component<MountainProps> {
             <ClimberPlaceholder
               playerID={blockedBy == null ? undefined : blockedBy}
               key={0}
+              {...{ columnParity }}
             />
           );
         } else if ([13, 12, 11].includes(row) && col === 2) {

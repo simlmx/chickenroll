@@ -138,7 +138,7 @@ export class CantStopBoard extends React.Component<
             {this.props.ctx.phase === "gameover" && (
               <button
                 onClick={() => this.props.moves.playAgain()}
-                className="btn btn-primary"
+                className={`btn bgcolor${this.props.ctx.currentPlayer}`}
               >
                 Play Again
               </button>

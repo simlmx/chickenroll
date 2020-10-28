@@ -10,8 +10,15 @@ body {
   background-color: #f7f6f2;
 }
 
-button {
+.btn {
   margin: 2px;
+}
+
+.btn:hover,
+.btn:focus,
+.btn:active {
+  filter: brightness(1.2);
+  box-shadow: 0px 0px 0px black;
 }
 
 .die {
@@ -39,8 +46,6 @@ button {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  /* width: 300px; */
-  /* height: 100px; */
 }
 
 .dot {
@@ -129,7 +134,7 @@ button {
 }
 
 .scoreBoardPlayerNameCurrent {
-  border: 2px solid black;
+  border: 2px solid black !important;
   filter: brightness(1.1);
 }
 
@@ -152,6 +157,7 @@ button {
   margin-left: -5px;
   z-index: 999;
   opacity: 1;
+  border-width: 0px !important;
 
   border-radius: 12px;
 }
@@ -161,7 +167,8 @@ button {
   width: 16px;
   background-color: black;
   box-shadow: 0px 0px 1px 1px black, 1px 3px 4px 0px black;
-  border: 2px solid white;
+  border-width: 2px !important;
+  border-style: solid;
 }
 
 .climberGroup {
@@ -179,17 +186,16 @@ button {
 
 .climberPlaceholder {
   font-weight: bold;
-  font-size: 12pt;
-  color: grey;
-
-  border-radius: 20px;
-  border: 2px solid grey;
-  width: 15px;
-  height: 15px;
+  border-radius: 999px;
+  background-color: #555555;
+  width: 3px;
+  height: 3px;
 }
 
 .climberPlaceholderBlocked {
   border: 0px;
+  width: 15px;
+  height: 15px;
 }
 
 .climberPlaceholderWrap,
@@ -203,10 +209,27 @@ button {
   justify-content: center;
 }
 
+.climberPlaceholderParity0 {
+  background-color: #555555;
+}
+
+.climberPlaceholderParity1 {
+  background-color: #222222;
+}
+
 .colNumbers {
   width: 32px;
   height: 22px;
   font-size: 11pt;
+  color: white;
+}
+
+.colParity0 {
+  background-color: #555555;
+}
+
+.colParity1 {
+  background-color: #222222;
 }
 
 .info {
@@ -251,7 +274,6 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* width: 110px; */
 }
 
 .gameSetupPlayer {
@@ -331,28 +353,33 @@ button {
   color: #cc79a7;
 }
 
-.bgcolor0 {
+.bgcolor0,
+.bgcolor0:hover {
   color: white;
   background-color: #d55e00;
 }
 
-.bgcolor1 {
+.bgcolor1,
+.bgcolor1:hover {
   color: white;
   background-color: #0072b2;
 }
 
-.bgcolor2 {
+.bgcolor2,
+.bgcolor2:hover {
   color: white;
   background-color: #009e73;
 }
 
-.bgcolor3 {
+.bgcolor3,
+.bgcolor3:hover {
   background-color: #f0e442;
   color: black;
   border: 1px solid black;
 }
 
-.bgcolor4 {
+.bgcolor4,
+.bgcolor4:hover {
   color: white;
   background-color: #cc79a7;
 }
@@ -477,12 +504,6 @@ button {
 }
 
 .downlight {
-  /* filter: brightness(0.6); */
   opacity: 0.6;
-  /* box-shadow: 0px 0px 4px -1px black; */
-  /* border: 0px; */
-  /* background-color: grey; */
-  /* box-shadow: 0px 0px 1px 1px black, 1px 3px 4px -2px black; */
   box-shadow: 0px 0px 1px 1px black, 1px 3px 4px 0px black;
-  /* background-color: transparent; */
 }

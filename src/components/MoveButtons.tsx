@@ -3,14 +3,18 @@ import { GameType } from "../Game";
 import { SumOption, DiceSum } from "../types";
 
 /* Roll / Stop buttons */
-class ActionButtons extends React.Component<{ moves: any; itsMe: boolean }> {
+class ActionButtons extends React.Component<{
+  moves: any;
+  itsMe: boolean;
+  currentPlayer: string;
+}> {
   render() {
     return (
       <div>
         <div>
           <button
             onClick={() => this.props.moves.rollDice()}
-            className="btn btn-success"
+            className={`btn bgcolor${this.props.currentPlayer}`}
             disabled={!this.props.itsMe}
           >
             Roll
@@ -19,7 +23,7 @@ class ActionButtons extends React.Component<{ moves: any; itsMe: boolean }> {
         <div>
           <button
             onClick={() => this.props.moves.stop()}
-            className="btn btn-success"
+            className={`btn bgcolor${this.props.currentPlayer}`}
             disabled={!this.props.itsMe}
           >
             Stop
@@ -39,6 +43,7 @@ class Possibilities extends React.Component<{
   itsMe: boolean;
   onMouseOver: (diceSplit: number, dicePairs: number[]) => void;
   onMouseOut: () => void;
+  currentPlayer: string;
 }> {
   render() {
     const last = this.props.lastPickedDiceSumOption;
@@ -69,14 +74,14 @@ class Possibilities extends React.Component<{
 
                   let buttonType: string;
                   if (this.props.itsMe) {
-                    buttonType = "success";
+                    buttonType = `bgcolor${this.props.currentPlayer}`;
                   } else if (wasSelected) {
-                    buttonType = "dark";
+                    buttonType = "btn-dark";
                   } else {
-                    buttonType = "secondary";
+                    buttonType = "btn-secondary";
                   }
 
-                  className += "btn-" + buttonType;
+                  className += buttonType;
                   className += " sum";
 
                   // If we are not in a split case, we'll highlight the non null
@@ -108,7 +113,7 @@ class Possibilities extends React.Component<{
                         {sums
                           .filter((x) => x != null)
                           .map(String)
-                          .join(" ")}
+                          .join(" · ")}
                       </button>
                     )
                   );
@@ -133,21 +138,26 @@ interface MoveButtonsProps {
 export default class MoveButtons extends React.Component<MoveButtonsProps> {
   render() {
     const currentPlayer = this.props.ctx.currentPlayer;
+    const { moves } = this.props;
     const stage = this.props.ctx.activePlayers[currentPlayer];
     const itsMe = this.props.playerID === this.props.ctx.currentPlayer;
+    const { lastPickedDiceSumOption, diceSumOptions } = this.props.G;
     if (itsMe && stage === "rolling") {
-      return <ActionButtons moves={this.props.moves} itsMe={itsMe} />;
+      return <ActionButtons {...{ moves, itsMe, currentPlayer }} />;
     } else {
       return (
         <Possibilities
-          moves={this.props.moves}
-          lastPickedDiceSumOption={this.props.G.lastPickedDiceSumOption}
-          diceSumOptions={this.props.G.diceSumOptions}
-          itsMe={itsMe}
           onMouseOver={(diceSplit, dicePairs) =>
             this.props.onMouseOver(diceSplit, dicePairs)
           }
           onMouseOut={() => this.props.onMouseOut()}
+          {...{
+            moves,
+            itsMe,
+            currentPlayer,
+            lastPickedDiceSumOption,
+            diceSumOptions,
+          }}
         />
       );
     }
