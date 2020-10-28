@@ -63,28 +63,48 @@ const dots = [
 /*
  * Map the value and current player to a list of <circle> tags.
  */
-const diceDots = (value: number, currentPlayer: string) =>
-  dots[value - 1].map((dot, i) => (
-    <circle {...dot} className={`dot dotColor${currentPlayer}`} key={i} />
+const diceDots = (value: number, currentPlayer: string, highlight?: number) => {
+  let className = `dot dotColor${currentPlayer}`;
+  if (highlight != null) {
+    className += ` dotHighlight${highlight}`;
+  }
+  return dots[value - 1].map((dot, i) => (
+    <circle {...dot} key={i} {...{ className }} />
   ));
+};
 
 interface DieProps {
   currentPlayer: string;
   value: number;
+  // index to group the highlight dice. If undefined then we don't highlight.
+  highlight?: number;
+  // In case we want to negative highlight a die.
+  noHighlight: boolean;
+  split?: string;
 }
 
 export class Die extends React.Component<DieProps> {
   render() {
+    const { currentPlayer, value, highlight, noHighlight, split } = this.props;
+
+    let className = `die bgcolor${currentPlayer}`;
+    if (highlight != null) {
+      className += ` dieHightlight${highlight}`;
+    } else if (noHighlight) {
+      className += " dieNoHighlight";
+    }
+    if (split != null) {
+      className += ` dieSplit${split}`;
+    }
+
     return (
       <svg
-        className={`die bgcolor${this.props.currentPlayer}`}
         viewBox="0 0 100 100"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
+        {...{ className }}
       >
-        <g fill="#000000">
-          {diceDots(this.props.value, this.props.currentPlayer)}
-        </g>
+        <g fill="#000000">{diceDots(value, currentPlayer, highlight)}</g>
       </svg>
     );
   }

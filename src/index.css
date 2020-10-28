@@ -15,14 +15,32 @@ button {
 }
 
 .die {
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   border-radius: 8px;
   margin: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
 
   box-shadow: 0px 0px 2px black, 1px 1px 1px black, 2px 2px 2px black,
     3px 3px 1px black;
   border: 1px solid black;
+}
+
+.diceRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diceContainer {
+  width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  /* width: 300px; */
+  /* height: 100px; */
 }
 
 .dot {
@@ -30,10 +48,11 @@ button {
   stroke: black;
 }
 
-.diceRow {
+.possibilitiesWrap {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .sums {
@@ -111,6 +130,7 @@ button {
 
 .scoreBoardPlayerNameCurrent {
   border: 2px solid black;
+  filter: brightness(1.1);
 }
 
 .mountainCell {
@@ -172,7 +192,8 @@ button {
   border: 0px;
 }
 
-.climberPlaceholderWrap {
+.climberPlaceholderWrap,
+.colNumbersWrap {
   max-height: 30px;
   min-height: 30px;
   max-width: 39px;
@@ -210,6 +231,7 @@ button {
 .upperSection {
   display: flex;
   width: 100%;
+  height: 140px;
 }
 
 .upperLeft {
@@ -218,6 +240,7 @@ button {
   justify-content: flex-end;
   align-items: center;
 }
+
 .upperRight {
   flex: 1;
   display: flex;
@@ -225,7 +248,10 @@ button {
 }
 
 .upperCenter {
-  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* width: 110px; */
 }
 
 .gameSetupPlayer {
@@ -323,6 +349,7 @@ button {
 .bgcolor3 {
   background-color: #f0e442;
   color: black;
+  border: 1px solid black;
 }
 
 .bgcolor4 {
@@ -370,4 +397,92 @@ button {
 
 .border4 {
   border-color: #cc79a7;
+}
+
+.dieDiv {
+}
+
+/* top right bottom left*/
+.dieSplit0 {
+  margin-left: 0px;
+  margin-right: 0px;
+  /* margin: 6px 0px 6px 0px; */
+}
+
+.dieSplit1 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.dieSplit20 {
+  transform: translate(1px, 1px);
+  margin: 0;
+  /* margin: 8px 0px 0px j8px; */
+}
+
+.dieSplit21 {
+  /* margin: 0px 0px 8px 8px; */
+  /* transform: translate(12, -8px); */
+  transform: translate(5px, -5px);
+  margin: 0;
+  /* transform: translate(4px, 4px); */
+}
+
+.dieSplit22 {
+  margin: 0;
+  /* margin: 8px 8px 0px 0px; */
+  transform: translate(-5px, 5px);
+  /* transform: translate(-4px, -px); */
+}
+.dieSplit23 {
+  /* transform: translate(-4px, -4px); */
+  /* transform: translate(-8px, 0px); */
+  margin: 0;
+  transform: translate(-1px, -1px);
+  /* margin: 0px 8px 8px 0px; */
+  /* margin-left: 8px; */
+  /* margin-top: 8px; */
+  /* align-self: flex-start; */
+}
+
+.dieHightlight0 {
+  filter: brightness(1.2);
+  /* border: 1px solid white !important; */
+  /* background-color: white; */
+}
+
+.dieHightlight1 {
+  filter: brightness(1.2);
+  /* background-color: rgb(220, 250, 240); */
+  /* background-color: grey; */
+  /* border: 1px solid black !important; */
+}
+
+.dotHighlight0 {
+  /* fill: black; */
+}
+
+.dotHighlight1 {
+  /* fill: white; */
+}
+
+.dieNoHighlight {
+  /* filter: brightness(.9); */
+  /* opacity: .5 !important; */
+}
+
+.highlight {
+  filter: brightness(1.2);
+  box-shadow: 0px 0px 1px 1px black, 1px 3px 6px 1px black;
+}
+
+.downlight {
+  /* filter: brightness(0.6); */
+  opacity: 0.6;
+  /* box-shadow: 0px 0px 4px -1px black; */
+  /* border: 0px; */
+  /* background-color: grey; */
+  /* box-shadow: 0px 0px 1px 1px black, 1px 3px 4px -2px black; */
+  box-shadow: 0px 0px 1px 1px black, 1px 3px 4px 0px black;
+  /* background-color: transparent; */
 }

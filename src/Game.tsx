@@ -1,6 +1,6 @@
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, sumSteps } from "./math";
-import { DiceSum } from "./types";
+import { SumOption } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 
 interface Info {
@@ -18,7 +18,7 @@ export interface GameType {
   diceValues: number[];
   currentPositions: { [key: number]: number };
   checkpointPositions: { [key: string]: { [key: number]: number } };
-  diceSumOptions: null | DiceSum[][][];
+  diceSumOptions?: SumOption[];
   lastPickedDiceSumOption: null | number[];
   blockedSums: { [key: number]: string };
   info: Info | null;
@@ -78,8 +78,8 @@ const turn = {
             G.blockedSums
           );
           // Check if busted.
-          const busted = G.diceSumOptions.every((sums) => {
-            return sums[0].length === 0;
+          const busted = G.diceSumOptions.every((sumOption: SumOption) => {
+            return sumOption.sums.every((x) => x == null);
           });
           if (busted) {
             G.info = { message: "Busted!", level: "danger" };
@@ -89,7 +89,7 @@ const turn = {
         },
         stop: (G: GameType, ctx) => {
           G.lastPickedDiceSumOption = null;
-          G.diceSumOptions = null;
+          G.diceSumOptions = undefined;
           // Save current positions as checkpoints.
           Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
             const diceSum = parseInt(diceSumStr);
@@ -122,14 +122,34 @@ const turn = {
     },
     moving: {
       moves: {
-        pickSumOption: (G: GameType, ctx, i, j) => {
+        /*
+         * Pick one of the sums in option.
+         * diceSplitIndex: One of the possible dice splits
+         * choiceIndex: 0 or 1, for "split' dice ([3] [5]) it means either the first or
+         * second one. For non split dice (e.g. [3 - 5]) it should always be 0.
+         */
+        pickSumOption: (
+          G: GameType,
+          ctx,
+          diceSplitIndex: number,
+          choiceIndex: number
+        ) => {
           // Should not happen but makes typescript happy.
           if (G.diceSumOptions == null) {
             throw new Error("assert false");
           }
-          const sumOption = G.diceSumOptions[i][j];
-          G.lastPickedDiceSumOption = [i, j];
-          sumOption.forEach((s) => {
+          const sumOption = G.diceSumOptions[diceSplitIndex];
+
+          // FIXME changer sums pour diceSums pour pouvoir utiliser les deconstructors
+          let diceSums = sumOption.sums;
+          if (sumOption?.split) {
+            diceSums = [diceSums[choiceIndex]];
+          }
+          G.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
+          diceSums.forEach((s) => {
+            if (s == null) {
+              return;
+            }
             if (G.currentPositions.hasOwnProperty(s)) {
               G.currentPositions[s]++;
             } else {
@@ -191,7 +211,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     // State of the 3 current climbers. diceSum -> position.
     currentPositions: {},
     checkpointPositions,
-    diceSumOptions: null,
+    diceSumOptions: undefined,
     lastPickedDiceSumOption: null,
     blockedSums,
     info: { message: "Good game!", level: "success" },

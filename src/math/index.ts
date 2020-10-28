@@ -1,4 +1,4 @@
-import { DiceSum } from "../types";
+import { DiceSum, SumOption } from "../types";
 
 export const DICE_INDICES = [
   [
@@ -28,7 +28,7 @@ export function getSumOptions(
   currentPositions: { [key: string]: number },
   checkpointPositions: { [key: number]: number },
   blockedSums: { [key: number]: string }
-): DiceSum[][][] {
+): SumOption[] {
   if (diceValues.length !== 4) {
     throw new Error("Should have 4 values");
   }
@@ -56,80 +56,88 @@ export function getSumOptions(
   });
 
   // First compute all the dice sums.
-  const allDiceSums = DICE_INDICES.map((group): DiceSum[][] => {
-    // Compute the 2 sums.
-    let diceSums = group.map(
-      (twoDiceIndices): DiceSum => {
-        return twoDiceIndices.map((i) => diceValues[i]).reduce((a, b) => a + b);
-      }
-    );
-
-    if (diceSums[0] === diceSums[1]) {
-      // If both of the sums are the same.
-      const diceSum = diceSums[0];
-      if (updatedBlockedSums.has(diceSum)) {
-        // If the column is blocked, there are no options.
-        return [[]];
-      }
-      if (currentClimberSpace.has(diceSum)) {
-        // Are we already climbing that "sum"?
-        if (currentClimberSpace.get(diceSum) === 1) {
-          // If the columns has one space left, we can choose the sum only once.
-          return [[diceSum]];
-        } else {
-          // Otherwise the column is not blocked and we have more than 1 space: we can
-          // use both sums.
-          return [[diceSum, diceSum]];
+  const allDiceSums = DICE_INDICES.map(
+    (group): SumOption => {
+      // Compute the 2 sums.
+      const diceSums: DiceSum[] = group.map(
+        (twoDiceIndices): DiceSum => {
+          return twoDiceIndices
+            .map((i) => diceValues[i])
+            .reduce((a, b) => a + b);
         }
-      } else {
-        // We are not climbing it. We can play it if we have a climber left.
-        if (numClimbersLeft > 0) {
-          // But we need 2 spaces if we already have a checkpoint there to be able to
-          // play both. Otherwise we can only play one.
-          if (checkpointPositions[diceSum] === sumSteps(diceSum) - 1) {
-            return [[diceSum]];
+      );
+
+      if (diceSums[0] === diceSums[1]) {
+        // If both of the sums are the same.
+        const diceSum = diceSums[0];
+        if (updatedBlockedSums.has(diceSum)) {
+          // If the column is blocked, there are no options.
+          return { sums: [null, null] };
+        }
+        if (currentClimberSpace.has(diceSum)) {
+          // Are we already climbing that "sum"?
+          if (currentClimberSpace.get(diceSum) === 1) {
+            // If the columns has one space left, we can choose the sum only once.
+            return { sums: [diceSum, null] };
           } else {
-            return [[diceSum, diceSum]];
+            // Otherwise the column is not blocked and we have more than 1 space: we can
+            // use both sums.
+            return { sums: [diceSum, diceSum] };
           }
         } else {
-          return [[]];
+          // We are not climbing it. We can play it if we have a climber left.
+          if (numClimbersLeft > 0) {
+            // But we need 2 spaces if we already have a checkpoint there to be able to
+            // play both. Otherwise we can only play one.
+            if (checkpointPositions[diceSum] === sumSteps(diceSum) - 1) {
+              return { sums: [diceSum, null] };
+            } else {
+              return { sums: [diceSum, diceSum] };
+            }
+          } else {
+            return { sums: [null, null] };
+          }
         }
-      }
-    } else {
-      // Both sums are different.
-      let availableDiceSums: DiceSum[] = [];
-      let climbingAtLeastOne = false;
-
-      diceSums.forEach((diceSum) => {
-        const alreadyClimbingIt = currentPositions.hasOwnProperty(diceSum);
-        if (
-          !updatedBlockedSums.has(diceSum) &&
-          (alreadyClimbingIt || numClimbersLeft > 0)
-        ) {
-          // If it's not blocked and we are already climbing or we have climbers left,
-          // then that sum is available.
-          availableDiceSums.push(diceSum);
-        }
-        if (alreadyClimbingIt) {
-          climbingAtLeastOne = true;
-        }
-      });
-
-      // Now the only tricky case left is if we are allowed for both sums, *but not
-      // at the same time*.
-      // This happens when we have only one climber left, and if the two sums are new
-      // sums that we are not already climbing.
-      if (
-        numClimbersLeft === 1 &&
-        !climbingAtLeastOne &&
-        availableDiceSums.length > 0
-      ) {
-        return availableDiceSums.map((x: DiceSum): DiceSum[] => [x]);
       } else {
-        return [availableDiceSums];
+        // Both sums are different.
+        let climbingAtLeastOne = false;
+        let numNonNull = 0;
+
+        // Change the unavailable dice sums to `null`.
+        const newDiceSums = diceSums.map((diceSum: DiceSum): DiceSum | null => {
+          const alreadyClimbingIt = currentPositions.hasOwnProperty(diceSum);
+
+          if (alreadyClimbingIt) {
+            // While we are at it note that we are climbing at least one of those
+            climbingAtLeastOne = true;
+          }
+
+          if (
+            updatedBlockedSums.has(diceSum) ||
+            (numClimbersLeft === 0 && !alreadyClimbingIt)
+          ) {
+            // It could be blocked or we could not be climbing it and have no climbers
+            // left.
+            return null;
+          } else {
+            numNonNull += 1;
+            return diceSum;
+          }
+        });
+
+        // Now the only tricky case left is if we are allowed for both sums, *but not
+        // at the same time*.
+        // This happens when we have only one climber left, and if the two sums are new
+        // sums that we are not already climbing.
+
+        const sumOption: SumOption = { sums: newDiceSums };
+        if (numClimbersLeft === 1 && !climbingAtLeastOne && numNonNull === 2) {
+          sumOption.split = true;
+        }
+        return sumOption;
       }
     }
-  });
+  );
 
   return allDiceSums;
 }

@@ -2,8 +2,8 @@ import React from "react";
 import { PlayerID } from "../types";
 
 interface ScoreBoardProps {
-  scores: { [number: string]: number };
-  playerNames: { [number: string]: number };
+  scores: { [key: string]: number };
+  playerNames: { [key: string]: string };
   currentPlayer: PlayerID;
   playOrder: PlayerID[];
 }

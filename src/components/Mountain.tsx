@@ -1,13 +1,23 @@
 import React from "react";
 import { sumSteps } from "../math";
-import { PlayerID } from "../types";
+import { PlayerID, SumOption } from "../types";
 
-const Climber = (props: { playerID?: PlayerID; currentPlayer?: PlayerID }) => {
+const Climber = (props: {
+  playerID?: PlayerID;
+  currentPlayer?: PlayerID;
+  highlight?: boolean;
+  downlight?: boolean;
+}) => {
   let className = "climber";
   if (props.playerID != null) {
     className += ` bgcolor${props.playerID}`;
   } else {
     className += ` climberCurrent border${props.currentPlayer}`;
+  }
+  if (props.highlight) {
+    className += " highlight";
+  } else if (props.downlight) {
+    className += " downlight";
   }
   return <div {...{ className }}></div>;
 };
@@ -29,10 +39,47 @@ interface MountainProps {
   checkpointPositions: object;
   blockedSums: { [key: number]: string };
   currentPlayer: PlayerID;
+  diceSumOptions?: SumOption[];
+  mouseOverPossibility?: { diceSplit: number; dicePairs: number[] };
 }
 
 export class Mountain extends React.Component<MountainProps> {
   render() {
+    let { currentPositions } = this.props;
+    // First we need to copy the prop.
+    const updatedCurrentPositions = {};
+    Object.assign(updatedCurrentPositions, currentPositions);
+
+    const {
+      mouseOverPossibility,
+      diceSumOptions,
+      checkpointPositions,
+      currentPlayer,
+    } = this.props;
+    // If  we want to highlight, we'll compute where the new positions will be!
+    let highlightSums: number[] = [];
+    if (mouseOverPossibility != null && diceSumOptions != null) {
+      const { diceSplit, dicePairs } = mouseOverPossibility;
+
+      // const highlightSums: (null | number)[] = [];
+
+      const diceSumOption = diceSumOptions[diceSplit];
+      highlightSums = dicePairs
+        .map((i) => diceSumOption.sums[i])
+        .filter((x) => x != null) as number[];
+
+      highlightSums.forEach((sum) => {
+        let checkpoint = checkpointPositions[currentPlayer][sum];
+        checkpoint = checkpoint == null ? 0 : checkpoint;
+
+        if (updatedCurrentPositions.hasOwnProperty(sum)) {
+          updatedCurrentPositions[sum] += 1;
+        } else {
+          updatedCurrentPositions[sum] = checkpoint + 1;
+        }
+      });
+    }
+
     let rows: JSX.Element[] = [];
     for (let row = 13; row >= 0; --row) {
       let cols: any[] = [];
@@ -40,7 +87,8 @@ export class Mountain extends React.Component<MountainProps> {
         let content: JSX.Element | string | (JSX.Element | string)[];
 
         const totalNumSteps = sumSteps(col);
-        const currentIsThere = this.props.currentPositions[col] === row;
+        const currentIsThere = currentPositions[col] === row;
+        const currentWillBeHere = updatedCurrentPositions[col] === row;
         const blockedBy = this.props.blockedSums[col];
 
         let climbers: JSX.Element[] = [];
@@ -52,8 +100,10 @@ export class Mountain extends React.Component<MountainProps> {
             opts.className += ` bgcolor${blockedBy}`;
           }
           content = (
-            <div {...opts} key={0}>
-              {col}
+            <div className="colNumbersWrap">
+              <div {...opts} key={0}>
+                {col}
+              </div>
             </div>
           );
         } else if (row < totalNumSteps) {
@@ -66,11 +116,19 @@ export class Mountain extends React.Component<MountainProps> {
         } else if ([13, 12, 11].includes(row) && col === 2) {
           // We place the left climbers in the top left of the table.
           const numClimbersLeft =
-            3 - Object.keys(this.props.currentPositions).length;
+            3 - Object.keys(updatedCurrentPositions).length;
           content = <ClimberPlaceholder key={0} />;
           if (row >= 14 - numClimbersLeft) {
             climbers.push(
               <Climber key={-1} currentPlayer={this.props.currentPlayer} />
+            );
+          } else if (row >= 11 + Object.keys(currentPositions).length) {
+            climbers.push(
+              <Climber
+                key={-1}
+                currentPlayer={this.props.currentPlayer}
+                downlight={true}
+              />
             );
           }
         } else {
@@ -91,7 +149,19 @@ export class Mountain extends React.Component<MountainProps> {
 
         if (currentIsThere) {
           climbers.push(
-            <Climber key={-1} currentPlayer={this.props.currentPlayer} />
+            <Climber
+              key={-1}
+              currentPlayer={this.props.currentPlayer}
+              downlight={highlightSums.includes(col)}
+            />
+          );
+        } else if (currentWillBeHere) {
+          climbers.push(
+            <Climber
+              key={-1}
+              currentPlayer={this.props.currentPlayer}
+              highlight={true}
+            />
           );
         }
 
