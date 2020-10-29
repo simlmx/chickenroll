@@ -21,6 +21,10 @@ body {
   box-shadow: 0px 0px 0px black;
 }
 
+.lastChoiceOtherPlayer:disabled {
+  background-color: #000000;
+}
+
 .die {
   width: 55px;
   height: 55px;

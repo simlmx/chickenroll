@@ -76,7 +76,7 @@ class Possibilities extends React.Component<{
                   if (this.props.itsMe) {
                     buttonType = `bgcolor${this.props.currentPlayer}`;
                   } else if (wasSelected) {
-                    buttonType = "btn-dark";
+                    buttonType = "btn-secondary lastChoiceOtherPlayer";
                   } else {
                     buttonType = "btn-secondary";
                   }
