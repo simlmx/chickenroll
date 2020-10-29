@@ -106,3 +106,68 @@ export class Die extends React.Component<DieProps> {
     );
   }
 }
+
+export class Background extends React.Component {
+  render() {
+    // dice side
+    const size = 100;
+    // space between two die
+    const padding = 50;
+    // number of dice on the side of a pattern
+    // This means we'll create a pattern of n x n dice and then we'll make a mosaic out
+    // of that pattern.
+    // This can't be too high because it can add some latency.
+    const n = 7;
+    const viewBox = n * (size + padding);
+    const diceValues = Array(n * n)
+      .fill(null)
+      .map(() => Math.floor(Math.random() * 6));
+
+    return (
+      <svg
+        id="background"
+        height="100%"
+        width="100%"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <pattern
+            id="dice"
+            width={30 * n}
+            height={30 * n}
+            patternUnits="userSpaceOnUse"
+            viewBox={`0 0 ${viewBox} ${viewBox}`}
+          >
+            <rect width={viewBox} height={viewBox} fill="#f7f6f2" />
+            {diceValues.map((value, i) => {
+              const dx = padding / 2 + (i % n) * (size + padding);
+              const dy = padding / 2 + Math.floor(i / n) * (size + padding);
+              return (
+                <g
+                  transform={`translate(${dx},${dy}),rotate(${
+                    Math.random() * 360
+                  }, ${padding}, ${padding})`}
+                  key={i}
+                >
+                  <rect
+                    rx="15"
+                    width={size}
+                    height={size}
+                    fill="transparent"
+                    stroke="#e6e5e3"
+                    strokeWidth="7px"
+                    key={i}
+                  />
+                  {dots[value].map((params, j) => (
+                    <circle {...params} fill="#e6e5e3" key={j} />
+                  ))}
+                </g>
+              );
+            })}
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#dice)" />
+      </svg>
+    );
+  }
+}

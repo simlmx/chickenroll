@@ -5,6 +5,7 @@ import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
 import { SocketIO, Local } from "boardgame.io/multiplayer";
 import { PlayerID } from "./types";
+import { Background } from "./components/Die";
 // import { Debug } from 'boardgame.io/debug';
 
 const { protocol, hostname, port } = window.location;
@@ -208,6 +209,7 @@ class App extends React.Component<{}, AppState> {
     if (this.state.passAndPlayMatch != null) {
       return (
         <div>
+          <Background />
           {/* We use playerID=0 but we will let all the players play for everyone,
             because we are assuming players are passing the device around */}
           <this.state.passAndPlayMatch playerID="0" />
@@ -249,6 +251,7 @@ class App extends React.Component<{}, AppState> {
       const { matchID, playerID, playerCredentials } = this.state.currentMatch;
       return (
         <div>
+          <Background />
           {/* TODO add some "are you sure?" */}
           <CantStopClient
             playerID={playerID}
