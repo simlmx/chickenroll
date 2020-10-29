@@ -7,6 +7,7 @@ import GameSetup from "./GameSetup";
 import MoveButtons from "./MoveButtons";
 import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
+import { PlayerID } from "../types";
 
 interface CantStopBoardState {
   // diceSplit: 0=horizontal, 1=vertical, 2=diagonal
@@ -18,7 +19,7 @@ interface CantStopBoardState {
 
 interface CantStopBoardProps {
   G: GameType;
-  playerID: string;
+  playerID: PlayerID;
   matchID: string;
   ctx: any;
   moves: any;

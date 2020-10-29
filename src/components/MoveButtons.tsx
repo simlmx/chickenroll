@@ -1,6 +1,6 @@
 import React from "react";
 import { GameType } from "../Game";
-import { SumOption, DiceSum } from "../types";
+import { SumOption, DiceSum, PlayerID } from "../types";
 
 /* Roll / Stop buttons */
 class ActionButtons extends React.Component<{
@@ -130,7 +130,7 @@ interface MoveButtonsProps {
   ctx: any;
   moves: any;
   G: GameType;
-  playerID: string;
+  playerID: PlayerID;
   onMouseOver: (diceSplit: number, dicePairs: number[]) => void;
   onMouseOut: () => void;
 }

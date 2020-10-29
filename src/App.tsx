@@ -4,6 +4,7 @@ import { CantStopBoard } from "./components/CantStopBoard";
 import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
 import { SocketIO, Local } from "boardgame.io/multiplayer";
+import { PlayerID } from "./types";
 // import { Debug } from 'boardgame.io/debug';
 
 const { protocol, hostname, port } = window.location;
@@ -116,7 +117,7 @@ interface AppState {
   currentMatch?: {
     matchID: string;
     playerCredentials: string;
-    playerID: string;
+    playerID: PlayerID;
   };
   passAndPlayMatch?: any;
 }
