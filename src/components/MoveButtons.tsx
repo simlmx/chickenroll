@@ -10,25 +10,21 @@ class ActionButtons extends React.Component<{
 }> {
   render() {
     return (
-      <div>
-        <div>
-          <button
-            onClick={() => this.props.moves.rollDice()}
-            className={`btn bgcolor${this.props.currentPlayer}`}
-            disabled={!this.props.itsMe}
-          >
-            Roll
-          </button>
-        </div>
-        <div>
-          <button
-            onClick={() => this.props.moves.stop()}
-            className={`btn bgcolor${this.props.currentPlayer}`}
-            disabled={!this.props.itsMe}
-          >
-            Stop
-          </button>
-        </div>
+      <div className="actionButtons">
+        <button
+          onClick={() => this.props.moves.rollDice()}
+          className={`btn bgcolor${this.props.currentPlayer}`}
+          disabled={!this.props.itsMe}
+        >
+          Roll
+        </button>
+        <button
+          onClick={() => this.props.moves.stop()}
+          className={`btn bgcolor${this.props.currentPlayer}`}
+          disabled={!this.props.itsMe}
+        >
+          Stop
+        </button>
       </div>
     );
   }

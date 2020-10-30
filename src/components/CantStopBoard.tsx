@@ -47,6 +47,16 @@ export class CantStopBoard extends React.Component<
       mouseOverPossibility: undefined,
     };
   }
+  renderInfo() {
+    const info = this.props.G.info;
+    const { level, message } = info || { message: "", level: "white" };
+    const className = `alert alert-${level} text-center info`;
+    return (
+      <div {...{ className }} role="alert">
+        {message}
+      </div>
+    );
+  }
   render() {
     const { moves, matchID, ctx, G } = this.props;
     const {
@@ -77,12 +87,6 @@ export class CantStopBoard extends React.Component<
       );
     }
 
-    const info = this.props.G.info;
-    const { level, message } = info || { message: "", level: "white" };
-    const infoOpts = {
-      className: `alert alert-${level} text-center info`,
-    };
-
     // Highlight or not for each die.
     let diceHighlight: boolean[] = Array(4).fill(false);
     let diceSplit: number | undefined = undefined;
@@ -101,54 +105,68 @@ export class CantStopBoard extends React.Component<
 
     return (
       <div className="cantStopBoard">
-        <div {...infoOpts} role="alert">
-          {message}
-        </div>
-        <div className="upperSection">
-          <div className="upperLeft">
-            <ScoreBoard
-              {...{ scores, playerNames, currentPlayer, playOrder }}
-            />
-          </div>
-          <div className="upperCenter">
-            <DiceBoard
-              {...{ diceValues, currentPlayer, diceHighlight, diceSplit }}
-            />
-          </div>
-          <div className="upperRight">
-            <MoveButtons
-              {...{ moves, ctx, G, playerID }}
-              onMouseOver={(diceSplit, dicePairs) =>
-                this.setState({
-                  mouseOverPossibility: { diceSplit, dicePairs },
-                })
-              }
-              onMouseOut={() => {
-                this.setState({ mouseOverPossibility: undefined });
-              }}
-            />
-          </div>
-        </div>
-        <div className="mountainContainer">
-          <Mountain
-            {...{
-              checkpointPositions,
-              currentPositions,
-              blockedSums,
-              currentPlayer,
-              diceSumOptions,
-              mouseOverPossibility,
-            }}
-          />
-          <div className="playAgainContainer">
-            {this.props.ctx.phase === "gameover" && (
-              <button
-                onClick={() => this.props.moves.playAgain()}
-                className={`btn bgcolor${this.props.ctx.currentPlayer}`}
-              >
-                Play Again
-              </button>
-            )}
+        {this.renderInfo()}
+        <div className="mainWrap container-fluid px-0">
+          {/* Main row with the bulk of the game. */}
+          <div className="row mainRow no-gutters align-items-center">
+            {/* Column for the mountain */}
+            <div className=" col-sm-8 col-xl-7">
+              <div className="mountainWrap">
+                {/* First column: the mountain. */}
+                <Mountain
+                  {...{
+                    checkpointPositions,
+                    currentPositions,
+                    blockedSums,
+                    currentPlayer,
+                    diceSumOptions,
+                    mouseOverPossibility,
+                  }}
+                />
+              </div>
+            </div>
+            {/* Second column: dice / actions / score board */}
+            <div className="col-sm-4 col-xl-5 rightWrap">
+              {/* We put this column in a row so that it can be stacked horizontally as well */}
+              {/*<div className="row no-gutters justify-content-center">*/}
+              {/* Dice / actions */}
+              {/*<div className="col-xl order-sm-2 my-sm-3 diceBoardButtonsWrap">*/}
+              <div className="diceBoardButtonWrap">
+                <DiceBoard
+                  {...{ diceValues, currentPlayer, diceHighlight, diceSplit }}
+                />
+
+                <div className="diceButtonsWrap">
+                  {this.props.ctx.phase === "gameover" ? (
+                    <div className="playAgainContainer">
+                      <button
+                        onClick={() => this.props.moves.playAgain()}
+                        className={`btn bgcolor${this.props.ctx.currentPlayer}`}
+                      >
+                        Play Again!
+                      </button>
+                    </div>
+                  ) : (
+                    <MoveButtons
+                      {...{ moves, ctx, G, playerID }}
+                      onMouseOver={(diceSplit, dicePairs) =>
+                        this.setState({
+                          mouseOverPossibility: { diceSplit, dicePairs },
+                        })
+                      }
+                      onMouseOut={() => {
+                        this.setState({ mouseOverPossibility: undefined });
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+              {/* Score board */}
+              {/*<div className="col-xl order-sm-1 my-sm-3 scoreBoardWrap">*/}
+              <ScoreBoard
+                {...{ scores, playerNames, currentPlayer, playOrder }}
+              />
+            </div>
           </div>
         </div>
       </div>

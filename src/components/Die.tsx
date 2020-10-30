@@ -154,12 +154,12 @@ export class Background extends React.Component {
                     width={size}
                     height={size}
                     fill="transparent"
-                    stroke="#e6e5e3"
+                    stroke="#ecebe9"
                     strokeWidth="7px"
                     key={i}
                   />
                   {dots[value].map((params, j) => (
-                    <circle {...params} fill="#e6e5e3" key={j} />
+                    <circle {...params} fill="#ecebe9" key={j} />
                   ))}
                 </g>
               );

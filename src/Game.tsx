@@ -190,7 +190,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
 
   //Those are for quick debugging
   // checkpointPositions["0"] = { 6: 10, 7: 12, 8: 7 };
-  // checkpointPositions["1"] = { 6: 10, 7: 12, 8: 10, 9: 2 };
+  // checkpointPositions["1"] = { 6: 10, 7: 12, 8: 10 };
   // checkpointPositions["2"] = { 6: 10, 7: 12, 8: 10, 9: 2 };
   // checkpointPositions["3"] = { 7: 12, 8: 7, 9: 2 };
   // scores["1"] = 2;

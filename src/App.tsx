@@ -213,20 +213,6 @@ class App extends React.Component<{}, AppState> {
           {/* We use playerID=0 but we will let all the players play for everyone,
             because we are assuming players are passing the device around */}
           <this.state.passAndPlayMatch playerID="0" />
-          {/*
-          <div className="quitMatchContainer">
-            <button
-              className="btn btn-danger"
-              onClick={() =>
-                this.setState({
-                  passAndPlayMatch: undefined,
-                })
-              }
-            >
-              Quit match
-            </button>
-          </div>
-          */}
         </div>
       );
     } else if (this.state.currentMatch == null) {

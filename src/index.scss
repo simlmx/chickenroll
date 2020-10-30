@@ -1,0 +1,682 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+@use "sass:math";
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+body {
+  margin: 0;
+  font-family: Verdana,Arial,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f7f6f2;
+  font-size: 16px;
+  border-color: black;
+  height: 100% !important;
+}
+
+$colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
+
+@for $i from 1 through length($colors) {
+  $color: nth($colors, $i);
+  .color#{$i - 1} {
+    color: $color;
+  }
+
+  .bgcolor#{$i - 1} {
+    color: white;
+    background-color: $color;
+    border: 0.1rem solid transparent;
+    border-color: $color;
+  }
+
+  button.bgcolor#{$i - 1},
+  button.bgcolor#{$i - 1}:hover {
+    color: white;
+    background-color: $color;
+    border: 0.1rem solid transparent;
+    border-color: $color;
+  }
+  
+  .border#{$i - 1} {
+    border-color: $color;
+  }
+}
+
+/* third color - yellow - is special because too light. */
+.bgcolor3 {
+  color: black;
+  background-color: #f0e442;
+  border-color: black;
+}
+
+button.bgcolor3, 
+button.bgcolor3:hover {
+  color: black;
+  background-color: #f0e442;
+  border-color: black;
+}
+
+@mixin cellDim($cell-height, $cell-width) {
+  min-height: $cell-height;
+  max-height: $cell-height;
+  min-width: $cell-width;
+  max-width: $cell-width;
+}
+
+.mainWrap {
+  height: 94vh;
+}
+
+.mainRow {
+  height: 100%;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.rightWrap {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100% !important;
+}
+
+.mountainWrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.cantStopBoard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+#background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+}
+
+
+.btn {
+  border-radius: 0.3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin: 0.3rem;
+}
+
+.btn:hover,
+.btn:focus,
+.btn:active {
+  filter: brightness(1.2);
+}
+
+.lastChoiceOtherPlayer:disabled {
+  background-color: #000000;
+}
+
+.die {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.58rem;
+  margin: 0.2rem;
+  margin-left: 0.2rem;
+  margin-right: 0.2rem;
+
+  box-shadow: 0.05rem 0.05rem 0.05rem black, 0.1rem 0.1rem 0.1rem black,
+    0.2rem 0.2rem 0.1rem black;
+  border: 0.05rem solid black;
+}
+
+.diceRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diceContainer {
+  width: 10rem;
+  height: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.dot {
+  stroke-width: 0.1rem;
+  stroke: black;
+}
+
+.possibilitiesWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mountain {
+  font-family: arial, sans-serif;
+  padding: 0px;
+  table-layout: fixed;
+}
+
+.mountainCol {
+  padding: 0px !important;
+  text-align: center;
+  /* border: 1px solid green !important; */
+}
+
+.diceBoard {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quitMatchContainer {
+  text-align: right;
+  margin: 10px;
+}
+
+.scoreBoardWrap {
+  align-self: flex-start;
+}
+
+.scoreBoard td {
+  padding: 0px;
+  margin: 0px;
+}
+
+.scoreBoardPlayerNameContainer {
+  text-align: right;
+  margin: 0.2rem;
+}
+
+.scoreBoardPlayerName {
+  border-radius: 0.7rem;
+  padding: 0.03rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border: 0.2rem solid transparent;
+}
+
+
+.scoreBoardPlayerNameCurrent {
+  border: 0.2rem solid black;
+  
+  filter: brightness(1.1);
+}
+
+
+.mountainCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.climber {
+  box-shadow: 0px 0px 4px -1px black, 1px 2px 3px 0px black;
+  z-index: 999;
+  opacity: 1;
+  border-width: 0px;
+  border-radius: 999px;
+}
+
+.climberCurrent {
+  background-color: black;
+  box-shadow: 0px 0px 1px 1px black, 1px 3px 4px 0px black;
+  border-style: solid;
+}
+
+.climberGroup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 10rem;
+}
+
+.climberPlaceholder {
+  border-radius: 0.3rem;
+  background-color: #555555;
+  width: 0.3rem;
+  height: 0.3rem;
+}
+
+.climberPlaceholderWrap,
+.colNumbersWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.climberPlaceholderParity0 {
+  background-color: #555555;
+}
+
+.climberPlaceholderParity1 {
+  background-color: #222222;
+}
+
+.colNumbers {
+  /* height: 22px; */
+  /* font-size: 0.9rem; */
+  border-radius: 0.5rem;
+  /* color: white; */
+}
+
+.colParity0 {
+  background-color: #555555;
+  color: white;
+}
+
+.colParity1 {
+  background-color: #222222;
+  color: white;
+}
+
+.info {
+  height: 5vh;
+  border-width: 1vh;
+  /* font-size: 1rem; */
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  /* padding-top: -10px; */
+  /* border-width: 3px; */
+  border-left: 0px;
+  border-right: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diceBoardButtonWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding-left: 1vw;
+}
+
+.emptyStar {
+  color: #f7f6f2;
+  text-shadow: 0px 0px 1px black;
+}
+
+/* FIXME  game setup rem */
+.gameSetupPlayer {
+  width: 400px;
+  border: 2px;
+  border-radius: 10px;
+
+  padding: 5px;
+  padding-left: 15px;
+  margin-bottom: 10px;
+
+  box-shadow: 1px 1px 2px black;
+}
+
+.gameSetupPlayerName {
+  font-size: 20pt;
+}
+
+.gameSetupPlayerFree {
+  background-color: white;
+  border: 2px dotted grey;
+  opacity: 0.5;
+  color: grey;
+  text-align: center;
+  box-shadow: 0 0 0 white;
+}
+
+.gameSetupPlayerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.gameSetup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.matchIdContainer {
+  align-self: flex-start;
+  padding: 5px;
+  padding-top: 2px;
+  padding-bottom: 0px;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.playAgainContainer button {
+  font-size: 1.5rem;
+}
+
+.matchId {
+  font-family: courier new;
+  font-size: 12pt;
+}
+
+
+
+.dotColor0,
+.dotColor1,
+.dotColor2,
+.dotColor4 {
+  fill: white;
+}
+
+.dotColor3 {
+  fill: black;
+  stroke-width: 0px;
+  stroke: black;
+}
+
+.dieSplit0 {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.dieSplit1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.dieSplit20 {
+  transform: translate(0.05rem, 0.05rem);
+  margin: 0;
+}
+
+.dieSplit21 {
+  transform: translate(0.3rem, -0.3rem);
+  margin: 0;
+}
+
+.dieSplit22 {
+  margin: 0;
+  transform: translate(-0.3rem, 0.3rem);
+}
+.dieSplit23 {
+  margin: 0;
+  transform: translate(-0.05rem, -0.05rem);
+}
+
+.dieHighlight {
+  filter: brightness(1.2);
+}
+
+.highlight {
+  filter: brightness(1.2);
+  box-shadow: 0px 0px 1px 1px black, 1px 3px 6px 1px black;
+}
+
+.downlight {
+  opacity: 0.6;
+  box-shadow: 0px 0px 1px 1px black, 1px 3px 4px 0px black;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+// height /width for one cell
+@mixin cellSize($height, $mountainRatio:0.8) {
+  $width: $height / $mountainRatio;
+
+  $neg-margin: $width * -0.3;
+  $climberSize: $width * 0.4;
+  $colNumWidth: $width * 0.85;
+  $currentClimberSize: $climberSize;
+  $currentClimberBorder: $width * 1/20;
+  $mountainWidth: $width * 11;
+  $blockedSize: $width * 0.35;
+
+  .mountain {
+    width: $mountainWidth;
+    min-width: $mountainWidth;
+  }
+
+  .climberPlaceholderWrap,
+  .colNumbersWrap,
+  .climberGroup,
+  .mountainCell {
+    @include cellDim($height, $width);
+  }
+  .climberGroup {
+    margin-top: -$height;
+  }
+
+  .climber {
+    height: $climberSize;
+    width: $climberSize;
+    /* box-shadow: 0px 0px 4px -1px black, 1px 2px 3px 0px black; */
+    margin-right: $neg-margin;
+    margin-left: $neg-margin;
+  }
+
+  .climberCurrent {
+    height: $currentClimberSize;
+    width: $currentClimberSize;
+    border-width: $currentClimberBorder !important;
+  }
+
+  .climberPlaceholderBlocked {
+      border-radius: 999px;
+      border:0px solid transparent;
+    width: $blockedSize !important;
+    height: $blockedSize !important;
+  }
+
+  .colNumbers {
+    width: $colNumWidth;
+  }
+}
+
+.diceButtonsWrap {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* tweaks per breakpoint */
+@include media-breakpoint-up(xl) {
+  @include cellSize(100vh / 14 * 0.65);
+  body * {
+    font-size: 1.5rem;
+  }
+
+  .btn {
+    font-size: 1.5rem;
+  }
+
+  .colNumbers {
+    font-size: 1.3rem;
+  }
+
+  .diceButtonsWrap {
+    height: 12rem;
+  }
+  .scoreBoard {
+    margin-bottom: 10vh;
+  }
+}
+@include media-breakpoint-down(lg) {
+  @include cellSize(100vh / 14 * 0.75);
+  body * {
+    font-size: 1.3rem;
+  }
+
+  .btn {
+    font-size: 1.3rem;
+  }
+
+  .colNumbers {
+    font-size: 1.1rem;
+  }
+
+  .diceButtonsWrap {
+    height: 12rem;
+  }
+  .scoreBoard {
+    margin-bottom: 5vh;
+  }
+}
+@include media-breakpoint-down(md) {
+  @include cellSize(94vh / 14 * 0.95);
+  body * {
+    font-size: 1.1rem;
+  }
+
+  .btn {
+    font-size: 1.5rem;
+    padding-left:2rem;
+    padding-right:2rem;
+  }
+
+  .colNumbers {
+    font-size: 1rem;
+  }
+
+  .diceButtonsWrap {
+    height: 12rem;
+  }
+  .scoreBoard {
+    margin-bottom: 0vh;
+  }
+
+  .rightWrap {
+     justify-content: space-between; 
+     align-items: center;
+  }
+  .die {
+    width: 3rem;
+    height: 3rem;
+  }
+  .diceContainer {
+    width: 7rem;
+    height: 7rem;
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  @include cellSize(94vh / 14 * 0.93);
+  body * {
+    font-size: 0.8rem;
+  }
+
+  .scoreBoardPlayerNameContainer  {
+      margin: 1px;
+  }
+
+  .btn {
+      margin:1px;
+  }
+
+  .colNumbers {
+    font-size: 0.8rem;
+  }
+
+  .diceButtonsWrap {
+    height: 10.5rem;
+  }
+  .die {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  .diceContainer {
+    width: 6rem;
+    height: 6rem;
+  }
+}
+
+@include media-breakpoint-down(xs) {
+    $mountainRatio: 0.7;
+    $width: 95vw / 11;
+    $height: $width * $mountainRatio;
+  @include cellSize($height, $mountainRatio);
+  body * {
+  }
+
+  .mountainWrap {
+      justify-content: center;
+  }
+
+  .colNumbers {
+    font-size: 0.8rem;
+  }
+  .rightWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height:auto !important;
+  }
+
+  .diceBoardButtonWrap {
+      flex-direction:row;
+      justify-content: center;
+      margin:0 !important;
+      width: 100%;
+  }
+
+  .diceButtonsWrap {
+      width: 12rem;
+  }
+  .die {
+    width: 4rem;
+    height: 4rem;
+  }
+  .diceContainer {
+    width: 7rem;
+    height: 7rem;
+  }
+
+}
+
+/* @include media-breakpoint-up(xs) { */
+/*   * { */
+/*     border: 1px solid red; */
+/*   } */
+/*   } */
+
+/* @include media-breakpoint-up(sm) { */
+/*   * { */
+/*     border: 1px solid orange; */
+/*   } */
+/* } */
+/* @include media-breakpoint-up(md) { */
+/*   * { */
+/*     border: 1px solid lime; */
+/*   } */
+/* } */
+/* @include media-breakpoint-up(lg) { */
+/*   * { */
+/*     border: 1px solid blue; */
+/*   } */
+/* } */
+/* @include media-breakpoint-up(xl) { */
+/*   * { */
+/*     border: 1px solid purple; */
+/*   } */
+/* } */
+
