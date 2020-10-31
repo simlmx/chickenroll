@@ -398,19 +398,17 @@ button.bgcolor3:hover {
 .playerNameFormButtonWrap {
   text-align: right;
 }
-.playerNameInput {
-  /* width: auto !important; */
-  /* max-width: 100%; */
-}
 
 .gameSetupPlayer {
   width: 100vw;
-  max-width: 40rem;
+  max-width: 30rem;
   border-radius: 10px;
   // No border not event for yellow
   border: 0px;
 
   padding: 0.4rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   margin: 0.1rem;
   /* padding-left: 15px; */
   /* margin-bottom: 0.5rem; */
@@ -434,6 +432,10 @@ button.bgcolor3:hover {
 .copyBtn {
   font-size: 0.6rem;
   font-weight: bold;
+  margin-left: 0.5rem;
+
+  // For some reason it's weirdly aligned
+  margin-top: -3px;
 }
 
 .playAgainContainer button {

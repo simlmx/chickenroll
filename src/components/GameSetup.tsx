@@ -92,7 +92,7 @@ export default class GameSetup extends React.Component<GameSetupProps> {
       <div className="gameSetup">
         <div className="gameSetupInviteWrap alert alert-success">
           <div>
-            <b>Share this link to Invite players</b>
+            <b>Share this link to invite players</b>
           </div>
           <div className="inviteLink badge badge-success user-select-all">
             {matchLink}

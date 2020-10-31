@@ -181,7 +181,7 @@ class App extends React.Component<{}, AppState> {
         passAndPlay: false,
       },
     });
-    await this.joinMatch(matchID);
+    window.location.replace(`${SERVER}/?m=${matchID}`);
   }
 
   createPassAndPlayMatch(numPlayers: number) {
@@ -209,11 +209,33 @@ class App extends React.Component<{}, AppState> {
       alert(
         "There was a problem. Make sure you have the right code and try again."
       );
+      window.location.replace(`${SERVER}/`);
       return;
     }
 
+    let playerID: string | null;
+    let playerCredentials: string | null;
+
+    // Try to get our login information from the local store if it's there
+    playerID = window.localStorage.getItem(`playerID for matchID=${matchID}`);
+    playerCredentials = window.localStorage.getItem(
+      `playerCredentials for matchID=${matchID}`
+    );
+    if (playerID != null && playerCredentials != null) {
+      this.setState({
+        currentMatch: {
+          matchID,
+          playerID,
+          playerCredentials,
+        },
+      });
+      return;
+    }
+
+    // If we didn't find it in local store, it's because we are not part of this game
+    // yet.
     // Find the next free playerID.
-    let playerID = "0";
+    playerID = "0";
     const thereIsRoom = match.players.some((player, i) => {
       playerID = i.toString();
       return !player.hasOwnProperty("name");
@@ -236,11 +258,16 @@ class App extends React.Component<{}, AppState> {
     }
 
     // If we get here it means we successfully joined the match.
-    const { playerCredentials } = resp;
+    playerCredentials = resp.playerCredentials as string;
     this.setState({
       currentMatch: { matchID, playerCredentials, playerID },
       passAndPlayMatch: undefined,
     });
+    window.localStorage.setItem(`playerID for matchID=${matchID}`, playerID);
+    window.localStorage.setItem(
+      `playerCredentials for matchID=${matchID}`,
+      playerCredentials
+    );
   }
 
   // We separate it to add the background to everything.
