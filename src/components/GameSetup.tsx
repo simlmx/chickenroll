@@ -1,5 +1,6 @@
 import React from "react";
 import { PlayerID } from "../types";
+import { SERVER } from "../constants";
 
 interface PlayerProps {
   moves: any;
@@ -21,33 +22,36 @@ export class Player extends React.Component<PlayerProps, { myName: string }> {
       className += " gameSetupPlayerWaiting";
     }
     return (
-      <div className={className}>
+      <div {...{ className }}>
         {this.props.itsMe && this.props.name === "" ? (
-          <form className="form-row">
-            <div className="col">
-              <input
-                className="form-control"
-                onChange={(event) =>
-                  this.setState({ myName: event.target.value })
-                }
-                placeholder="Enter your name"
-                autoFocus
-                maxLength={16}
-              />
-            </div>
-            <div className="col">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                placeholder="Enter your name"
-                onClick={(e) => {
-                  e.preventDefault();
-                  this.props.moves.setName(this.state.myName);
-                }}
-                disabled={this.state.myName === ""}
-              >
-                Ready!
-              </button>
+          <form className="playerNameForm">
+            <div className="form-group row">
+              <div className="col-sm">
+                <input
+                  type="text"
+                  className="form-control"
+                  onChange={(event) =>
+                    this.setState({ myName: event.target.value })
+                  }
+                  placeholder="Enter your name"
+                  autoFocus
+                  maxLength={16}
+                />
+              </div>
+              <div className="col-sm-auto">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  placeholder="Enter your name"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.props.moves.setName(this.state.myName);
+                  }}
+                  disabled={this.state.myName === ""}
+                >
+                  Ready!
+                </button>
+              </div>
             </div>
           </form>
         ) : (
@@ -83,13 +87,25 @@ export default class GameSetup extends React.Component<GameSetupProps> {
     const maxNumPlayers = this.props.maxNumPlayers;
     const numFreeSpots =
       maxNumPlayers - Object.keys(this.props.playerNames).length;
+    const matchLink = `${SERVER}/?m=${this.props.matchID}`;
     return (
       <div className="gameSetup">
-        <div className="matchIdContainer">
-          Match code:{" "}
-          <span className="badge badge-dark matchId">{this.props.matchID}</span>
+        <div className="gameSetupInviteWrap alert alert-success">
+          <div>
+            <b>Share this link to Invite players</b>
+          </div>
+          <div className="inviteLink badge badge-success user-select-all">
+            {matchLink}
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline-success btn-sm copyBtn"
+            onClick={() => navigator.clipboard.writeText(matchLink)}
+          >
+            Copy
+          </button>
         </div>
-        <div className="gameSetupPlayerContainer">
+        <div className="gameSetupPlayersWrap">
           {Object.entries(this.props.playerNames).map(([playerID, name]) => (
             <Player
               moves={this.props.moves}

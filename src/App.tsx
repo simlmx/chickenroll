@@ -7,11 +7,8 @@ import { SocketIO, Local } from "boardgame.io/multiplayer";
 import { PlayerID } from "./types";
 import { Background } from "./components/Die";
 import { DiceBoard } from "./components/DiceBoard";
+import { SERVER } from "./constants";
 // import { Debug } from 'boardgame.io/debug';
-
-const { protocol, hostname, port } = window.location;
-
-const SERVER = `${protocol}//${hostname}:${port}`;
 
 const MAX_PLAYERS = 4;
 
@@ -107,26 +104,24 @@ class MainMenu extends React.Component<
             </div>
             <hr />
             <h2> Play over the internet </h2>
-            <form className="form-inline needs-validation">
+            <form className="form-inline">
               <div className="form-row">
-                <div>
-                  <button
-                    type="submit"
-                    className="btn btn-success"
-                    onClick={() => this.props.onJoin(this.state.matchID)}
-                  >
-                    Join a match
-                  </button>
-                  <input
-                    type="text"
-                    className="form-control"
-                    onChange={(event) =>
-                      this.setState({ matchID: event.target.value })
-                    }
-                    placeholder="Enter the match code"
-                    required
-                  />
-                </div>
+                <button
+                  type="submit"
+                  className="btn btn-success"
+                  onClick={() => this.props.onJoin(this.state.matchID)}
+                >
+                  Join a match
+                </button>
+                <input
+                  type="text"
+                  className="form-control"
+                  onChange={(event) =>
+                    this.setState({ matchID: event.target.value })
+                  }
+                  placeholder="Enter the match code"
+                  required
+                />
               </div>
             </form>
             <div>
@@ -169,6 +164,14 @@ class App extends React.Component<{}, AppState> {
     this.client = new LobbyClient({ server: SERVER });
   }
 
+  componentDidMount() {
+    // Parse the query params to extract the match id if present.
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchID = urlParams.get("m");
+    if (matchID != null) {
+      this.joinMatch(matchID);
+    }
+  }
   async createMatch(): Promise<void> {
     const { matchID } = await this.client.createMatch("cantstop", {
       // This is the maximum number of players. We will adjust the turns if less players
@@ -280,24 +283,11 @@ class App extends React.Component<{}, AppState> {
 
       const { matchID, playerID, playerCredentials } = this.state.currentMatch;
       return (
-        <div>
-          {/* TODO add some "are you sure?" */}
-          <CantStopClient
-            playerID={playerID}
-            matchID={matchID}
-            credentials={playerCredentials}
-          />
-          {/*<button
-            onClick={() => {
-              this.client.leaveMatch("cantstop", matchID, {
-                playerID,
-                credentials: playerCredentials,
-              });
-            }}
-          >
-            Leave Match
-            </button>*/}
-        </div>
+        <CantStopClient
+          playerID={playerID}
+          matchID={matchID}
+          credentials={playerCredentials}
+        />
       );
     }
   }
