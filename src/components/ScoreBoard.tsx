@@ -3,6 +3,7 @@ import { PlayerID } from "../types";
 
 interface ScoreBoardProps {
   scores: { [key: string]: number };
+  numVictories: { [key: string]: number };
   playerNames: { [key: string]: string };
   currentPlayer: PlayerID;
   playOrder: PlayerID[];
@@ -38,6 +39,11 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
       }
       return (
         <tr key={playerID}>
+          <td className="numVictoriesCol">
+            <div className={`badge bgcolor${playerID}`}>
+              {this.props.numVictories[playerID] || ""}
+            </div>
+          </td>
           <td>
             <div className="scoreBoardPlayerNameContainer">
               <div {...{ className }}>{name}</div>

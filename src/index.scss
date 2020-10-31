@@ -509,6 +509,11 @@ button.bgcolor3:hover {
   justify-content: center;
 }
 
+.numVictoriesCol {
+  min-width: 2.5rem;
+  text-align: right;
+}
+
 // height /width for one cell
 @mixin cellSize($height, $mountainRatio: 0.8) {
   $width: $height / $mountainRatio;

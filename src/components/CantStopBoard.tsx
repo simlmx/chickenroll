@@ -67,6 +67,7 @@ export class CantStopBoard extends React.Component<
       playerNames,
       diceValues,
       scores,
+      numVictories,
     } = G;
     const { currentPlayer, phase, numPlayers, playOrder } = ctx;
     const { mouseOverPossibility } = this.state;
@@ -164,7 +165,13 @@ export class CantStopBoard extends React.Component<
               {/* Score board */}
               {/*<div className="col-xl order-sm-1 my-sm-3 scoreBoardWrap">*/}
               <ScoreBoard
-                {...{ scores, playerNames, currentPlayer, playOrder }}
+                {...{
+                  scores,
+                  playerNames,
+                  currentPlayer,
+                  playOrder,
+                  numVictories,
+                }}
               />
             </div>
           </div>

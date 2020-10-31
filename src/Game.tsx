@@ -31,6 +31,8 @@ export interface GameType {
   // people will join.
   numPlayers: number;
   setupData: SetupDataType;
+  // Number of victories for the current match.
+  numVictories: { [key: string]: number };
 }
 
 /*
@@ -112,6 +114,7 @@ const turn = {
               message: `${G.playerNames[ctx.currentPlayer]} won!`,
               level: "success",
             };
+            G.numVictories[ctx.currentPlayer] += 1;
             ctx.events.endPhase();
           } else {
             G.info = { message: "Stopped.", level: "success" };
@@ -172,11 +175,12 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
 
   const scores: { [key: number]: number } = {};
   const checkpointPositions = {};
-  // const playerNames = {};
+  const numVictories = {};
 
   for (let i = 0; i < ctx.numPlayers; ++i) {
     scores[i] = 0;
     checkpointPositions[i] = {};
+    numVictories[i] = 0;
   }
 
   const playerNames = {};
@@ -219,6 +223,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     playerNames,
     numPlayers: ctx.numPlayers,
     setupData,
+    numVictories,
   };
 };
 
@@ -290,7 +295,7 @@ const CantStop = {
         playAgain: (G, ctx) => {
           // We need to keep some of the fields that were entered during the game, in the "setup"
           // phase.
-          const keepFields = ["playerNames", "numPlayers"];
+          const keepFields = ["playerNames", "numPlayers", "numVictories"];
 
           // Create an object like G but with only the fields to keep.
           const GKeep = Object.keys(G)

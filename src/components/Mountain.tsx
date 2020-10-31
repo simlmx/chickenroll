@@ -125,7 +125,7 @@ export class Mountain extends React.Component<MountainProps> {
           // We place the left climbers in the top left of the table.
           const numClimbersLeft =
             3 - Object.keys(updatedCurrentPositions).length;
-          content = <ClimberPlaceholder key={0} />;
+          content = <ClimberPlaceholder key={0} {...{ columnParity }} />;
           if (row >= 14 - numClimbersLeft) {
             climbers.push(
               <Climber key={-1} currentPlayer={this.props.currentPlayer} />
