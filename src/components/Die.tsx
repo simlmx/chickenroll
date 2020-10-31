@@ -63,15 +63,18 @@ const dots = [
 /*
  * Map the value and current player to a list of <circle> tags.
  */
-const diceDots = (value: number, currentPlayer: string) => {
-  let className = `dot dotColor${currentPlayer}`;
+const diceDots = (value: number, currentPlayer?: string) => {
+  let className = `dot`;
+  if (currentPlayer != null) {
+    className += ` dotColor${currentPlayer}`;
+  }
   return dots[value - 1].map((dot, i) => (
     <circle {...dot} key={i} {...{ className }} />
   ));
 };
 
 interface DieProps {
-  currentPlayer: string;
+  currentPlayer?: string;
   value: number;
   highlight?: boolean;
   // 0: horizontal split
@@ -86,7 +89,10 @@ export class Die extends React.Component<DieProps> {
   render() {
     const { currentPlayer, value, highlight, split } = this.props;
 
-    let className = `die bgcolor${currentPlayer}`;
+    let className = "die";
+    if (currentPlayer != null) {
+      className += ` bgcolor${currentPlayer}`;
+    }
     if (highlight) {
       className += " dieHighlight";
     }

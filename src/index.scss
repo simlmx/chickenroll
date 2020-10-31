@@ -2,13 +2,15 @@
 @use "sass:math";
 
 html,
-body {
+body,
+#root,
+#megaWrap {
   height: 100%;
   width: 100%;
 }
 body {
   margin: 0;
-  font-family: Verdana,Arial,sans-serif;
+  font-family: Verdana, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f7f6f2;
@@ -39,7 +41,7 @@ $colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
     border: 0.1rem solid transparent;
     border-color: $color;
   }
-  
+
   .border#{$i - 1} {
     border-color: $color;
   }
@@ -52,7 +54,7 @@ $colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
   border-color: black;
 }
 
-button.bgcolor3, 
+button.bgcolor3,
 button.bgcolor3:hover {
   color: black;
   background-color: #f0e442;
@@ -64,6 +66,39 @@ button.bgcolor3:hover {
   max-height: $cell-height;
   min-width: $cell-width;
   max-width: $cell-width;
+}
+
+.welcomeWrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcomeTitleWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.welcomeTitle {
+  /* font-size: 4rem; */
+  margin-top: 2rem;
+  font-weight: bold;
+}
+
+.welcomeReference {
+  font-size: 1rem;
+}
+
+.welcomeContentWrap {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .mainWrap {
@@ -99,7 +134,6 @@ button.bgcolor3:hover {
   align-items: center;
 }
 
-
 #background {
   position: absolute;
   top: 0;
@@ -108,7 +142,6 @@ button.bgcolor3:hover {
   width: 100%;
   z-index: -1;
 }
-
 
 .btn {
   border-radius: 0.3rem;
@@ -213,13 +246,11 @@ button.bgcolor3:hover {
   border: 0.2rem solid transparent;
 }
 
-
 .scoreBoardPlayerNameCurrent {
   border: 0.2rem solid black;
-  
+
   filter: brightness(1.1);
 }
-
 
 .mountainCell {
   display: flex;
@@ -272,10 +303,7 @@ button.bgcolor3:hover {
 }
 
 .colNumbers {
-  /* height: 22px; */
-  /* font-size: 0.9rem; */
   border-radius: 0.5rem;
-  /* color: white; */
 }
 
 .colParity0 {
@@ -291,12 +319,9 @@ button.bgcolor3:hover {
 .info {
   height: 5vh;
   border-width: 1vh;
-  /* font-size: 1rem; */
   width: 100%;
   padding: 0;
   margin: 0;
-  /* padding-top: -10px; */
-  /* border-width: 3px; */
   border-left: 0px;
   border-right: 0px;
   display: flex;
@@ -375,8 +400,6 @@ button.bgcolor3:hover {
   font-size: 12pt;
 }
 
-
-
 .dotColor0,
 .dotColor1,
 .dotColor2,
@@ -440,7 +463,7 @@ button.bgcolor3:hover {
 }
 
 // height /width for one cell
-@mixin cellSize($height, $mountainRatio:0.8) {
+@mixin cellSize($height, $mountainRatio: 0.8) {
   $width: $height / $mountainRatio;
 
   $neg-margin: $width * -0.3;
@@ -481,8 +504,8 @@ button.bgcolor3:hover {
   }
 
   .climberPlaceholderBlocked {
-      border-radius: 999px;
-      border:0px solid transparent;
+    border-radius: 999px;
+    border: 0px solid transparent;
     width: $blockedSize !important;
     height: $blockedSize !important;
   }
@@ -493,19 +516,19 @@ button.bgcolor3:hover {
 }
 
 .diceButtonsWrap {
-    display:flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* tweaks per breakpoint */
 @include media-breakpoint-up(xl) {
   @include cellSize(100vh / 14 * 0.65);
-  body * {
+  div {
     font-size: 1.5rem;
   }
 
-  .btn {
+  .btnAction {
     font-size: 1.5rem;
   }
 
@@ -522,11 +545,11 @@ button.bgcolor3:hover {
 }
 @include media-breakpoint-down(lg) {
   @include cellSize(100vh / 14 * 0.75);
-  body * {
+  div {
     font-size: 1.3rem;
   }
 
-  .btn {
+  .btnAction {
     font-size: 1.3rem;
   }
 
@@ -543,14 +566,12 @@ button.bgcolor3:hover {
 }
 @include media-breakpoint-down(md) {
   @include cellSize(94vh / 14 * 0.95);
-  body * {
+  div {
     font-size: 1.1rem;
   }
 
-  .btn {
+  .btnAction {
     font-size: 1.5rem;
-    padding-left:2rem;
-    padding-right:2rem;
   }
 
   .colNumbers {
@@ -565,8 +586,8 @@ button.bgcolor3:hover {
   }
 
   .rightWrap {
-     justify-content: space-between; 
-     align-items: center;
+    justify-content: space-between;
+    align-items: center;
   }
   .die {
     width: 3rem;
@@ -580,16 +601,16 @@ button.bgcolor3:hover {
 
 @include media-breakpoint-down(sm) {
   @include cellSize(94vh / 14 * 0.93);
-  body * {
+  div {
     font-size: 0.8rem;
   }
 
-  .scoreBoardPlayerNameContainer  {
-      margin: 1px;
+  .scoreBoardPlayerNameContainer {
+    margin: 1px;
   }
 
   .btn {
-      margin:1px;
+    margin: 1px;
   }
 
   .colNumbers {
@@ -607,50 +628,68 @@ button.bgcolor3:hover {
     width: 6rem;
     height: 6rem;
   }
+
+  .welcomeTitle,
+  .welcomeContentWrap {
+    margin: 0;
+  }
+
+  .welcomeTitle {
+    font-size: 2rem;
+  }
 }
 
 @include media-breakpoint-down(xs) {
-    $mountainRatio: 0.7;
-    $width: 95vw / 11;
-    $height: $width * $mountainRatio;
+  $mountainRatio: 0.7;
+  $width: 95vw / 11;
+  $height: $width * $mountainRatio;
   @include cellSize($height, $mountainRatio);
-  body * {
+  div {
   }
 
   .mountainWrap {
-      justify-content: center;
+    justify-content: center;
   }
 
   .colNumbers {
     font-size: 0.8rem;
   }
   .rightWrap {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height:auto !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto !important;
   }
 
   .diceBoardButtonWrap {
-      flex-direction:row;
-      justify-content: center;
-      margin:0 !important;
-      width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0 !important;
+    width: 100%;
   }
 
   .diceButtonsWrap {
-      width: 12rem;
+    width: 12rem;
   }
   .die {
     width: 4rem;
     height: 4rem;
   }
   .diceContainer {
-    width: 7rem;
-    height: 7rem;
+    width: 10rem;
+    height: 10rem;
   }
 
+  .welcomeWrap .diceContainer {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  .welcomeWrap .die {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 /* @include media-breakpoint-up(xs) { */
@@ -679,4 +718,3 @@ button.bgcolor3:hover {
 /*     border: 1px solid purple; */
 /*   } */
 /* } */
-

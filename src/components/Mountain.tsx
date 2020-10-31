@@ -26,7 +26,7 @@ const ClimberPlaceholder = (props: {
   playerID?: PlayerID;
   columnParity?: number;
 }) => {
-  let className = '';//"climberPlaceholder";
+  let className = ""; //"climberPlaceholder";
   if (props.playerID != null) {
     className += ` bgcolor${props.playerID} climberPlaceholderBlocked`;
   } else if (props.columnParity != null) {
@@ -103,7 +103,7 @@ export class Mountain extends React.Component<MountainProps> {
           if (blockedBy != null) {
             className += ` bgcolor${blockedBy}`;
           } else {
-          // className += columnParity ? ' colNumbersOdd' : ' colNumbersEven';
+            // className += columnParity ? ' colNumbersOdd' : ' colNumbersEven';
             className += ` colParity${columnParity}`;
           }
           content = (

@@ -5,7 +5,7 @@ import { Die } from "./Die";
 /* The 4 dice in a 2x2 square */
 export class DiceBoard extends React.Component<{
   diceValues: number[];
-  currentPlayer: string;
+  currentPlayer?: string;
   diceHighlight: boolean[];
   diceSplit?: number;
 }> {

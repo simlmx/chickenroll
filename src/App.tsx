@@ -6,6 +6,7 @@ import { Client } from "boardgame.io/react";
 import { SocketIO, Local } from "boardgame.io/multiplayer";
 import { PlayerID } from "./types";
 import { Background } from "./components/Die";
+import { DiceBoard } from "./components/DiceBoard";
 // import { Debug } from 'boardgame.io/debug';
 
 const { protocol, hostname, port } = window.location;
@@ -69,42 +70,76 @@ class MainMenu extends React.Component<
   }
   render() {
     return (
-      <div>
-        <h1>Play on one device</h1>
-        <div>
-          Choose the number of players:
-          {Array(MAX_PLAYERS)
-            .fill(null)
-            .map((_, i) => (
-              <button
-                className="btn btn-primary"
-                onClick={() => this.props.onCreatePassAndPlay(i + 1)}
-                key={i}
-              >
-                {i + 1}
-              </button>
-            ))}
-        </div>
-        <h1> Play over the internet </h1>
-        <div>
-          <button
-            className="btn btn-primary"
-            onClick={() => this.props.onCreate()}
-          >
-            Create a new match
-          </button>
-        </div>
-        <div>
-          <input
-            onChange={(event) => this.setState({ matchID: event.target.value })}
-            placeholder="Enter the code here"
+      <div className="welcomeWrap">
+        <div className="welcomeTitleWrap">
+          <h1 className="welcomeTitle"> Can't Stop! </h1>
+          <DiceBoard
+            diceValues={Array(4)
+              .fill(null)
+              .map(() => Math.floor(Math.random() * 6) + 1)}
+            diceHighlight={[false, false, false, false]}
+            currentPlayer={Math.floor(Math.random() * 5).toString()}
           />
-          <button
-            className="btn btn-primary"
-            onClick={() => this.props.onJoin(this.state.matchID)}
-          >
-            Join a match
-          </button>
+          <p className="welcomeReference">
+            This is an online version of the classic game{" "}
+            <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
+              Can't Stop
+            </a>
+            .
+          </p>
+        </div>
+        <div className="welcomeContentWrap">
+          <div className="welcomeContentInner">
+            <h2>Play on one device</h2>
+            <div>
+              <p>Choose the number of players:</p>
+              {Array(MAX_PLAYERS)
+                .fill(null)
+                .map((_, i) => (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => this.props.onCreatePassAndPlay(i + 1)}
+                    key={i}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+            </div>
+            <hr />
+            <h2> Play over the internet </h2>
+            <form className="form-inline needs-validation">
+              <div className="form-row">
+                <div>
+                  <button
+                    type="submit"
+                    className="btn btn-success"
+                    onClick={() => this.props.onJoin(this.state.matchID)}
+                  >
+                    Join a match
+                  </button>
+                  <input
+                    type="text"
+                    className="form-control"
+                    onChange={(event) =>
+                      this.setState({ matchID: event.target.value })
+                    }
+                    placeholder="Enter the match code"
+                    required
+                  />
+                </div>
+              </div>
+            </form>
+            <div>
+              <div className="form-row">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => this.props.onCreate()}
+                >
+                  Create a new match
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -205,11 +240,20 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  // We separate it to add the background to everything.
   render() {
+    return (
+      <div id="megaWrap">
+        {this._render()}
+        <Background />
+      </div>
+    );
+  }
+
+  _render() {
     if (this.state.passAndPlayMatch != null) {
       return (
         <div>
-          <Background />
           {/* We use playerID=0 but we will let all the players play for everyone,
             because we are assuming players are passing the device around */}
           <this.state.passAndPlayMatch playerID="0" />
@@ -237,7 +281,6 @@ class App extends React.Component<{}, AppState> {
       const { matchID, playerID, playerCredentials } = this.state.currentMatch;
       return (
         <div>
-          <Background />
           {/* TODO add some "are you sure?" */}
           <CantStopClient
             playerID={playerID}

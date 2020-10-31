@@ -13,14 +13,14 @@ class ActionButtons extends React.Component<{
       <div className="actionButtons">
         <button
           onClick={() => this.props.moves.rollDice()}
-          className={`btn bgcolor${this.props.currentPlayer}`}
+          className={`btn btnAction bgcolor${this.props.currentPlayer}`}
           disabled={!this.props.itsMe}
         >
           Roll
         </button>
         <button
           onClick={() => this.props.moves.stop()}
-          className={`btn bgcolor${this.props.currentPlayer}`}
+          className={`btn btnAction bgcolor${this.props.currentPlayer}`}
           disabled={!this.props.itsMe}
         >
           Stop
@@ -66,7 +66,7 @@ class Possibilities extends React.Component<{
                   const wasSelected =
                     last != null && last[0] === i && last[1] === j;
 
-                  let className = "btn ";
+                  let className = "btn btnAction ";
 
                   let buttonType: string;
                   if (this.props.itsMe) {
