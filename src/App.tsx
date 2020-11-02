@@ -44,6 +44,10 @@ class Home extends React.Component<{ onCreate: () => void }> {
               </a>
               .
             </p>
+            <p className="homeHowToPlay">
+              You can learn how to play by watching{" "}
+              <a href="https://youtu.be/VUGvOQatVDc">this video</a>.
+            </p>
           </div>
           <div className="homeContentWrap">
             <div className="homeContentInner">
