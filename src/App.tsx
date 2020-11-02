@@ -30,60 +30,56 @@ class Home extends React.Component<{ onCreate: () => void }> {
       <div className="backgroundWrap">
         <Background />
         <div className="homeWrap">
-          <div className="homeTitleWrap">
-            <h1 className="homeTitle"> Can't Stop! </h1>
-            <DiceBoard
-              diceValues={this.diceValues}
-              diceHighlight={[false, false, false, false]}
-              currentPlayer={this.colorIdx}
-            />
-            <p className="homeReference">
-              This is an online version of the classic game{" "}
-              <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
-                Can't Stop
-              </a>
-              .
-            </p>
-            <p className="homeHowToPlay">
-              You can learn how to play by watching{" "}
-              <a href="https://youtu.be/VUGvOQatVDc">this video</a>.
-            </p>
-          </div>
-          <div className="homeContentWrap">
-            <div className="homeContentInner">
-              <h2> Play over the internet </h2>
-              <form>
-                <div className="form-group">
+          <h1 className="homeTitle"> Can't Stop! </h1>
+          <DiceBoard
+            diceValues={this.diceValues}
+            diceHighlight={[false, false, false, false]}
+            currentPlayer={this.colorIdx}
+          />
+          <p className="homeReference">
+            This is an online version of the classic game{" "}
+            <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
+              Can't Stop
+            </a>
+            .
+          </p>
+          <p className="homeHowToPlay">
+            You can learn how to play by watching{" "}
+            <a href="https://youtu.be/VUGvOQatVDc">this video</a>.
+          </p>
+          <div>
+            <h2> Play over the internet </h2>
+            <form>
+              <div className="form-group">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => this.props.onCreate()}
+                >
+                  Create a new match
+                </button>
+                <small className="form-text text-muted">
+                  You will be able to send an invitation link to your friends.
+                </small>
+              </div>
+            </form>
+            <hr />
+            <h2>Play on one device</h2>
+            <div>
+              <p>Choose the number of players:</p>
+              {Array(MAX_PLAYERS)
+                .fill(null)
+                .map((_, i) => (
                   <button
                     className="btn btn-primary"
-                    onClick={() => this.props.onCreate()}
+                    onClick={() => {
+                      window.location.href = `${SERVER}/${i + 1}`;
+                    }}
+                    key={i}
                   >
-                    Create a new match
+                    {/* `*/}
+                    {i + 1}
                   </button>
-                  <small className="form-text text-muted">
-                    You will be able to send an invitation link to your friends.
-                  </small>
-                </div>
-              </form>
-              <hr />
-              <h2>Play on one device</h2>
-              <div>
-                <p>Choose the number of players:</p>
-                {Array(MAX_PLAYERS)
-                  .fill(null)
-                  .map((_, i) => (
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        window.location.href = `${SERVER}/${i + 1}`;
-                      }}
-                      key={i}
-                    >
-                      {/* `*/}
-                      {i + 1}
-                    </button>
-                  ))}
-              </div>
+                ))}
             </div>
           </div>
         </div>

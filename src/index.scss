@@ -124,21 +124,15 @@ button.bgcolor3:hover {
   align-items: center;
   justify-content: center;
   min-height: 100%;
+  padding: 2vw;
 }
 
 .gameSetup {
 }
 
-.homeTitleWrap {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100%;
-}
-
 .homeTitle {
   font-weight: bold;
+  text-align: center;
 }
 
 .homeReference {
@@ -147,13 +141,6 @@ button.bgcolor3:hover {
 
 .homeHowToPlay {
   font-size: 0.8rem;
-}
-
-.homeContentWrap {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 .mainWrap {
