@@ -1,3 +1,9 @@
 const { protocol, hostname, port } = window.location;
 
-export const SERVER = `${protocol}//${hostname}:${port}`;
+let server = `${protocol}//${hostname}`;
+
+if (port) {
+  server += `:${port}`;
+}
+
+export const SERVER = server;
