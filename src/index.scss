@@ -4,20 +4,37 @@
 /* $debug: true; */
 $debug: false;
 
-html,
-body,
+// https://stackoverflow.com/questions/6654958/make-body-have-100-of-the-browser-height/25829844#25829844
+html {
+  width: 100%;
+  height: 100%;
+  display: table;
+}
+
+body {
+  width: 100%;
+  display: table-cell;
+}
+
 #root,
-#megaWrap {
+.bgio-client {
   height: 100%;
   width: 100%;
 }
+
+.backgroundWrap {
+  // https://stackoverflow.com/a/31267758/1067132
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 body {
   font-family: Verdana, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f7f6f2;
-  border-color: black;
-  height: 100% !important;
 }
 
 @include media-breakpoint-up(xl) {
@@ -101,30 +118,34 @@ button.bgcolor3:hover {
   max-width: $cell-width;
 }
 
-.welcomeWrap {
-  height: 100%;
+.homeWrap {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
+  min-height: 100%;
 }
 
-.welcomeTitleWrap {
+.gameSetup {
+}
+
+.homeTitleWrap {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
+  min-height: 100%;
 }
 
-.welcomeTitle {
+.homeTitle {
   font-weight: bold;
 }
 
-.welcomeReference {
+.homeReference {
   font-size: 1rem;
 }
 
-.welcomeContentWrap {
+.homeContentWrap {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -162,22 +183,15 @@ button.bgcolor3:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  /* min-height: 100%; */
 }
 
 #background {
+  pointer-events: none;
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
+  min-height: 100%;
+  min-width: 100%;
   z-index: -1;
-}
-
-.btn {
-  /* border-radius: 0.3rem; */
-  /* padding-left: 1rem; */
-  /* padding-right: 1rem; */
-  /* margin: 0.3rem; */
 }
 
 .btn:hover,
@@ -247,11 +261,6 @@ button.bgcolor3:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.quitMatchContainer {
-  text-align: right;
-  margin: 10px;
 }
 
 .scoreBoardWrap {
@@ -335,7 +344,6 @@ button.bgcolor3:hover {
 
 .colNumbers {
   border-radius: 0.4rem;
-  /* font-size: 1rem; */
   font-size: 0.8rem;
 }
 
@@ -375,28 +383,32 @@ button.bgcolor3:hover {
   text-shadow: 0px 0px 1px black;
 }
 
-.gameSetup {
-  height: 100%;
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* align-items: center; */
-  /* justify-content: center; */
-}
-
-.gameSetupPlayersWrap {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
 .playerNameForm div {
   margin: 0;
 }
 
 .playerNameFormButtonWrap {
   text-align: right;
+}
+
+.gameSetupWrap {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.gameSetupPlayersWrap {
+  display: table-row;
+  width: 100%;
+  height: 100%;
+}
+
+.gameSetupPlayersWrap > div {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .gameSetupPlayer {
@@ -410,8 +422,6 @@ button.bgcolor3:hover {
   padding-left: 1rem;
   padding-right: 1rem;
   margin: 0.1rem;
-  /* padding-left: 15px; */
-  /* margin-bottom: 0.5rem; */
 
   box-shadow: 1px 1px 2px black;
 }
@@ -423,6 +433,9 @@ button.bgcolor3:hover {
   color: grey;
   text-align: center;
   box-shadow: 0 0 0 white;
+}
+
+.gameSetupInviteWrap {
 }
 
 .inviteLink {
@@ -683,12 +696,12 @@ button.bgcolor3:hover {
     height: 10rem;
   }
 
-  .welcomeWrap .diceContainer {
+  .homeWrap .diceContainer {
     width: 6rem;
     height: 6rem;
   }
 
-  .welcomeWrap .die {
+  .homeWrap .die {
     width: 2.5rem;
     height: 2.5rem;
   }

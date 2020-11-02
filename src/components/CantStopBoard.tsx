@@ -163,7 +163,6 @@ export class CantStopBoard extends React.Component<
                 </div>
               </div>
               {/* Score board */}
-              {/*<div className="col-xl order-sm-1 my-sm-3 scoreBoardWrap">*/}
               <ScoreBoard
                 {...{
                   scores,

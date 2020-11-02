@@ -129,13 +129,12 @@ export class Background extends React.Component {
       .fill(null)
       .map(() => Math.floor(Math.random() * 6));
 
+    const colorBg = "#f7f6f2";
+    const colorFg = "#eae9e7";
+    // const colorFg = 'grey';
+
     return (
-      <svg
-        id="background"
-        height="100%"
-        width="100%"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg id="background" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern
             id="dice"
@@ -144,7 +143,7 @@ export class Background extends React.Component {
             patternUnits="userSpaceOnUse"
             viewBox={`0 0 ${viewBox} ${viewBox}`}
           >
-            <rect width={viewBox} height={viewBox} fill="#f7f6f2" />
+            <rect width={viewBox} height={viewBox} fill={colorBg} />
             {diceValues.map((value, i) => {
               const dx = padding / 2 + (i % n) * (size + padding);
               const dy = padding / 2 + Math.floor(i / n) * (size + padding);
@@ -160,12 +159,12 @@ export class Background extends React.Component {
                     width={size}
                     height={size}
                     fill="transparent"
-                    stroke="#ecebe9"
+                    stroke={colorFg}
                     strokeWidth="7px"
                     key={i}
                   />
                   {dots[value].map((params, j) => (
-                    <circle {...params} fill="#ecebe9" key={j} />
+                    <circle {...params} fill={colorFg} key={j} />
                   ))}
                 </g>
               );

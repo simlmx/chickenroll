@@ -1,6 +1,7 @@
 import React from "react";
 import { PlayerID } from "../types";
 import { SERVER } from "../constants";
+import { Background } from "./Die";
 
 interface PlayerProps {
   moves: any;
@@ -87,57 +88,64 @@ export default class GameSetup extends React.Component<GameSetupProps> {
     const maxNumPlayers = this.props.maxNumPlayers;
     const numFreeSpots =
       maxNumPlayers - Object.keys(this.props.playerNames).length;
-    const matchLink = `${SERVER}/?m=${this.props.matchID}`;
+    const matchLink = `${SERVER}/match/${this.props.matchID}`;
     return (
-      <div className="gameSetup">
-        <div className="gameSetupInviteWrap alert alert-success">
-          <div>
-            <b>Share this link to invite players</b>
-          </div>
-          <div className="inviteLink badge badge-success user-select-all">
-            {matchLink}
-          </div>
-          <button
-            type="button"
-            className="btn btn-outline-success btn-sm copyBtn"
-            onClick={() => navigator.clipboard.writeText(matchLink)}
-          >
-            Copy
-          </button>
-        </div>
-        <div className="gameSetupPlayersWrap">
-          {Object.entries(this.props.playerNames).map(([playerID, name]) => (
-            <Player
-              moves={this.props.moves}
-              name={name}
-              itsMe={playerID === this.props.playerID}
-              playerID={playerID}
-              key={playerID}
-            />
-          ))}
-          {Array(numFreeSpots)
-            .fill(null)
-            .map((_, i) => (
-              <div
-                className="gameSetupPlayer gameSetupPlayerFree"
-                key={numPlayers + i}
-              >
-                Waiting for player to join
-              </div>
-            ))}
-          {this.props.playerID === "0" && (
+      <div className="backgroundWrap">
+        <Background />
+        <div className="gameSetupWrap">
+          <div className="gameSetupInviteWrap alert alert-success">
+            <div>
+              <b>Share this link to invite players</b>
+            </div>
+            <div className="inviteLink badge badge-success user-select-all">
+              {matchLink}
+            </div>
             <button
-              className="btn btn-primary"
-              onClick={() => this.props.moves.startGame()}
-              disabled={Object.values(this.props.playerNames).some(
-                (name) => !name
-              )}
-              key="last"
+              type="button"
+              className="btn btn-outline-success btn-sm copyBtn"
+              onClick={() => navigator.clipboard.writeText(matchLink)}
             >
-              Start the match with {numPlayers} player
-              {numPlayers === 1 ? "" : "s"}!
+              Copy
             </button>
-          )}
+          </div>
+          <div className="gameSetupPlayersWrap">
+            <div>
+              {Object.entries(this.props.playerNames).map(
+                ([playerID, name]) => (
+                  <Player
+                    moves={this.props.moves}
+                    name={name}
+                    itsMe={playerID === this.props.playerID}
+                    playerID={playerID}
+                    key={playerID}
+                  />
+                )
+              )}
+              {Array(numFreeSpots)
+                .fill(null)
+                .map((_, i) => (
+                  <div
+                    className="gameSetupPlayer gameSetupPlayerFree"
+                    key={numPlayers + i}
+                  >
+                    Waiting for player to join
+                  </div>
+                ))}
+              {this.props.playerID === "0" && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => this.props.moves.startGame()}
+                  disabled={Object.values(this.props.playerNames).some(
+                    (name) => !name
+                  )}
+                  key="last"
+                >
+                  Start the match with {numPlayers} player
+                  {numPlayers === 1 ? "" : "s"}!
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );

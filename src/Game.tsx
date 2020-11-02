@@ -190,6 +190,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
       playerNames[i.toString()] = `Player ${i + 1}`;
     }
   }
+
   const blockedSums = {};
 
   //Those are for quick debugging
