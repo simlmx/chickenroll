@@ -1,6 +1,6 @@
 import React from "react";
 
-import { DiceBoard } from "./DiceBoard";
+import { DiceBoard, FlatDiceBoard } from "./DiceBoard";
 import { Mountain } from "./Mountain";
 import { ScoreBoard } from "./ScoreBoard";
 import GameSetup from "./GameSetup";
@@ -68,6 +68,7 @@ export class CantStopBoard extends React.Component<
       diceValues,
       scores,
       numVictories,
+      moveHistory,
     } = G;
     const { currentPlayer, phase, numPlayers, playOrder } = ctx;
     const { mouseOverPossibility } = this.state;
@@ -111,7 +112,8 @@ export class CantStopBoard extends React.Component<
           {/* Main row with the bulk of the game. */}
           <div className="row mainRow no-gutters align-items-center">
             {/* Column for the mountain */}
-            <div className=" col-sm-8 col-xl-7">
+            <div className='col-lg-1'></div>
+            <div className="col-sm-8 col-lg-6">
               <div className="mountainWrap">
                 {/* First column: the mountain. */}
                 <Mountain
@@ -127,11 +129,8 @@ export class CantStopBoard extends React.Component<
               </div>
             </div>
             {/* Second column: dice / actions / score board */}
-            <div className="col-sm-4 col-xl-5 rightWrap">
-              {/* We put this column in a row so that it can be stacked horizontally as well */}
-              {/*<div className="row no-gutters justify-content-center">*/}
+            <div className="col-sm-3 col-lg-3 rightWrap">
               {/* Dice / actions */}
-              {/*<div className="col-xl order-sm-2 my-sm-3 diceBoardButtonsWrap">*/}
               <div className="diceBoardButtonWrap">
                 <DiceBoard
                   {...{ diceValues, currentPlayer, diceHighlight, diceSplit }}
@@ -173,6 +172,29 @@ export class CantStopBoard extends React.Component<
                 }}
               />
             </div>
+            <div className='col-sm-1'>
+            <div className='moveHistoryWrap'>
+              {
+                moveHistory.map(move => {
+                  // FIXME if the variable names we uniform it would be as simple as
+                  // {...move} to call it
+                  //
+                  if (move === 'gameEnd') {
+                    return <div>---</div>;
+                  }
+
+                  const currentPlayer = move.playerID;
+                  const { diceHighlight, diceValues} = move;
+                  return (
+                    <div className='moveHistoryItem'>
+                      <FlatDiceBoard {...{currentPlayer, diceHighlight, diceValues}} />
+                    </div>
+                  );
+                })
+              }
+              </div>
+            </div>
+            <div className='col-lg-1'></div>
           </div>
         </div>
       </div>

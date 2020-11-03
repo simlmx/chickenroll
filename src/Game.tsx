@@ -1,6 +1,6 @@
 import { Stage } from "boardgame.io/core";
-import { getSumOptions, sumSteps } from "./math";
-import { SumOption } from "./types";
+import { getSumOptions, sumSteps, DICE_INDICES } from "./math";
+import { SumOption, PlayerID } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 
 interface Info {
@@ -33,6 +33,11 @@ export interface GameType {
   setupData: SetupDataType;
   // Number of victories for the current match.
   numVictories: { [key: string]: number };
+  // The history of all the dice rolls and moves.
+  moveHistory: (
+    | { diceValues: number[]; diceHighlight: boolean[]; playerID: PlayerID }
+    | "gameEnd"
+  )[];
 }
 
 /*
@@ -127,7 +132,8 @@ const turn = {
       moves: {
         /*
          * Pick one of the sums in option.
-         * diceSplitIndex: One of the possible dice splits
+         * diceSplitIndex: One of the possible dice splits (0=horizontal, 1=vertical,
+         * 2=diagonal)
          * choiceIndex: 0 or 1, for "split' dice ([3] [5]) it means either the first or
          * second one. For non split dice (e.g. [3 - 5]) it should always be 0.
          */
@@ -143,15 +149,22 @@ const turn = {
           }
           const sumOption = G.diceSumOptions[diceSplitIndex];
 
+          // Gather the information for the move history.
+          const { diceValues } = G;
+          const diceHighlight: boolean[] = Array(4).fill(false);
+          const possibleDiceIndex = DICE_INDICES[diceSplitIndex];
+
           let { diceSums } = sumOption;
           if (sumOption?.split) {
             diceSums = [diceSums[choiceIndex]];
           }
           G.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
-          diceSums.forEach((s) => {
+          diceSums.forEach((s, i) => {
             if (s == null) {
               return;
             }
+            possibleDiceIndex[i].forEach(x => diceHighlight[x] = true);
+
             if (G.currentPositions.hasOwnProperty(s)) {
               G.currentPositions[s]++;
             } else {
@@ -160,6 +173,8 @@ const turn = {
               G.currentPositions[s] = checkpoint + 1;
             }
           });
+          // Add at the beginning.
+          G.moveHistory.unshift({diceValues, diceHighlight, playerID: ctx.currentPlayer});
           gotoStage(G, ctx, "rolling");
         },
       },
@@ -192,6 +207,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   }
 
   const blockedSums = {};
+  const moveHistory = []
 
   //Those are for quick debugging
   // checkpointPositions["0"] = { 6: 10, 7: 12, 8: 7 };
@@ -203,6 +219,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // playerNames["1"] = "simon lemieux 123";
   // blockedSums[3] = "1";
   // blockedSums[5] = "3";
+  //
 
   return {
     /*
@@ -225,6 +242,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     numPlayers: ctx.numPlayers,
     setupData,
     numVictories,
+    moveHistory,
   };
 };
 
@@ -293,10 +311,10 @@ const CantStop = {
       },
       moves: {
         /* Reset the game to initial state */
-        playAgain: (G, ctx) => {
+        playAgain: (G: GameType, ctx) => {
           // We need to keep some of the fields that were entered during the game, in the "setup"
           // phase.
-          const keepFields = ["playerNames", "numPlayers", "numVictories"];
+          const keepFields = ["playerNames", "numPlayers", "numVictories", 'moveHistory'];
 
           // Create an object like G but with only the fields to keep.
           const GKeep = Object.keys(G)

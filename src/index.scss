@@ -451,6 +451,39 @@ button.bgcolor3:hover {
   font-size: 12pt;
 }
 
+.moveHistoryItem {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.moveHistoryItem .die {
+    margin: 0.1em;
+    height: 0.8em;
+    width: 0.8em;
+    border-radius: 0.15rem;
+    box-shadow: 1px 1px 1px black;
+}
+
+.moveHistoryItem .die:not(.dieHighlight) {
+  filter: brightness(0.8);
+}
+
+.flatDiceContainer {
+    height: 1rem;
+}
+
+.moveHistoryWrap {
+    opacity: 0.2;
+    overflow: scroll;
+    max-height: 90vh;
+}
+
+.moveHistoryWrap:hover {
+    opacity: 1;
+}
+
+
 .dotColor0,
 .dotColor1,
 .dotColor2,

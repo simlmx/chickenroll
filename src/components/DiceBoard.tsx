@@ -44,3 +44,18 @@ export class DiceBoard extends React.Component<{
     );
   }
 }
+
+
+// Similar to the DiceBoard but in a row and for the history.
+export class FlatDiceBoard extends DiceBoard {
+  render() {
+    return (
+      <div className="flatDiceContainer">
+        {this.getDie(0)}
+        {this.getDie(1)}
+        {this.getDie(2)}
+        {this.getDie(3)}
+      </div>
+    );
+  }
+}
