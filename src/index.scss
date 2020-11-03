@@ -370,6 +370,36 @@ button.bgcolor3:hover {
   justify-content: center;
 }
 
+.homeLink {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.homeLink * {
+  display: inline-block;
+}
+
+.info .logoRow {
+  display: flex;
+}
+
+.info .logoWrap {
+  margin: 0.2rem;
+}
+
+.info .logoWrap .die {
+  height: 0.7rem;
+  width: 0.7rem;
+  border-radius: 0.12rem;
+  box-shadow: 1px 1px 2px black;
+  margin: 1px;
+}
+
+.message {
+  flex: 1;
+}
+
 .diceBoardButtonWrap {
   display: flex;
   align-items: center;

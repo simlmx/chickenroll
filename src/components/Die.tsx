@@ -176,3 +176,18 @@ export class Background extends React.Component {
     );
   }
 }
+
+export const DieLogo = (props) => {
+  return (
+    <div className="logoWrap">
+      <div className="logoRow">
+        <Die value={1} currentPlayer="0" />
+        <Die value={2} currentPlayer="1" />
+      </div>
+      <div className="logoRow">
+        <Die value={3} currentPlayer="2" />
+        <Die value={6} currentPlayer="3" />
+      </div>
+    </div>
+  );
+};

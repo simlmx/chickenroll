@@ -8,6 +8,7 @@ import MoveButtons from "./MoveButtons";
 import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
 import { PlayerID } from "../types";
+import { DieLogo } from "./Die";
 
 interface CantStopBoardState {
   // diceSplit: 0=horizontal, 1=vertical, 2=diagonal
@@ -53,7 +54,10 @@ export class CantStopBoard extends React.Component<
     const className = `alert alert-${level} text-center info`;
     return (
       <div {...{ className }} role="alert">
-        {message}
+        <a href="/" title="Home" className="homeLink">
+          <DieLogo />
+        </a>
+        <div className="message">{message}</div>
       </div>
     );
   }
