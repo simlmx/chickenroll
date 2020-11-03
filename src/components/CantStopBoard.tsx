@@ -5,6 +5,7 @@ import { Mountain } from "./Mountain";
 import { ScoreBoard } from "./ScoreBoard";
 import GameSetup from "./GameSetup";
 import MoveButtons from "./MoveButtons";
+import MoveHistory from "./MoveHistory";
 import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
 import { PlayerID, PlayerInfo } from "../types";
@@ -183,11 +184,13 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     lastAllowedColumns,
     passAndPlay,
     numColsToWin,
+    moveHistory,
   } = G;
   const { currentPlayer, phase, numPlayers, playOrder } = ctx;
 
   const [showInfo, setShowInfo] = useState(true);
   const [showRules, setShowRules] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [gameStartedWithoutYou, setGameStartedWithoutYou] = useState<
     boolean | undefined
   >(undefined);
@@ -330,14 +333,13 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   const inGameIcons = (
     <InGameIcons
       showCoffee={!passAndPlay || gameStartedWithoutYou}
-      howToPlayOnClick={() => {
-        setShowRules(!showRules);
-      }}
+      howToPlayOnClick={() => setShowRules(!showRules)}
       volume={volume}
       changeVolume={() => {
         changeVolume();
       }}
       showVolume={!passAndPlay}
+      historyOnClick={() => setShowHistory(!showHistory)}
     />
   );
 
@@ -565,12 +567,51 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     </div>
   );
 
+  const historyModal = (
+    <div className="modal" tabIndex={-1}>
+      <div className="modal-dialog moveHistoryModal modal-sm modal-dialog-scrollable">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Moves Log</h5>
+            <button
+              type="button"
+              className="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onClick={() => setShowHistory(false)}
+            >
+              <span aria-hidden="false">&times;</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            <div className="moveHistoryWrap">
+              <div className="moveHistory">
+                <MoveHistory {...{ moveHistory, playerInfos }} />
+              </div>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-primary"
+              data-dismiss="modal"
+              onClick={() => setShowHistory(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   // The onClick is necessary to disable the double-click zoom on ios.
   // See stackoverflow.com/a/54753520/1067132
   return (
     <div className="cantStopBoard" onClick={() => {}}>
       {infoTag}
       {showRules && rulesModal}
+      {showHistory && historyModal}
       {inGameIcons}
       <div className="megaWrap">
         <div className="bigHspace"></div>

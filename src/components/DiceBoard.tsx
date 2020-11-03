@@ -2,17 +2,20 @@ import React from "react";
 
 import { Die } from "./Die";
 
-/* The 4 dice in a 2x2 square */
-export class DiceBoard extends React.Component<{
+interface DiceBoardProps {
   diceValues: number[];
   color?: number | number[];
   diceHighlight: boolean[];
   diceSplit?: number;
   onClick?: (number) => void;
-}> {
-  getDie(index: number) {
-    const { diceValues, color, diceHighlight, diceSplit, onClick } = this.props;
+  flat?: boolean;
+}
 
+/* The 4 dice in a 2x2 square */
+export const DiceBoard = (props: DiceBoardProps) => {
+  const { diceValues, color, diceHighlight, diceSplit, onClick, flat } = props;
+
+  const getDie = (index: number): JSX.Element => {
     // Hack for the diagonal dice split.
     let diceSplitStr;
     if (diceSplit === 2) {
@@ -36,19 +39,23 @@ export class DiceBoard extends React.Component<{
         {...opts}
       />
     );
+  };
+
+  let className = "diceContainer";
+  if (flat) {
+    className += " flatDiceContainer";
   }
-  render() {
-    return (
-      <div className="diceContainer">
-        <div className="diceRow">
-          {this.getDie(0)}
-          {this.getDie(1)}
-        </div>
-        <div className="diceRow">
-          {this.getDie(2)}
-          {this.getDie(3)}
-        </div>
+
+  return (
+    <div {...{ className }}>
+      <div className="diceRow">
+        {getDie(0)}
+        {getDie(1)}
       </div>
-    );
-  }
-}
+      <div className="diceRow">
+        {getDie(2)}
+        {getDie(3)}
+      </div>
+    </div>
+  );
+};

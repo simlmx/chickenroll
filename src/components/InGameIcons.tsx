@@ -31,6 +31,7 @@ type InGameIconsProps = {
   volume?: number;
   changeVolume?: () => void;
   showVolume?: boolean;
+  historyOnClick?: () => void;
 };
 
 const InGameIcons = (props: InGameIconsProps) => {
@@ -40,6 +41,7 @@ const InGameIcons = (props: InGameIconsProps) => {
     volume,
     changeVolume,
     showVolume,
+    historyOnClick,
   } = props;
   if (showCoffee == null) {
     showCoffee = true;
@@ -47,6 +49,7 @@ const InGameIcons = (props: InGameIconsProps) => {
   if (showVolume == null) {
     showVolume = false;
   }
+
   return (
     <div className="homeLinkWrap">
       <div className="inGameIcon homeLinkIcon">
@@ -78,6 +81,17 @@ const InGameIcons = (props: InGameIconsProps) => {
             onClick={() => howToPlayOnClick && howToPlayOnClick()}
           >
             ?
+          </div>
+        </div>
+      )}
+      {historyOnClick && (
+        <div className="inGameIcon">
+          <div
+            className="howToPlayWrap"
+            title="Moves Log"
+            onClick={() => historyOnClick && historyOnClick()}
+          >
+            L
           </div>
         </div>
       )}

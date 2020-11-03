@@ -22,6 +22,19 @@ export interface SetupDataType {
   passAndPlay: boolean;
 }
 
+export interface Move {
+  // Values of the 4 dice.
+  diceValues?: number[];
+  //0=horzontal, 1=vertical, 2=diagonal
+  diceSplitIndex?: number;
+  // [0] for the first 2, [1] for the last 2 and [0, 1] for all 4.
+  diceUsed?: number[];
+  // Did we bust on that move?
+  bust?: boolean;
+  // Player who made the move.
+  playerID: string;
+}
+
 type GameMode = "pass-and-play" | "remote";
 
 export interface GameType {
@@ -47,7 +60,16 @@ export interface GameType {
   playerInfos: { [key: string]: PlayerInfo };
   // Number of columns to complete to win.
   numColsToWin: number | "auto";
+  // History of all the moves.
+  moveHistory: Move[];
 }
+
+/*
+ * Return the last move in the history of moves.
+ */
+const getLastMove = (G: GameType): Move => {
+  return G.moveHistory[G.moveHistory.length - 1];
+};
 
 /*
  * Go to a given stage but taking into account the passAndPlay mode.
@@ -90,7 +112,12 @@ const turn = {
       moves: {
         rollDice: (G: GameType, ctx) => {
           // After a roll we remove how the last player finished.
-          G.diceValues = ctx.random.Die(6, 4);
+          const diceValues = ctx.random.Die(6, 4);
+
+          G.diceValues = diceValues;
+
+          const move: Move = { diceValues, playerID: ctx.currentPlayer };
+
           G.lastPickedDiceSumOption = null;
           G.diceSumOptions = getSumOptions(
             G.diceValues,
@@ -109,9 +136,12 @@ const turn = {
               ts: new Date().getTime(),
             };
             endRollingTurn(G, ctx);
+            move.bust = true;
           }
           G.currentPlayerHasStarted = true;
           gotoStage(G, ctx, "moving");
+
+          G.moveHistory.push(move);
         },
         stop: (G: GameType, ctx) => {
           G.lastPickedDiceSumOption = null;
@@ -166,17 +196,25 @@ const turn = {
           diceSplitIndex: number,
           choiceIndex: number
         ) => {
+          const move = getLastMove(G);
+          move.diceSplitIndex = diceSplitIndex;
           // Should not happen but makes typescript happy.
           if (G.diceSumOptions == null) {
             throw new Error("assert false");
           }
           const sumOption = G.diceSumOptions[diceSplitIndex];
-
           let { diceSums } = sumOption;
+
           if (sumOption?.split) {
             diceSums = [diceSums[choiceIndex]];
+            move.diceUsed = [choiceIndex];
+          } else {
+            move.diceUsed = diceSums
+              .map((s, i) => (s == null ? null : i))
+              .filter((x) => x != null) as number[];
           }
           G.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
+
           diceSums.forEach((s) => {
             if (s == null) {
               return;
@@ -237,7 +275,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // numVictories[0] = 1;
   // numVictories[3] = 2;
   // numVictories[2] = 1;
-  // numVictories[1] = 7
+  // numVictories[1] = 7;
   // checkpointPositions["0"][3] = 4;
   // checkpointPositions["2"][7] = 4;
   // checkpointPositions["3"][7] = 5;
@@ -273,6 +311,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     currentPlayerHasStarted: false,
     lastAllowedColumns: [],
     numColsToWin: "auto",
+    moveHistory: [],
   };
 };
 
