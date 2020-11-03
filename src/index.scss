@@ -16,6 +16,12 @@ body {
   display: table-cell;
 }
 
+footer {
+  padding: 0.3rem;
+  display: flex;
+  justify-content: center;
+}
+
 #root,
 .bgio-client {
   height: 100%;
@@ -121,6 +127,13 @@ button.bgcolor3:hover {
 .homeWrap {
   display: flex;
   flex-direction: column;
+  min-height: 100%;
+}
+
+.homeContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100%;
@@ -136,11 +149,7 @@ button.bgcolor3:hover {
 }
 
 .homeWrap h2 {
-    padding-top: 1.5rem;
-}
-
-.homeHowToPlay {
-  font-size: 0.8rem;
+  padding-top: 1.5rem;
 }
 
 .mainWrap {

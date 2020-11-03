@@ -2,7 +2,7 @@ import { Server } from "boardgame.io/server";
 import path from "path";
 import serve from "koa-static";
 import CantStop from "./Game";
-import sslify, {xForwardedProtoResolver} from 'koa-sslify';
+import sslify, { xForwardedProtoResolver } from "koa-sslify";
 
 const server = Server({
   games: [CantStop],
