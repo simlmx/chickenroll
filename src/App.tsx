@@ -49,19 +49,17 @@ class Home extends React.Component<{ onCreate: () => void }> {
           </p>
           <div>
             <h2> Play over the internet </h2>
-            <form>
-              <div className="form-group">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => this.props.onCreate()}
-                >
-                  Create a new match
-                </button>
-                <small className="form-text text-muted">
-                  You will be able to send an invitation link to your friends.
-                </small>
-              </div>
-            </form>
+            <div className="form-group">
+              <button
+                className="btn btn-primary"
+                onClick={() => this.props.onCreate()}
+              >
+                Create a new match
+              </button>
+              <small className="form-text text-muted">
+                You will be able to send an invitation link to your friends.
+              </small>
+            </div>
             <hr />
             <h2>Play on one device</h2>
             <div>
@@ -137,7 +135,7 @@ class Match extends React.Component<
       match = await this.props.lobbyClient.getMatch("cantstop", matchID);
     } catch (e) {
       alert(
-        "There was a problem. Make sure you have the right code and try again."
+        "There was a problem. Make sure you have the right url and try again."
       );
       window.location.replace(`${SERVER}/`);
       return;
@@ -224,15 +222,23 @@ class App extends React.Component {
   }
 
   async createMatch(): Promise<void> {
-    const { matchID } = await this.lobbyClient.createMatch("cantstop", {
-      // This is the maximum number of players. We will adjust the turns if less players
-      // join.
-      numPlayers: MAX_PLAYERS,
-      setupData: {
-        passAndPlay: false,
-      },
-    });
-    window.location.replace(`${SERVER}/match/${matchID}`);
+    let matchID;
+    try {
+      const resp = await this.lobbyClient.createMatch("cantstop", {
+        // This is the maximum number of players. We will adjust the turns if less players
+        // join.
+        numPlayers: MAX_PLAYERS,
+        setupData: {
+          passAndPlay: false,
+        },
+      });
+      matchID = resp.matchID;
+    } catch (e) {
+      alert("There was a problem creating the match. Please try again.");
+    }
+    if (matchID != null) {
+      window.location.href = `${SERVER}/match/${matchID}`;
+    }
   }
 
   render() {
