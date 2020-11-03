@@ -36,7 +36,7 @@ class Home extends React.Component<{ onCreate: () => void }> {
             diceHighlight={[false, false, false, false]}
             currentPlayer={this.colorIdx}
           />
-          <p className="homeReference">
+          <p>
             This is an online version of the classic game{" "}
             <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
               Can't Stop
@@ -60,7 +60,6 @@ class Home extends React.Component<{ onCreate: () => void }> {
                 You will be able to send an invitation link to your friends.
               </small>
             </div>
-            <hr />
             <h2>Play on one device</h2>
             <div>
               <p>Choose the number of players:</p>
