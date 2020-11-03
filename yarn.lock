@@ -7170,6 +7170,11 @@ koa-socket-2@^1.0.17:
     koa-compose "^4.1.0"
     socket.io "^2.2.0"
 
+koa-sslify@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/koa-sslify/-/koa-sslify-4.0.3.tgz#79ec31042a607d0c4c0a32e21cea513708840c1c"
+  integrity sha512-5RwsRc+Zkawoq9ev5pNAPP8r+wj4Eqo3b7IfSXrpYISBDNo0fwrMcYMioR+B00piV9NpXqPZA4gh36SpIeZSvw==
+
 koa-static@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/koa-static/-/koa-static-5.0.0.tgz#5e92fc96b537ad5219f425319c95b64772776943"
