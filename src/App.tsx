@@ -16,13 +16,15 @@ const MAX_PLAYERS = 4;
 const Footer = (props) => {
   return (
     <footer>
-      <a
-        className="muted-text small"
-        href="mailto:info@cantstop.fun"
-        title="Questions / Feedback / Comments"
-      >
-        Drop us a line!
-      </a>
+      <span className="muted-text small text-center">
+        Drop us a line! <br />
+        <a
+          href="mailto:info@cantstop.fun"
+          title="Questions / Feedback / Comments"
+        >
+          info@cantstop.fun
+        </a>
+      </span>
     </footer>
   );
 };
