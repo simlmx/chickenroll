@@ -100,11 +100,11 @@ class Home extends React.Component<{ onCreate: () => void }> {
   render() {
     return (
       <div className="backgroundWrap">
-        <Background />
         <div className="homeWrap">
           {this.renderContent()}
           <Footer />
         </div>
+        <Background />
       </div>
     );
   }
@@ -124,8 +124,8 @@ const PassAndPlayMatch = (props: { numPlayers: number }) => {
 
   return (
     <div className="backgroundWrap">
-      <Background />
       <CantStopClient playerID="0" />
+      <Background />
     </div>
   );
 };
@@ -225,12 +225,12 @@ class Match extends React.Component<
     } else {
       return (
         <div className="backgroundWrap">
-          <Background />
           <this.CantStopClient
             playerID={this.state.playerID}
             matchID={this.props.matchID}
             credentials={this.state.playerCredentials}
           />
+          <Background />
         </div>
       );
     }

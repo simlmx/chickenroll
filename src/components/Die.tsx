@@ -129,7 +129,7 @@ export class Background extends React.Component {
       .fill(null)
       .map(() => Math.floor(Math.random() * 6));
 
-    const colorBg = "#f7f6f2";
+    const colorBg = "transparent";
     const colorFg = "#ecebe9";
     // const colorFg = "grey";
 
