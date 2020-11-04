@@ -13,6 +13,7 @@ html {
 
 body {
   width: 100%;
+  height: 100%;
   display: table-cell;
 }
 
@@ -24,7 +25,8 @@ footer {
 
 #root,
 .bgio-client {
-  height: 100%;
+  display: flex;
+  height: 100% !important;
   width: 100%;
 }
 
@@ -50,29 +52,23 @@ body {
 }
 @include media-breakpoint-down(lg) {
   html {
-    font-size: 21px;
+    font-size: 20px;
   }
 }
 @include media-breakpoint-down(md) {
-  html {
-    font-size: 18px;
-  }
-}
-
-@include media-breakpoint-down(sm) {
   html {
     font-size: 17px;
   }
 }
 
-@include media-breakpoint-down(xs) {
+@include media-breakpoint-down(sm) {
   html {
     font-size: 16px;
   }
 }
 
-.btn {
-  margin: 1px;
+button {
+  margin: 2px;
 }
 
 $colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
@@ -86,7 +82,7 @@ $colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
   .bgcolor#{$i - 1} {
     color: white;
     background-color: $color;
-    border: 0.1rem solid transparent;
+    border: 0.05rem solid transparent;
     border-color: $color;
   }
 
@@ -94,7 +90,7 @@ $colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
   button.bgcolor#{$i - 1}:hover {
     color: white;
     background-color: $color;
-    border: 0.1rem solid transparent;
+    border: 1px solid transparent;
     border-color: $color;
   }
 
@@ -152,38 +148,48 @@ button.bgcolor3:hover {
   padding-top: 1.5rem;
 }
 
-.mainWrap {
-  height: 94vh;
-}
-
-.mainRow {
-  height: 100%;
-}
-
 .table {
   margin-bottom: 0;
 }
 
 .rightWrap {
+  align-self: stretch;
+
   display: flex;
   flex-direction: column-reverse;
+  justify-content: space-between;
+}
+
+.diceButtons {
+  align-self: stretch;
+
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  height: 100% !important;
+}
+
+.boardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bandBegin,
+.bandMiddle,
+.bandEnd {
+  flex: 1;
 }
 
 .mountainWrap {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: center;
 }
 
 .cantStopBoard {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  /* min-height: 100%; */
+  height: 100% !important;
+  width: 100%;
 }
 
 #background {
@@ -204,18 +210,32 @@ button.bgcolor3:hover {
   background-color: #000000;
 }
 
-.die {
-  width: 4rem;
-  height: 4rem;
-  border-radius: 0.58rem;
-  margin: 0.2rem;
-  margin-left: 0.2rem;
-  margin-right: 0.2rem;
+@mixin setDice($diceSize) {
+  $unit: $diceSize / 40;
 
-  box-shadow: 0.05rem 0.05rem 0.05rem black, 0.1rem 0.1rem 0.1rem black,
-    0.2rem 0.2rem 0.1rem black;
-  border: 0.05rem solid black;
+  .die {
+    width: $diceSize;
+    height: $diceSize;
+    border-radius: $diceSize / 10;
+    margin: $diceSize / 15;
+
+    box-shadow: $unit $unit $unit black, 2 * $unit 2 * $unit 2 * $unit black,
+      $unit $unit $unit / 2 black;
+    border: $unit solid black;
+  }
+
+  .diceContainer {
+    width: $diceSize * 2.5;
+    height: $diceSize * 2.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
 }
+
+$diceSize: 3.4rem;
+@include setDice($diceSize);
 
 .diceRow {
   display: flex;
@@ -223,13 +243,49 @@ button.bgcolor3:hover {
   justify-content: center;
 }
 
-.diceContainer {
-  width: 10rem;
-  height: 10rem;
+.buttonsWrap,
+.fakeButtons {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   flex-direction: column;
+}
+
+.fakeButtonsWrap {
+  display: flex;
+  flex-direction: row;
+}
+
+.fakeButton {
+  display: flex;
+  flex-direction: column;
+  width: 0 !important;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  color: transparent !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
+}
+
+.fakeButtonInside {
+  height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  color: transparent !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
+}
+
+.fakeButtonInsideWrap {
+  height: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.btnAction {
+  margin: 0.1rem;
 }
 
 .dot {
@@ -246,12 +302,12 @@ button.bgcolor3:hover {
 
 .mountain {
   font-family: arial, sans-serif;
-  padding: 0px;
+  padding: 0;
   table-layout: fixed;
 }
 
 .mountainCol {
-  padding: 0px !important;
+  padding: 0 !important;
   text-align: center;
   /* border: 1px solid green !important; */
 }
@@ -263,18 +319,13 @@ button.bgcolor3:hover {
   justify-content: center;
 }
 
-.scoreBoardWrap {
-  align-self: flex-start;
+.scoreBoard {
+  align-self: center;
 }
 
 .scoreBoard td {
-  padding: 0px;
-  margin: 0px;
-}
-
-.scoreBoardPlayerNameContainer {
-  text-align: right;
-  margin: 0.2rem;
+  padding: 0;
+  margin: 0;
 }
 
 .scoreBoardPlayerName {
@@ -284,11 +335,11 @@ button.bgcolor3:hover {
   padding-right: 0.2rem;
   border: 0.2rem solid transparent;
   font-size: 0.8rem;
+  margin: 0.1rem;
 }
 
 .scoreBoardPlayerNameCurrent {
   border: 0.2rem solid black;
-
   filter: brightness(1.1);
 }
 
@@ -358,13 +409,12 @@ button.bgcolor3:hover {
 }
 
 .info {
-  height: 5vh;
-  border-width: 1vh;
+  height: 2rem;
   width: 100%;
   padding: 0;
   margin: 0;
-  border-left: 0px;
-  border-right: 0px;
+  border-left: 0;
+  border-right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -405,7 +455,6 @@ button.bgcolor3:hover {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding-left: 1vw;
 }
 
 .emptyStar {
@@ -481,8 +530,10 @@ button.bgcolor3:hover {
   margin-top: -3px;
 }
 
-.playAgainContainer button {
-  font-size: 1.5rem;
+.playAgainWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .matchId {
@@ -499,7 +550,7 @@ button.bgcolor3:hover {
 
 .dotColor3 {
   fill: black;
-  stroke-width: 0px;
+  stroke-width: 0;
   stroke: black;
 }
 
@@ -557,8 +608,15 @@ button.bgcolor3:hover {
   text-align: right;
 }
 
+.megaWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
 // height /width for one cell
-@mixin cellSize($height, $mountainRatio: 0.8) {
+$mountainRatio: 0.75;
+@mixin cellSize($height) {
   $width: $height / $mountainRatio;
 
   $neg-margin: $width * -0.3;
@@ -571,7 +629,6 @@ button.bgcolor3:hover {
 
   .mountain {
     width: $mountainWidth;
-    min-width: $mountainWidth;
   }
 
   .climberPlaceholderWrap,
@@ -607,161 +664,134 @@ button.bgcolor3:hover {
 
   .colNumbers {
     width: $colNumWidth;
+    font-size: $width / 3.5;
+    border-radius: $width / 7;
+    /* font-size: $width / 4; */
   }
 }
 
-.diceButtonsWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.bigHspace {
+  flex: 1;
 }
 
-/* tweaks per breakpoint */
-@include media-breakpoint-up(xl) {
-  @include cellSize(100vh / 14 * 0.65);
-
-  .diceButtonsWrap {
-    height: 12rem;
-  }
-  .scoreBoard {
-    margin-bottom: 10vh;
-  }
-}
-@include media-breakpoint-down(lg) {
-  @include cellSize(100vh / 14 * 0.75);
-
-  .diceButtonsWrap {
-    height: 12rem;
-  }
-  .scoreBoard {
-    margin-bottom: 5vh;
-  }
-}
-@include media-breakpoint-down(md) {
-  @include cellSize(94vh / 14 * 0.95);
-
-  .btnAction {
-    font-size: 1.5rem;
-  }
-
-  .diceButtonsWrap {
-    height: 12rem;
-  }
-  .scoreBoard {
-    margin-bottom: 0vh;
-  }
-
-  .rightWrap {
-    justify-content: space-between;
-    align-items: center;
-  }
-  .die {
-    width: 3rem;
-    height: 3rem;
-  }
-  .diceContainer {
-    width: 7rem;
-    height: 7rem;
-  }
+.diceButtonsBefore,
+.diceButtonsAfter {
+  flex: 1;
 }
 
-@include media-breakpoint-down(sm) {
-  @include cellSize(94vh / 14 * 0.93);
-
-  .scoreBoardPlayerNameContainer {
-    margin: 1px;
-  }
-
-  .btn {
-    margin: 1px;
-  }
-
-  .diceButtonsWrap {
-    height: 10.5rem;
-  }
-  .die {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-  .diceContainer {
-    width: 6rem;
-    height: 6rem;
-  }
+.diceButtonsMiddle {
+  flex: 0.5;
 }
 
-@include media-breakpoint-down(xs) {
-  $mountainRatio: 0.7;
-  $width: 95vw / 11;
-  $height: $width * $mountainRatio;
-  @include cellSize($height, $mountainRatio);
-
-  .mountainWrap {
-    justify-content: center;
-  }
-
-  .rightWrap {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: auto !important;
-  }
-
-  .diceBoardButtonWrap {
-    flex-direction: row;
-    justify-content: center;
-    margin: 0 !important;
-    width: 100%;
-  }
-
-  .diceButtonsWrap {
-    width: 12rem;
-  }
-  .die {
-    width: 4rem;
-    height: 4rem;
-  }
-  .diceContainer {
-    width: 10rem;
-    height: 10rem;
-  }
-
-  .homeWrap .diceContainer {
-    width: 6rem;
-    height: 6rem;
-  }
-
-  .homeWrap .die {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-}
+// Default is really tall not wide
+// In that case we want the mountain to take the full width
+$width: 96vw / 11;
+$height: $width * $mountainRatio;
+@include cellSize($height);
 
 @if $debug {
-  @include media-breakpoint-up(xs) {
-    * {
-      border: 1px solid red;
-    }
+  * {
+    border: 1px solid red;
   }
+}
 
-  @include media-breakpoint-up(sm) {
+// As we get closer to a square, we want to use some ratio of the height of the device
+// as the side of our mountain square
+@media (min-aspect-ratio: 3/5) {
+  @include cellSize(0.5 * 100vh / 14);
+  @if $debug {
     * {
       border: 1px solid orange;
     }
   }
-  @include media-breakpoint-up(md) {
+}
+
+@media (min-aspect-ratio: 1/1) {
+  $width: 60vw / 11;
+  $height: $width * $mountainRatio;
+  @include cellSize($height);
+  @if $debug {
     * {
-      border: 1px solid lime;
+      border: 1px solid gold;
     }
   }
-  @include media-breakpoint-up(lg) {
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .rightWrap {
+    flex-direction: column;
+  }
+
+  .megaWrap {
+    flex-direction: column;
+  }
+
+  .bandMiddle {
+    flex: 0.1;
+  }
+
+  .boardContent {
+    flex-direction: row;
+  }
+
+  .diceButtons {
+    flex-direction: column;
+  }
+  @if $debug {
+    * {
+      border: 1px solid orange;
+    }
+  }
+}
+
+@media (min-aspect-ratio: 4/3) {
+  @include cellSize(80vh / 14);
+
+  @if $debug {
+    * {
+      border: 1px solid green;
+    }
+  }
+}
+
+@media (min-aspect-ratio: 3/2) {
+  @include cellSize(80vh / 14);
+
+  .diceButtons {
+    flex-direction: row;
+  }
+  .bandMiddle {
+    flex: 0.2;
+  }
+  @if $debug {
     * {
       border: 1px solid blue;
     }
   }
-  @include media-breakpoint-up(xl) {
+}
+@media (min-width: 800px) and (min-height: 800px) and (min-aspect-ratio: 3/2) {
+  .diceButtons {
+    flex-direction: column;
+  }
+  .bandMiddle {
+    flex: 0;
+  }
+  @if $debug {
     * {
       border: 1px solid purple;
+    }
+  }
+}
+
+// Tweaks per bootstrap breakpoints.
+// On a super big screen that is a nice "normal" rectangle, we don't make the mountain
+// as big.
+
+@media (min-width: 1200px) and (min-height: 900px) and (min-aspect-ratio: 1/1) and (max-aspect-ratio: 7/3) {
+  @include cellSize(65vh / 14);
+  @if $debug {
+    * {
+      border: 1px solid pink;
     }
   }
 }

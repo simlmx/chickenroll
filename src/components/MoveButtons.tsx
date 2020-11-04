@@ -16,6 +16,7 @@ class ActionButtons extends React.Component<{
           className={`btn btnAction bgcolor${this.props.currentPlayer}`}
           disabled={!this.props.itsMe}
         >
+          {/*`*/}
           Roll
         </button>
         <button
@@ -23,6 +24,7 @@ class ActionButtons extends React.Component<{
           className={`btn btnAction bgcolor${this.props.currentPlayer}`}
           disabled={!this.props.itsMe}
         >
+          {/*`*/}
           Stop
         </button>
       </div>

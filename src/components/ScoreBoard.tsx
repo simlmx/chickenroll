@@ -14,7 +14,6 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
     const content = this.props.playOrder.map((playerID) => {
       const name = this.props.playerNames[playerID];
       const points = this.props.scores[playerID];
-      const baseClassName = `scoreBoardStars`;
       // 3 is the maximum number of points but you can finish with up to 5
       const tds = Array(5)
         .fill(null)
@@ -23,10 +22,9 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
           if (i >= 3 && !hasStar) {
             return null;
           }
-          const className =
-            baseClassName + (hasStar ? ` color${playerID}` : ` emptyStar`);
+          const className = hasStar ? ` color${playerID}` : ` emptyStar`;
           return (
-            <td key={i}>
+            <td className="starCol" key={i}>
               <div {...{ className }} key={playerID}>
                 ★
               </div>
@@ -44,10 +42,8 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
               {this.props.numVictories[playerID] || ""}
             </div>
           </td>
-          <td>
-            <div className="scoreBoardPlayerNameContainer">
-              <div {...{ className }}>{name}</div>
-            </div>
+          <td className="nameCol">
+            <div {...{ className }}>{name}</div>
           </td>
           {tds}
         </tr>

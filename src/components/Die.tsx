@@ -131,7 +131,7 @@ export class Background extends React.Component {
 
     const colorBg = "#f7f6f2";
     const colorFg = "#ecebe9";
-    // const colorFg = 'grey';
+    // const colorFg = "grey";
 
     return (
       <svg id="background" xmlns="http://www.w3.org/2000/svg">

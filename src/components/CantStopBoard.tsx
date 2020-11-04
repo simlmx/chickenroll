@@ -108,76 +108,119 @@ export class CantStopBoard extends React.Component<
       });
     }
 
+    const mountain = (
+      <Mountain
+        {...{
+          checkpointPositions,
+          currentPositions,
+          blockedSums,
+          currentPlayer,
+          diceSumOptions,
+          mouseOverPossibility,
+        }}
+      />
+    );
+
+    const scoreBoard = (
+      <ScoreBoard
+        {...{
+          scores,
+          playerNames,
+          currentPlayer,
+          playOrder,
+          numVictories,
+        }}
+      />
+    );
+
+    const diceBoard = (
+      <DiceBoard {...{ diceValues, currentPlayer, diceHighlight, diceSplit }} />
+    );
+
+    const buttons =
+      this.props.ctx.phase === "gameover" ? (
+        <div className="playAgainWrap">
+          <button
+            onClick={() => this.props.moves.playAgain()}
+            className={`btn btnAction bgcolor${this.props.ctx.currentPlayer}`}
+          >
+            {/*`*/}
+            Play
+            <br />
+            Again!
+          </button>
+        </div>
+      ) : (
+        <MoveButtons
+          {...{ moves, ctx, G, playerID }}
+          onMouseOver={(diceSplit, dicePairs) =>
+            this.setState({
+              mouseOverPossibility: { diceSplit, dicePairs },
+            })
+          }
+          onMouseOut={() => {
+            this.setState({ mouseOverPossibility: undefined });
+          }}
+        />
+      );
+
+    const fakeButtons = (
+      <div className="fakeButtons">
+        <div>
+          <button className="btn btn-success fakeButton btnAction">1</button>
+        </div>
+        <div>
+          <button className="btn btn-success fakeButton btnAction">1</button>
+        </div>
+        <div>
+          <button className="btn btn-success fakeButton btnAction">1</button>
+        </div>
+      </div>
+    );
+
+    const fakeButtonsInside = (
+      <div className="fakeButtonInsideWrap">
+        <button className="btn btnAction fakeButtonInside">11</button>
+        <button className="btn btnAction fakeButtonInside">12</button>
+      </div>
+    );
+
     return (
       <div className="cantStopBoard">
         {this.renderInfo()}
-        <div className="mainWrap container-fluid px-0">
-          {/* Main row with the bulk of the game. */}
-          <div className="row mainRow no-gutters align-items-center">
-            {/* Column for the mountain */}
-            <div className=" col-sm-8 col-xl-7">
-              <div className="mountainWrap">
-                {/* First column: the mountain. */}
-                <Mountain
-                  {...{
-                    checkpointPositions,
-                    currentPositions,
-                    blockedSums,
-                    currentPlayer,
-                    diceSumOptions,
-                    mouseOverPossibility,
-                  }}
-                />
-              </div>
+        <div className="megaWrap">
+          <div className="bigHspace"></div>
+          <div className="boardContent">
+            <div className="bandBegin"></div>
+            <div className="mountainWrap">
+              {/* First column: the mountain. */}
+              {mountain}
             </div>
+            <div className="bandMiddle"></div>
             {/* Second column: dice / actions / score board */}
-            <div className="col-sm-4 col-xl-5 rightWrap">
-              {/* We put this column in a row so that it can be stacked horizontally as well */}
-              {/*<div className="row no-gutters justify-content-center">*/}
-              {/* Dice / actions */}
-              {/*<div className="col-xl order-sm-2 my-sm-3 diceBoardButtonsWrap">*/}
-              <div className="diceBoardButtonWrap">
-                <DiceBoard
-                  {...{ diceValues, currentPlayer, diceHighlight, diceSplit }}
-                />
-
-                <div className="diceButtonsWrap">
-                  {this.props.ctx.phase === "gameover" ? (
-                    <div className="playAgainContainer">
-                      <button
-                        onClick={() => this.props.moves.playAgain()}
-                        className={`btn bgcolor${this.props.ctx.currentPlayer}`}
-                      >
-                        Play Again!
-                      </button>
-                    </div>
-                  ) : (
-                    <MoveButtons
-                      {...{ moves, ctx, G, playerID }}
-                      onMouseOver={(diceSplit, dicePairs) =>
-                        this.setState({
-                          mouseOverPossibility: { diceSplit, dicePairs },
-                        })
-                      }
-                      onMouseOut={() => {
-                        this.setState({ mouseOverPossibility: undefined });
-                      }}
-                    />
-                  )}
+            <div className="rightWrap">
+              {scoreBoard}
+              {/* Section with Dice and Buttons */}
+              <div className="diceButtons">
+                <div className="diceButtonsBefore"></div>
+                {/* Dice */}
+                {diceBoard}
+                <div className="diceButtonsMiddle"></div>
+                {/* Buttons */}
+                <div className="fakeButtonsWrap">
+                  {/* We insert fake transparent buttons with 0 width xor height as placeholders to make sure the container stays the same size */}
+                  {fakeButtons}
+                  <div className="buttonsWrap">
+                    {fakeButtonsInside}
+                    {buttons}
+                  </div>
                 </div>
+                <div className="diceButtonsBefore"></div>
               </div>
-              {/* Score board */}
-              <ScoreBoard
-                {...{
-                  scores,
-                  playerNames,
-                  currentPlayer,
-                  playOrder,
-                  numVictories,
-                }}
-              />
             </div>
+            <div className="bandEnd"></div>
           </div>
+          <div className="bigHspace"></div>
         </div>
       </div>
     );
