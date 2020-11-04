@@ -1,7 +1,6 @@
 import React from "react";
 import { PlayerID } from "../types";
 import { SERVER } from "../constants";
-import { Background } from "./Die";
 
 interface PlayerProps {
   moves: any;
@@ -22,44 +21,44 @@ export class Player extends React.Component<PlayerProps, { myName: string }> {
     if (!this.props.itsMe && !this.props.name) {
       className += " gameSetupPlayerWaiting";
     }
-    return (
-      <div {...{ className }}>
-        {this.props.itsMe && this.props.name === "" ? (
-          <form className="playerNameForm">
-            <div className="form-group row">
-              <div className="col-sm">
-                <input
-                  type="text"
-                  className="form-control"
-                  onChange={(event) =>
-                    this.setState({ myName: event.target.value })
-                  }
-                  placeholder="Enter your name"
-                  autoFocus
-                  maxLength={16}
-                />
-              </div>
-              <div className="col-sm-auto">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  placeholder="Enter your name"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.props.moves.setName(this.state.myName);
-                  }}
-                  disabled={this.state.myName === ""}
-                >
-                  Ready!
-                </button>
-              </div>
-            </div>
-          </form>
-        ) : (
-          <div className="gameSetupPlayerName">{this.props.name || "..."}</div>
-        )}
-      </div>
-    );
+
+    if (this.props.itsMe && this.props.name === "") {
+      return (
+        <div {...{ className }}>
+          {/* On <enter> same as clicking ready */}
+          <input
+            type="text"
+            className="form-control"
+            onChange={(event) => this.setState({ myName: event.target.value })}
+            placeholder="Enter your name"
+            autoFocus
+            maxLength={16}
+            onKeyDown={(e) => {
+              if (e.keyCode === 13) {
+                this.props.moves.setName(this.state.myName);
+                return false;
+              }
+              return true;
+            }}
+          />
+          <button
+            type="submit"
+            id="readyButton"
+            className="btn btn-primary"
+            placeholder="Enter your name"
+            onClick={(e) => {
+              e.preventDefault();
+              this.props.moves.setName(this.state.myName);
+            }}
+            disabled={this.state.myName === ""}
+          >
+            Ready!
+          </button>
+        </div>
+      );
+    } else {
+      return <div {...{ className }}>{this.props.name || "..."}</div>;
+    }
   }
 }
 
@@ -90,62 +89,55 @@ export default class GameSetup extends React.Component<GameSetupProps> {
       maxNumPlayers - Object.keys(this.props.playerNames).length;
     const matchLink = `${SERVER}/match/${this.props.matchID}`;
     return (
-      <div className="backgroundWrap">
-        <Background />
-        <div className="gameSetupWrap">
-          <div className="gameSetupInviteWrap alert alert-success">
-            <div>
-              <b>Share this link to invite players</b>
-            </div>
-            <div className="inviteLink badge badge-success user-select-all">
-              {matchLink}
-            </div>
+      <div className="gameSetupWrap">
+        <div className="gameSetupInviteWrap alert alert-success">
+          <div>
+            <b>Share this link to invite players</b>
+          </div>
+          <div className="inviteLink badge badge-success user-select-all">
+            {matchLink}
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline-success btn-sm copyBtn"
+            onClick={() => navigator.clipboard.writeText(matchLink)}
+          >
+            Copy
+          </button>
+        </div>
+        <div className="gameSetupPlayersWrap">
+          {Object.entries(this.props.playerNames).map(([playerID, name]) => (
+            <Player
+              moves={this.props.moves}
+              name={name}
+              itsMe={playerID === this.props.playerID}
+              playerID={playerID}
+              key={playerID}
+            />
+          ))}
+          {Array(numFreeSpots)
+            .fill(null)
+            .map((_, i) => (
+              <div
+                className="gameSetupPlayer gameSetupPlayerFree"
+                key={numPlayers + i}
+              >
+                Waiting for player to join
+              </div>
+            ))}
+          {this.props.playerID === "0" && (
             <button
-              type="button"
-              className="btn btn-outline-success btn-sm copyBtn"
-              onClick={() => navigator.clipboard.writeText(matchLink)}
+              className="btn btn-primary startButton"
+              onClick={() => this.props.moves.startGame()}
+              disabled={Object.values(this.props.playerNames).some(
+                (name) => !name
+              )}
+              key="last"
             >
-              Copy
+              Start with {numPlayers} player
+              {numPlayers === 1 ? "" : "s"}!
             </button>
-          </div>
-          <div className="gameSetupPlayersWrap">
-            <div>
-              {Object.entries(this.props.playerNames).map(
-                ([playerID, name]) => (
-                  <Player
-                    moves={this.props.moves}
-                    name={name}
-                    itsMe={playerID === this.props.playerID}
-                    playerID={playerID}
-                    key={playerID}
-                  />
-                )
-              )}
-              {Array(numFreeSpots)
-                .fill(null)
-                .map((_, i) => (
-                  <div
-                    className="gameSetupPlayer gameSetupPlayerFree"
-                    key={numPlayers + i}
-                  >
-                    Waiting for player to join
-                  </div>
-                ))}
-              {this.props.playerID === "0" && (
-                <button
-                  className="btn btn-primary"
-                  onClick={() => this.props.moves.startGame()}
-                  disabled={Object.values(this.props.playerNames).some(
-                    (name) => !name
-                  )}
-                  key="last"
-                >
-                  Start the match with {numPlayers} player
-                  {numPlayers === 1 ? "" : "s"}!
-                </button>
-              )}
-            </div>
-          </div>
+          )}
         </div>
       </div>
     );
