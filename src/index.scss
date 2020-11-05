@@ -355,6 +355,7 @@ $diceSize: 3.4rem;
 .scoreBoardPlayerNameCurrent {
   border: 0.2rem solid black;
   filter: brightness(1.1);
+  box-shadow: 0 0 0.14rem black;
 }
 
 .flash {
@@ -499,12 +500,15 @@ $diceSize: 3.4rem;
 }
 
 .info .logoWrap {
-  margin: 0.2rem;
+  margin-left: 0.3rem;
+  position: absolute;
+  top: 0;
+  left: 0.1rem;
 }
 
 .info .logoWrap .die {
-  height: 0.7rem;
-  width: 0.7rem;
+  height: 0.85rem;
+  width: 0.85rem;
   border-radius: 0.12rem;
   box-shadow: 1px 1px 2px black;
   margin: 1px;
