@@ -153,12 +153,12 @@ export class CantStopBoard extends React.Component<
       ) : (
         <MoveButtons
           {...{ moves, ctx, G, playerID }}
-          onMouseOver={(diceSplit, dicePairs) =>
+          onMouseEnter={(diceSplit, dicePairs) =>
             this.setState({
               mouseOverPossibility: { diceSplit, dicePairs },
             })
           }
-          onMouseOut={() => {
+          onMouseLeave={() => {
             this.setState({ mouseOverPossibility: undefined });
           }}
         />

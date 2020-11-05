@@ -42,8 +42,8 @@ class Possibilities extends React.Component<{
   lastPickedDiceSumOption: null | number[];
   diceSumOptions?: SumOption[];
   itsMe: boolean;
-  onMouseOver: (diceSplit: number, dicePairs: number[]) => void;
-  onMouseOut: () => void;
+  onMouseEnter: (diceSplit: number, dicePairs: number[]) => void;
+  onMouseLeave: () => void;
   currentPlayer: string;
 }> {
   render() {
@@ -102,12 +102,12 @@ class Possibilities extends React.Component<{
                         key={j}
                         onClick={() => {
                           this.props.moves.pickSumOption(i, j);
-                          this.props.onMouseOut();
+                          this.props.onMouseLeave();
                         }}
-                        onMouseOver={() =>
-                          this.props.onMouseOver(i, diceComboIndices)
+                        onMouseEnter={() =>
+                          this.props.onMouseEnter(i, diceComboIndices)
                         }
-                        onMouseOut={() => this.props.onMouseOut()}
+                        onMouseLeave={() => this.props.onMouseLeave()}
                         disabled={!this.props.itsMe}
                         {...{ className }}
                       >
@@ -132,8 +132,8 @@ interface MoveButtonsProps {
   moves: any;
   G: GameType;
   playerID: PlayerID;
-  onMouseOver: (diceSplit: number, dicePairs: number[]) => void;
-  onMouseOut: () => void;
+  onMouseEnter: (diceSplit: number, dicePairs: number[]) => void;
+  onMouseLeave: () => void;
 }
 
 export default class MoveButtons extends React.Component<MoveButtonsProps> {
@@ -156,10 +156,10 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
     } else {
       return (
         <Possibilities
-          onMouseOver={(diceSplit, dicePairs) =>
-            this.props.onMouseOver(diceSplit, dicePairs)
+          onMouseEnter={(diceSplit, dicePairs) =>
+            this.props.onMouseEnter(diceSplit, dicePairs)
           }
-          onMouseOut={() => this.props.onMouseOut()}
+          onMouseLeave={() => this.props.onMouseLeave()}
           {...{
             moves,
             itsMe,
