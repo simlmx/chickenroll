@@ -358,11 +358,11 @@ $diceSize: 3.4rem;
 }
 
 .flash {
-  animation: flash;
-  animation-duration: 0.5s;
+  animation: flash, vibrate;
+  animation-duration: 0.5s, 2.5s;
   animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-timing-function: ease-in-out;
+  animation-direction: alternate, reverse;
+  animation-timing-function: ease-in-out, linear;
 }
 
 @keyframes flash {
@@ -371,6 +371,39 @@ $diceSize: 3.4rem;
   }
   to {
     filter: brightness(1.2);
+  }
+}
+
+@keyframes vibrate {
+  from {
+    transform: rotate(0deg);
+  }
+  1% {
+    transform: rotate(-2deg);
+  }
+  2% {
+    transform: rotate(0);
+  }
+  3% {
+    transform: rotate(3deg);
+  }
+  4% {
+    transform: rotate(0);
+  }
+  6% {
+    transform: rotate(-3deg);
+  }
+  8% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(2deg);
+  }
+  12% {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(0deg);
   }
 }
 
