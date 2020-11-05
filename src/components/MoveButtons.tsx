@@ -7,13 +7,16 @@ class ActionButtons extends React.Component<{
   moves: any;
   itsMe: boolean;
   currentPlayer: string;
+  currentPlayerHasStarted: boolean;
 }> {
   render() {
     return (
       <div className="actionButtons">
         <button
           onClick={() => this.props.moves.rollDice()}
-          className={`btn btnAction bgcolor${this.props.currentPlayer}`}
+          className={`btn btnAction bgcolor${this.props.currentPlayer}${
+            this.props.currentPlayerHasStarted ? "" : " flash"
+          }`}
           disabled={!this.props.itsMe}
         >
           {/*`*/}
@@ -139,9 +142,17 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
     const { moves } = this.props;
     const stage = this.props.ctx.activePlayers[currentPlayer];
     const itsMe = this.props.playerID === this.props.ctx.currentPlayer;
-    const { lastPickedDiceSumOption, diceSumOptions } = this.props.G;
+    const {
+      lastPickedDiceSumOption,
+      diceSumOptions,
+      currentPlayerHasStarted,
+    } = this.props.G;
     if (itsMe && stage === "rolling") {
-      return <ActionButtons {...{ moves, itsMe, currentPlayer }} />;
+      return (
+        <ActionButtons
+          {...{ moves, itsMe, currentPlayer, currentPlayerHasStarted }}
+        />
+      );
     } else {
       return (
         <Possibilities

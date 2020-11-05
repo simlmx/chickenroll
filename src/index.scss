@@ -357,6 +357,23 @@ $diceSize: 3.4rem;
   filter: brightness(1.1);
 }
 
+.flash {
+  animation: flash;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes flash {
+  from {
+    filter: brightness(0.9);
+  }
+  to {
+    filter: brightness(1.2);
+  }
+}
+
 .mountainCell {
   display: flex;
   align-items: center;

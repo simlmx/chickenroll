@@ -33,6 +33,7 @@ export interface GameType {
   setupData: SetupDataType;
   // Number of victories for the current match.
   numVictories: { [key: string]: number };
+  currentPlayerHasStarted: boolean;
 }
 
 /*
@@ -52,6 +53,7 @@ const turn = {
   onBegin: (G: GameType, ctx) => {
     G.currentPositions = {};
     gotoStage(G, ctx, "rolling");
+    G.currentPlayerHasStarted = false;
   },
   order: {
     first: (G: GameType, ctx) => 0,
@@ -87,6 +89,7 @@ const turn = {
             G.info = { message: "Busted!", level: "danger" };
             ctx.events.endTurn();
           }
+          G.currentPlayerHasStarted = true;
           gotoStage(G, ctx, "moving");
         },
         stop: (G: GameType, ctx) => {
@@ -225,6 +228,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     numPlayers: ctx.numPlayers,
     setupData,
     numVictories,
+    currentPlayerHasStarted: false,
   };
 };
 
