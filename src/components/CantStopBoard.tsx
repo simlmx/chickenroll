@@ -223,21 +223,31 @@ export class CantStopBoard extends React.Component<
     const fakeButtons = (
       <div className="fakeButtons">
         <div>
-          <button className="btn btn-success fakeButton btnAction">1</button>
+          <button className="btn btn-success fakeButton btnAction" disabled>
+            1
+          </button>
         </div>
         <div>
-          <button className="btn btn-success fakeButton btnAction">1</button>
+          <button className="btn btn-success fakeButton btnAction" disabled>
+            1
+          </button>
         </div>
         <div>
-          <button className="btn btn-success fakeButton btnAction">1</button>
+          <button className="btn btn-success fakeButton btnAction" disabled>
+            1
+          </button>
         </div>
       </div>
     );
 
     const fakeButtonsInside = (
       <div className="fakeButtonInsideWrap">
-        <button className="btn btnAction fakeButtonInside">11</button>
-        <button className="btn btnAction fakeButtonInside">12</button>
+        <button className="btn btnAction fakeButtonInside" disabled>
+          11
+        </button>
+        <button className="btn btnAction fakeButtonInside" disabled>
+          12
+        </button>
       </div>
     );
 
