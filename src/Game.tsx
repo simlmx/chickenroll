@@ -1,11 +1,11 @@
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, sumSteps } from "./math";
-import { SumOption } from "./types";
+import { SumOption, PlayerID } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 
 interface Info {
-  message: string;
-  level: "success" | "danger";
+  playerID?: PlayerID;
+  code: "bust" | "stop" | "win" | "goodgame";
 }
 
 export interface SetupDataType {
@@ -21,7 +21,7 @@ export interface GameType {
   diceSumOptions?: SumOption[];
   lastPickedDiceSumOption: null | number[];
   blockedSums: { [key: number]: string };
-  info: Info | null;
+  info?: Info;
   scores: { [key: number]: number };
   // Game mode without the need of a server.
   passAndPlay: boolean;
@@ -72,7 +72,7 @@ const turn = {
       moves: {
         rollDice: (G: GameType, ctx) => {
           // After a roll we remove how the last player finished.
-          G.info = null;
+          G.info = undefined;
           G.diceValues = ctx.random.Die(6, 4);
           G.lastPickedDiceSumOption = null;
           G.diceSumOptions = getSumOptions(
@@ -86,7 +86,10 @@ const turn = {
             return sumOption.diceSums.every((x) => x == null);
           });
           if (busted) {
-            G.info = { message: "Busted!", level: "danger" };
+            G.info = {
+              code: "bust",
+              playerID: G.playerNames[ctx.currentPlayer],
+            };
             ctx.events.endTurn();
           }
           G.currentPlayerHasStarted = true;
@@ -114,13 +117,16 @@ const turn = {
             // Clean the board a bit.
             G.currentPositions = {};
             G.info = {
-              message: `${G.playerNames[ctx.currentPlayer]} won!`,
-              level: "success",
+              code: "win",
+              playerID: G.playerNames[ctx.currentPlayer],
             };
             G.numVictories[ctx.currentPlayer] += 1;
             ctx.events.endPhase();
           } else {
-            G.info = { message: "Stopped.", level: "success" };
+            G.info = {
+              code: "stop",
+              playerID: G.playerNames[ctx.currentPlayer],
+            };
             ctx.events.endTurn();
           }
         },
@@ -221,7 +227,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     diceSumOptions: undefined,
     lastPickedDiceSumOption: null,
     blockedSums,
-    info: { message: "Good game!", level: "success" },
+    info: { code: "goodgame" },
     scores,
     passAndPlay,
     playerNames,

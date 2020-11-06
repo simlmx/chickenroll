@@ -38,6 +38,74 @@ interface CantStopBoardProps {
   isMultiplayer: boolean;
 }
 
+export class Info extends React.Component<{
+  info?: { code: string; playerID?: PlayerID };
+}> {
+  renderContent(): {
+    msg: string | JSX.Element;
+    level?: "danger" | "success";
+  } {
+    if (this.props?.info == null) {
+      return { msg: "", level: undefined };
+    }
+
+    const { info } = this.props;
+
+    switch (info.code) {
+      case "bust":
+        return {
+          msg: (
+            <span>
+              <strong>{info.playerID}</strong> busted!
+            </span>
+          ),
+          level: "danger",
+        };
+      case "stop":
+        return {
+          msg: (
+            <span>
+              <strong>{info.playerID}</strong> stopped
+            </span>
+          ),
+          level: "success",
+        };
+      case "win":
+        return {
+          msg: (
+            <span>
+              <strong>{info.playerID}</strong> won!{" "}
+              <span role="img" aria-label="party">
+                🎉
+              </span>
+            </span>
+          ),
+          level: "success",
+        };
+      case "goodgame":
+        return {
+          msg: "Good game!",
+          level: "success",
+        };
+      default:
+        return { msg: "", level: undefined };
+    }
+  }
+
+  render() {
+    const { msg, level } = this.renderContent();
+    const className = `alert alert-${level} text-center info`;
+    return (
+      <div {...{ className }} role="alert">
+        <a href="/" title="Home" className="homeLink">
+          <DieLogo />
+        </a>
+        <div className="message">{msg}</div>
+      </div>
+    );
+  }
+}
+
 export class CantStopBoard extends React.Component<
   CantStopBoardProps,
   CantStopBoardState
@@ -47,19 +115,6 @@ export class CantStopBoard extends React.Component<
     this.state = {
       mouseOverPossibility: undefined,
     };
-  }
-  renderInfo() {
-    const info = this.props.G.info;
-    const { level, message } = info || { message: "", level: "white" };
-    const className = `alert alert-${level} text-center info`;
-    return (
-      <div {...{ className }} role="alert">
-        <a href="/" title="Home" className="homeLink">
-          <DieLogo />
-        </a>
-        <div className="message">{message}</div>
-      </div>
-    );
   }
   render() {
     const { moves, matchID, ctx, G } = this.props;
@@ -72,6 +127,7 @@ export class CantStopBoard extends React.Component<
       diceValues,
       scores,
       numVictories,
+      info,
     } = G;
     const { currentPlayer, phase, numPlayers, playOrder } = ctx;
     const { mouseOverPossibility } = this.state;
@@ -187,7 +243,7 @@ export class CantStopBoard extends React.Component<
 
     return (
       <div className="cantStopBoard">
-        {this.renderInfo()}
+        <Info info={info} />
         <div className="megaWrap">
           <div className="bigHspace"></div>
           <div className="boardContent">
