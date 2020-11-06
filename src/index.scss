@@ -580,16 +580,34 @@ $diceSize: 3.4rem;
 
 .gameSetupInviteWrap {
   width: 100%;
+  max-width: 100vw;
+  padding: 0.4rem;
+  margin: 0;
+}
+
+.playerNameInput {
+  min-width: 0;
+}
+
+.inviteLinkWrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .inviteLink {
-  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 0.4em;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
 }
 
 .copyBtn {
   font-size: 0.6rem;
   font-weight: bold;
-  margin-left: 0.5rem;
+  padding: 0.1rem;
+  margin: 0.2rem 0;
 }
 
 .playAgainWrap {

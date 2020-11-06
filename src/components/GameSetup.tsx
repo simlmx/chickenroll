@@ -28,7 +28,7 @@ export class Player extends React.Component<PlayerProps, { myName: string }> {
           {/* On <enter> same as clicking ready */}
           <input
             type="text"
-            className="form-control"
+            className="form-control playerNameInput"
             onChange={(event) => this.setState({ myName: event.target.value })}
             placeholder="Enter your name"
             autoFocus
@@ -94,16 +94,18 @@ export default class GameSetup extends React.Component<GameSetupProps> {
           <div>
             <b>Share this link to invite players</b>
           </div>
-          <div className="inviteLink badge badge-success user-select-all">
-            {matchLink}
+          <div className="inviteLinkWrap">
+            <span className="inviteLink badge badge-success user-select-all">
+              {matchLink}
+            </span>
+            <button
+              type="button"
+              className="btn btn-outline-success btn-sm copyBtn"
+              onClick={() => navigator.clipboard.writeText(matchLink)}
+            >
+              Copy
+            </button>
           </div>
-          <button
-            type="button"
-            className="btn btn-outline-success btn-sm copyBtn"
-            onClick={() => navigator.clipboard.writeText(matchLink)}
-          >
-            Copy
-          </button>
         </div>
         <div className="gameSetupPlayersWrap">
           {Object.entries(this.props.playerNames).map(([playerID, name]) => (
