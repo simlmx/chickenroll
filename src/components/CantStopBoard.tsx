@@ -220,20 +220,33 @@ export class CantStopBoard extends React.Component<
         />
       );
 
+    // We use 3x2 placeholder buttons to make sure the <div> containing them stays the
+    // same dimensions. We need them disabled to prevent the mouse changing on mouse
+    // over (it happens even if they have dimensions 0x? or ?x0). We also need to make
+    // them invisible to prevent some weird click behviour for the buttons next to it.
     const fakeButtons = (
       <div className="fakeButtons">
         <div>
-          <button className="btn btn-success fakeButton btnAction" disabled>
+          <button
+            className="btn btn-success fakeButton btnAction invisible"
+            disabled
+          >
             1
           </button>
         </div>
         <div>
-          <button className="btn btn-success fakeButton btnAction" disabled>
+          <button
+            className="btn btn-success fakeButton btnAction invisible"
+            disabled
+          >
             1
           </button>
         </div>
         <div>
-          <button className="btn btn-success fakeButton btnAction" disabled>
+          <button
+            className="btn btn-success fakeButton btnAction invisible"
+            disabled
+          >
             1
           </button>
         </div>
@@ -242,10 +255,10 @@ export class CantStopBoard extends React.Component<
 
     const fakeButtonsInside = (
       <div className="fakeButtonInsideWrap">
-        <button className="btn btnAction fakeButtonInside" disabled>
+        <button className="btn btnAction fakeButtonInside invisible" disabled>
           11
         </button>
-        <button className="btn btnAction fakeButtonInside" disabled>
+        <button className="btn btnAction fakeButtonInside invisible" disabled>
           12
         </button>
       </div>
