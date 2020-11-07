@@ -264,8 +264,10 @@ export class CantStopBoard extends React.Component<
       </div>
     );
 
+    // The onClick is necessary to disable the double-click zoom on ios.
+    // See stackoverflow.com/a/54753520/1067132
     return (
-      <div className="cantStopBoard">
+      <div className="cantStopBoard" onClick={() => {}}>
         <Info info={info} />
         <div className="megaWrap">
           <div className="bigHspace"></div>

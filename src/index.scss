@@ -17,6 +17,10 @@ body {
   display: table-cell;
 }
 
+.cantStopBoard {
+  touch-action: manipulation;
+}
+
 footer {
   padding: 0.3rem;
   display: flex;
@@ -206,8 +210,16 @@ button.bgcolor3:hover {
   width: 100%;
 }
 
-.btn:hover,
-.btn:focus,
+// The media query fixes an issue on ios where the button at the same place as the last
+// clicked button is "hovered".
+@media (hover: hover) {
+  .btn:hover,
+  .btn:focus {
+    filter: brightness(1.2);
+  }
+}
+
+// Active is fine though!
 .btn:active {
   filter: brightness(1.2);
 }

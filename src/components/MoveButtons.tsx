@@ -46,6 +46,12 @@ class Possibilities extends React.Component<{
   onMouseLeave: () => void;
   currentPlayer: string;
 }> {
+  touch: boolean;
+  constructor(props) {
+    super(props);
+    this.touch = false;
+  }
+
   render() {
     const last = this.props.lastPickedDiceSumOption;
     return (
@@ -104,10 +110,21 @@ class Possibilities extends React.Component<{
                           this.props.moves.pickSumOption(i, j);
                           this.props.onMouseLeave();
                         }}
-                        onMouseEnter={() =>
+                        // Using mouse over and mouse out because the behaviour is
+                        // nicer!
+                        onMouseOver={() =>
+                          !this.touch &&
                           this.props.onMouseEnter(i, diceComboIndices)
                         }
-                        onMouseLeave={() => this.props.onMouseLeave()}
+                        onMouseLeave={() => {
+                          !this.touch && this.props.onMouseLeave();
+                        }}
+                        onTouchStart={() => {
+                          this.touch = true;
+                        }}
+                        onTouchEnd={() => {
+                          this.touch = false;
+                        }}
                         disabled={!this.props.itsMe}
                         {...{ className }}
                       >
