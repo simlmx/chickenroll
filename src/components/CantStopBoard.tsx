@@ -9,6 +9,7 @@ import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
 import { PlayerID } from "../types";
 import { DieLogo } from "./Die";
+import { OddsCalculator } from "../math/probs";
 
 interface CantStopBoardState {
   // diceSplit: 0=horizontal, 1=vertical, 2=diagonal
@@ -40,7 +41,22 @@ interface CantStopBoardProps {
 
 export class Info extends React.Component<{
   info?: { code: string; playerID?: PlayerID };
+  lastAllowedColumns: number[];
 }> {
+  oddsCalculator: OddsCalculator;
+
+  constructor(props) {
+    super(props);
+    this.oddsCalculator = new OddsCalculator();
+  }
+
+  getProbBust(): string {
+    const { lastAllowedColumns } = this.props;
+    const prob = this.oddsCalculator.oddsBust(lastAllowedColumns);
+    const probStr = (Math.round(prob * 1000) / 10).toFixed(1);
+    return probStr;
+  }
+
   renderContent(): {
     msg: string | JSX.Element;
     level?: "danger" | "success";
@@ -51,12 +67,21 @@ export class Info extends React.Component<{
 
     const { info } = this.props;
 
+    // We compute it without needing it sometimes. Maybe a `switch` is a bad idea!
+    const prob = this.getProbBust();
+    const probMsg = (
+      <span className="small" title={`The probability of busting was ${prob}%`}>
+        Prob of bust was {prob}%
+      </span>
+    );
     switch (info.code) {
       case "bust":
         return {
           msg: (
             <span>
               <strong>{info.playerID}</strong> busted!
+              <br />
+              {probMsg}.
             </span>
           ),
           level: "danger",
@@ -65,7 +90,9 @@ export class Info extends React.Component<{
         return {
           msg: (
             <span>
-              <strong>{info.playerID}</strong> stopped
+              <strong>{info.playerID}</strong> ended their turn.
+              <br />
+              {probMsg}
             </span>
           ),
           level: "success",
@@ -128,6 +155,7 @@ export class CantStopBoard extends React.Component<
       scores,
       numVictories,
       info,
+      lastAllowedColumns,
     } = G;
     const { currentPlayer, phase, numPlayers, playOrder } = ctx;
     const { mouseOverPossibility } = this.state;
@@ -200,7 +228,6 @@ export class CantStopBoard extends React.Component<
             onClick={() => this.props.moves.playAgain()}
             className={`btn btnAction bgcolor${this.props.ctx.currentPlayer}`}
           >
-            {/*`*/}
             Play
             <br />
             Again!
@@ -268,7 +295,7 @@ export class CantStopBoard extends React.Component<
     // See stackoverflow.com/a/54753520/1067132
     return (
       <div className="cantStopBoard" onClick={() => {}}>
-        <Info info={info} />
+        <Info {...{ info, lastAllowedColumns }} />
         <div className="megaWrap">
           <div className="bigHspace"></div>
           <div className="boardContent">

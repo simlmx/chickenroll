@@ -1,5 +1,5 @@
 import React from "react";
-import { sumSteps } from "../math";
+import { getNumStepsForSum } from "../math";
 import { PlayerID, SumOption } from "../types";
 
 const Climber = (props: {
@@ -89,7 +89,7 @@ export class Mountain extends React.Component<MountainProps> {
       for (let col = 2; col < 13; ++col) {
         let content: JSX.Element | string | (JSX.Element | string)[];
 
-        const totalNumSteps = sumSteps(col);
+        const totalNumSteps = getNumStepsForSum(col);
         const currentIsThere = currentPositions[col] === row;
         const currentWillBeHere = updatedCurrentPositions[col] === row;
         const blockedBy = this.props.blockedSums[col];

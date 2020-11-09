@@ -44,7 +44,7 @@ export function getSumOptions(
 
   Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
     const diceSum = parseInt(diceSumStr);
-    const space = sumSteps(diceSum) - currentStep;
+    const space = getNumStepsForSum(diceSum) - currentStep;
 
     currentClimberSpace.set(diceSum, space);
 
@@ -89,7 +89,10 @@ export function getSumOptions(
           if (numClimbersLeft > 0) {
             // But we need 2 spaces if we already have a checkpoint there to be able to
             // play both. Otherwise we can only play one.
-            if (checkpointPositions[diceSum] === sumSteps(diceSum) - 1) {
+            if (
+              checkpointPositions[diceSum] ===
+              getNumStepsForSum(diceSum) - 1
+            ) {
               return { diceSums: [diceSum, null] };
             } else {
               return { diceSums: [diceSum, diceSum] };
@@ -147,6 +150,6 @@ export function getSumOptions(
  * e.g. 2 -> 3, 3 -> 5, .., 7 -> 13, ..
  */
 // TODO rename getNumStepsForSum
-export function sumSteps(sum: number): number {
+export function getNumStepsForSum(sum: number): number {
   return -2 * Math.abs(sum - 7) + 13;
 }

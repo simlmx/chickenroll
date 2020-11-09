@@ -1,7 +1,8 @@
 import { Stage } from "boardgame.io/core";
-import { getSumOptions, sumSteps } from "./math";
+import { getSumOptions, getNumStepsForSum } from "./math";
 import { SumOption, PlayerID } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
+import { getAllowedColumns } from "./math/probs";
 
 interface Info {
   playerID?: PlayerID;
@@ -34,6 +35,7 @@ export interface GameType {
   // Number of victories for the current match.
   numVictories: { [key: string]: number };
   currentPlayerHasStarted: boolean;
+  lastAllowedColumns: number[];
 }
 
 /*
@@ -44,6 +46,11 @@ const gotoStage = (G: GameType, ctx, newStage: string): void => {
     ? { all: newStage }
     : { currentPlayer: newStage, others: Stage.NULL };
   ctx.events.setActivePlayers(activePlayers);
+};
+
+const endRollingTurn = (G: GameType, ctx): void => {
+  G.lastAllowedColumns = getAllowedColumns(G.currentPositions, G.blockedSums);
+  ctx.events.endTurn();
 };
 
 /*
@@ -90,7 +97,7 @@ const turn = {
               code: "bust",
               playerID: G.playerNames[ctx.currentPlayer],
             };
-            ctx.events.endTurn();
+            endRollingTurn(G, ctx);
           }
           G.currentPlayerHasStarted = true;
           gotoStage(G, ctx, "moving");
@@ -102,7 +109,7 @@ const turn = {
           Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
             const diceSum = parseInt(diceSumStr);
             G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
-            if (step === sumSteps(diceSum)) {
+            if (step === getNumStepsForSum(diceSum)) {
               G.blockedSums[diceSum] = ctx.currentPlayer;
               G.scores[ctx.currentPlayer] += 1;
               // Remove all the checkpoints for that one
@@ -127,7 +134,7 @@ const turn = {
               code: "stop",
               playerID: G.playerNames[ctx.currentPlayer],
             };
-            ctx.events.endTurn();
+            endRollingTurn(G, ctx);
           }
         },
       },
@@ -210,8 +217,8 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // scores["1"] = 2;
   // scores["2"] = 1;
   // playerNames["1"] = "simon lemieux 123";
-  // blockedSums[3] = "1";
-  // blockedSums[5] = "3";
+  // blockedSums[8] = "1";
+  // blockedSums[6] = "0";
 
   return {
     /*
@@ -235,6 +242,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     setupData,
     numVictories,
     currentPlayerHasStarted: false,
+    lastAllowedColumns: [],
   };
 };
 
