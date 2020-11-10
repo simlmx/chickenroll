@@ -225,6 +225,9 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // playerNames["1"] = "simon lemieux 123";
   // blockedSums[8] = "1";
   // blockedSums[6] = "0";
+  // numVictories[0] = 12;
+  // numVictories[1] = 1;
+  // numVictories[2] = 2;
 
   return {
     /*

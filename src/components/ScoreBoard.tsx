@@ -38,11 +38,11 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
       return (
         <tr key={playerID}>
           <td className="numVictoriesCol">
-            <div className={`badge bgcolor${playerID}`}>
+            <div className={`bgcolor${playerID} scoreBoardNumVictories`}>
               {this.props.numVictories[playerID] || ""}
             </div>
           </td>
-          <td className="nameCol">
+          <td>
             <div {...{ className }}>{name}</div>
           </td>
           {tds}
