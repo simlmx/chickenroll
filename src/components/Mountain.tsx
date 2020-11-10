@@ -121,7 +121,7 @@ export class Mountain extends React.Component<MountainProps> {
               {...{ columnParity }}
             />
           );
-        } else if ([13, 12, 11].includes(row) && col === 2) {
+        } else if ([13, 12, 11].includes(row) && col === 12) {
           // We place the left climbers in the top left of the table.
           const numClimbersLeft =
             3 - Object.keys(updatedCurrentPositions).length;

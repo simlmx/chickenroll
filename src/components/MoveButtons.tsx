@@ -8,26 +8,40 @@ class ActionButtons extends React.Component<{
   itsMe: boolean;
   currentPlayer: string;
   currentPlayerHasStarted: boolean;
+  onRoll: () => void;
+  onStop: () => void;
 }> {
   render() {
+    const {
+      moves,
+      onRoll,
+      currentPlayer,
+      itsMe,
+      onStop,
+      currentPlayerHasStarted,
+    } = this.props;
     return (
       <div className="actionButtons">
         <button
-          onClick={() => this.props.moves.rollDice()}
-          className={`btn btnAction bgcolor${this.props.currentPlayer}${
-            this.props.currentPlayerHasStarted ? "" : " flash"
+          onClick={() => {
+            moves.rollDice();
+            onRoll();
+          }}
+          className={`btn btnAction bgcolor${currentPlayer}${
+            currentPlayerHasStarted ? "" : " flashVibrate"
           }`}
-          disabled={!this.props.itsMe}
+          disabled={!itsMe}
         >
-          {/*`*/}
           Roll
         </button>
         <button
-          onClick={() => this.props.moves.stop()}
-          className={`btn btnAction bgcolor${this.props.currentPlayer}`}
-          disabled={!this.props.itsMe}
+          onClick={() => {
+            moves.stop();
+            onStop();
+          }}
+          className={`btn btnAction bgcolor${currentPlayer}`}
+          disabled={!itsMe}
         >
-          {/*`*/}
           Stop
         </button>
       </div>
@@ -151,14 +165,23 @@ interface MoveButtonsProps {
   playerID: PlayerID;
   onMouseEnter: (diceSplit: number, dicePairs: number[]) => void;
   onMouseLeave: () => void;
+  onRoll: () => void;
+  onStop: () => void;
 }
 
 export default class MoveButtons extends React.Component<MoveButtonsProps> {
   render() {
-    const currentPlayer = this.props.ctx.currentPlayer;
-    const { moves } = this.props;
-    const stage = this.props.ctx.activePlayers[currentPlayer];
-    const itsMe = this.props.playerID === this.props.ctx.currentPlayer;
+    const {
+      moves,
+      onRoll,
+      onStop,
+      onMouseEnter,
+      onMouseLeave,
+      ctx,
+    } = this.props;
+    const currentPlayer = ctx.currentPlayer;
+    const stage = ctx.activePlayers[currentPlayer];
+    const itsMe = this.props.playerID === currentPlayer;
     const {
       lastPickedDiceSumOption,
       diceSumOptions,
@@ -167,16 +190,23 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
     if (itsMe && stage === "rolling") {
       return (
         <ActionButtons
-          {...{ moves, itsMe, currentPlayer, currentPlayerHasStarted }}
+          {...{
+            moves,
+            itsMe,
+            currentPlayer,
+            currentPlayerHasStarted,
+            onRoll,
+            onStop,
+          }}
         />
       );
     } else {
       return (
         <Possibilities
           onMouseEnter={(diceSplit, dicePairs) =>
-            this.props.onMouseEnter(diceSplit, dicePairs)
+            onMouseEnter(diceSplit, dicePairs)
           }
-          onMouseLeave={() => this.props.onMouseLeave()}
+          onMouseLeave={() => onMouseLeave()}
           {...{
             moves,
             itsMe,

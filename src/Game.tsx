@@ -5,8 +5,12 @@ import { INVALID_MOVE } from "boardgame.io/core";
 import { getAllowedColumns } from "./math/probs";
 
 interface Info {
+  // Player that is referred by the message.
   playerID?: PlayerID;
-  code: "bust" | "stop" | "win" | "goodgame";
+  // Here "start" means we'll only write 'it's your turn' to the starting player.
+  code: "bust" | "stop" | "win" | "start";
+  // Timestamp at which we got the info. This is treated as an ID to compare two info.
+  ts: number;
 }
 
 export interface SetupDataType {
@@ -79,7 +83,6 @@ const turn = {
       moves: {
         rollDice: (G: GameType, ctx) => {
           // After a roll we remove how the last player finished.
-          G.info = undefined;
           G.diceValues = ctx.random.Die(6, 4);
           G.lastPickedDiceSumOption = null;
           G.diceSumOptions = getSumOptions(
@@ -95,7 +98,8 @@ const turn = {
           if (busted) {
             G.info = {
               code: "bust",
-              playerID: G.playerNames[ctx.currentPlayer],
+              playerID: ctx.currentPlayer,
+              ts: new Date().getTime(),
             };
             endRollingTurn(G, ctx);
           }
@@ -125,14 +129,16 @@ const turn = {
             G.currentPositions = {};
             G.info = {
               code: "win",
-              playerID: G.playerNames[ctx.currentPlayer],
+              playerID: ctx.currentPlayer,
+              ts: new Date().getTime(),
             };
             G.numVictories[ctx.currentPlayer] += 1;
             ctx.events.endPhase();
           } else {
             G.info = {
               code: "stop",
-              playerID: G.playerNames[ctx.currentPlayer],
+              playerID: ctx.currentPlayer,
+              ts: new Date().getTime(),
             };
             endRollingTurn(G, ctx);
           }
@@ -234,13 +240,16 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     diceSumOptions: undefined,
     lastPickedDiceSumOption: null,
     blockedSums,
-    info: { code: "goodgame" },
     scores,
     passAndPlay,
     playerNames,
     numPlayers: ctx.numPlayers,
     setupData,
     numVictories,
+    // This will contain the details about the last info we want to show to the user.
+    info: { code: "start", ts: new Date().getTime() },
+    // This tells us if the current player has started playing. When this is true we'll
+    // show the players things like "it's your turn" messages.
     currentPlayerHasStarted: false,
     lastAllowedColumns: [],
   };

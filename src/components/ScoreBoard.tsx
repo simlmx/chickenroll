@@ -33,7 +33,7 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
         });
       let className = `scoreBoardPlayerName bgcolor${playerID}`;
       if (playerID === this.props.currentPlayer) {
-        className += " scoreBoardPlayerNameCurrent";
+        className += " scoreBoardPlayerNameCurrent littleFlash";
       }
       return (
         <tr key={playerID}>

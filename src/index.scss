@@ -34,12 +34,13 @@ footer {
   width: 100%;
 }
 
+$bgcolor: #f7f6f2;
 .backgroundWrap {
   // https://stackoverflow.com/a/31267758/1067132
   display: inline-block;
   position: relative;
   width: 100%;
-  background-color: #f7f6f2;
+  background-color: $bgcolor;
 }
 
 // Make sure the main content is on top of the background
@@ -366,7 +367,15 @@ $diceSize: 3.4rem;
   box-shadow: 0 0 0.14rem black;
 }
 
-.flash {
+.littleFlash {
+  animation: littleFlash;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+.flashVibrate {
   animation: flash, vibrate;
   animation-duration: 0.5s, 2.5s;
   animation-iteration-count: infinite;
@@ -380,6 +389,15 @@ $diceSize: 3.4rem;
   }
   to {
     filter: brightness(1.2);
+  }
+}
+
+@keyframes littleFlash {
+  from {
+    filter: brightness(0.95);
+  }
+  to {
+    filter: brightness(1.1);
   }
 }
 
@@ -425,7 +443,7 @@ $diceSize: 3.4rem;
 
 .climber {
   box-shadow: 0px 0px 4px -1px black, 1px 2px 3px 0px black;
-  z-index: 999;
+  z-index: 50;
   opacity: 1;
   border-width: 0px;
   border-radius: 999px;
@@ -481,19 +499,62 @@ $diceSize: 3.4rem;
   color: white;
 }
 
+.infoWrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.infoBackground {
+  background-color: rgba(white, 0.95);
+  border-radius: 1rem;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.4);
+  padding: 1rem;
+}
+
 .info {
-  height: 2rem;
-  width: 100%;
-  padding: 0;
+  font-size: 1.5rem;
+
+  opacity: 2;
+  pointer-events: auto;
+  cursor: pointer;
+
+  padding: 0.4rem;
   margin: 0;
-  border-left: 0;
-  border-right: 0;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+// The yellow player is too close to white, we make it a bit darker
+.infoPlayerName.color3 .itsYourTurn.color3 {
+  filter: brightness(0.9);
+}
+
+.probMsgWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.itsYourTurn {
+  font-weight: bold;
+}
+
 .homeLink {
+  position: absolute;
+  left: 0.3rem;
+  top: 0.3rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -503,27 +564,22 @@ $diceSize: 3.4rem;
   display: inline-block;
 }
 
-.info .logoRow {
+.logoRow {
   display: flex;
 }
 
-.info .logoWrap {
-  margin-left: 0.3rem;
+.logoWrap {
   position: absolute;
   top: 0;
   left: 0.1rem;
 }
 
-.info .logoWrap .die {
+.logoWrap .die {
   height: 0.85rem;
   width: 0.85rem;
   border-radius: 0.12rem;
   box-shadow: 1px 1px 2px black;
   margin: 1px;
-}
-
-.message {
-  flex: 1;
 }
 
 .diceBoardButtonWrap {
@@ -534,7 +590,7 @@ $diceSize: 3.4rem;
 }
 
 .emptyStar {
-  color: #f7f6f2;
+  color: $bgcolor;
   text-shadow: 0px 0px 1px black;
 }
 
