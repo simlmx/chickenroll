@@ -43,7 +43,7 @@ const dots = [
     {
       cx: 50,
       cy: 50,
-      r: 15,
+      r: 18,
     },
   ],
   [topLeft, bottomRight],
