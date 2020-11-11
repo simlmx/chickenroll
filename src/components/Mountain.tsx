@@ -2,17 +2,17 @@ import React from "react";
 import { getNumStepsForSum } from "../math";
 import { PlayerID, SumOption } from "../types";
 
-const Climber = (props: {
+export const Climber = (props: {
   playerID?: PlayerID;
-  currentPlayer?: PlayerID;
+  current?: boolean;
   highlight?: boolean;
   downlight?: boolean;
 }) => {
   let className = "climber";
-  if (props.playerID != null) {
+  if (!props.current) {
     className += ` bgcolor${props.playerID}`;
   } else {
-    className += ` climberCurrent border${props.currentPlayer}`;
+    className += ` climberCurrent border${props.playerID}`;
   }
   if (props.highlight) {
     className += " highlight";
@@ -22,7 +22,7 @@ const Climber = (props: {
   return <div {...{ className }}></div>;
 };
 
-const ClimberPlaceholder = (props: {
+export const ClimberPlaceholder = (props: {
   playerID?: PlayerID;
   columnParity?: number;
 }) => {
@@ -35,6 +35,25 @@ const ClimberPlaceholder = (props: {
   return (
     <div className="climberPlaceholderWrap">
       <div {...{ className }}></div>
+    </div>
+  );
+};
+
+export const ColNum = (props: { colNum: number; blockedBy?: PlayerID }) => {
+  // Below row 0 we write the dice sum.
+  const { colNum, blockedBy } = props;
+  let className = "badge colNumbers";
+  if (blockedBy != null) {
+    className += ` bgcolor${blockedBy}`;
+  } else {
+    // className += columnParity ? ' colNumbersOdd' : ' colNumbersEven';
+    className += ` colParity${colNum % 2}`;
+  }
+  return (
+    <div className="colNumbersWrap">
+      <div {...{ className }} key={0}>
+        {colNum}
+      </div>
     </div>
   );
 };
@@ -98,21 +117,7 @@ export class Mountain extends React.Component<MountainProps> {
         const columnParity = col % 2;
 
         if (row === 0 || row === totalNumSteps) {
-          // Below row 0 we write the dice sum.
-          let className = "badge colNumbers";
-          if (blockedBy != null) {
-            className += ` bgcolor${blockedBy}`;
-          } else {
-            // className += columnParity ? ' colNumbersOdd' : ' colNumbersEven';
-            className += ` colParity${columnParity}`;
-          }
-          content = (
-            <div className="colNumbersWrap">
-              <div {...{ className }} key={0}>
-                {col}
-              </div>
-            </div>
-          );
+          content = <ColNum colNum={col} blockedBy={blockedBy} />;
         } else if (row < totalNumSteps) {
           content = (
             <ClimberPlaceholder
@@ -128,13 +133,18 @@ export class Mountain extends React.Component<MountainProps> {
           content = <ClimberPlaceholder key={0} {...{ columnParity }} />;
           if (row >= 14 - numClimbersLeft) {
             climbers.push(
-              <Climber key={-1} currentPlayer={this.props.currentPlayer} />
+              <Climber
+                key={-1}
+                current={true}
+                playerID={this.props.currentPlayer}
+              />
             );
           } else if (row >= 11 + Object.keys(currentPositions).length) {
             climbers.push(
               <Climber
                 key={-1}
-                currentPlayer={this.props.currentPlayer}
+                current={true}
+                playerID={this.props.currentPlayer}
                 downlight={true}
               />
             );
@@ -159,7 +169,8 @@ export class Mountain extends React.Component<MountainProps> {
           climbers.push(
             <Climber
               key={-1}
-              currentPlayer={this.props.currentPlayer}
+              current={true}
+              playerID={this.props.currentPlayer}
               downlight={highlightSums.includes(col)}
             />
           );
@@ -167,7 +178,8 @@ export class Mountain extends React.Component<MountainProps> {
           climbers.push(
             <Climber
               key={-1}
-              currentPlayer={this.props.currentPlayer}
+              current={true}
+              playerID={this.props.currentPlayer}
               highlight={true}
             />
           );

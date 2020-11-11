@@ -133,10 +133,93 @@ button.bgcolor3:hover {
   max-width: $cell-width;
 }
 
-.homeWrap {
+.pageContentWrap {
   display: flex;
   flex-direction: column;
+  align-items: center;
   min-height: 100%;
+  padding: 0rem 0.5rem 0.5rem 0.5rem;
+}
+
+.pageContentWrap > div {
+  /* min-width: 70%; */
+}
+@include media-breakpoint-up(md) {
+  .pageContentWrap > div {
+    width: 70%;
+  }
+
+  .pageContentWrap h1 {
+    /* margin: 1rem; */
+  }
+}
+
+.howToPlayWrap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  right: 0.3rem;
+  top: 0.3rem;
+  display: flex;
+
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 999px;
+
+  height: 1rem;
+  width: 1rem;
+
+  cursor: pointer;
+
+  background-color: grey;
+  color: white;
+
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.modal {
+  display: block;
+  pointer-events: none;
+}
+
+.inGameRulesWrap {
+  /* position:absolute; */
+  /* top:2rem; */
+  /* left:2rem; */
+  /* width: 50%; */
+  /* height: 50%; */
+  /* overflow: auto; */
+  /* z-index: 75; */
+
+  /* padding: 1rem; */
+
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* justify-content: flex-end; */
+  /* align-items: center; */
+
+  /* border: 0.1rem solid black; */
+  /* border-radius: 1rem; */
+
+  /* background-color: white; */
+
+  /* pointer-events: none; */
+}
+
+nav {
+  /* align-self: flex-start; */
+}
+
+nav .active {
+  /* font-weight: bold !important; */
+}
+
+.rules p,
+.rules li {
+  text-align: justify;
 }
 
 .homeContent {
@@ -146,7 +229,6 @@ button.bgcolor3:hover {
   align-items: center;
   justify-content: center;
   min-height: 100%;
-  padding: 0.5rem;
 }
 
 .homeTitle {
@@ -154,7 +236,12 @@ button.bgcolor3:hover {
   text-align: center;
 }
 
-.homeWrap h2 {
+h1 {
+  font-weight: bold;
+  text-align: center;
+}
+
+.homeContent h2 {
   padding-top: 1.5rem;
 }
 
@@ -239,7 +326,7 @@ button.bgcolor3:hover {
   .die {
     width: $diceSize;
     height: $diceSize;
-    border-radius: $diceSize / 10;
+    border-radius: $diceSize / 8 + 0.1rem;
     margin: $diceSize / 15;
 
     box-shadow: $unit $unit $unit black, 2 * $unit 2 * $unit 2 * $unit black,
@@ -788,7 +875,7 @@ $diceSize: 3.4rem;
 
 // height /width for one cell
 $mountainRatio: 0.75;
-@mixin cellSize($height) {
+@mixin cellSize($height, $numCols: 11) {
   $width: $height / $mountainRatio;
 
   $neg-margin: $width * -0.3;
@@ -796,7 +883,7 @@ $mountainRatio: 0.75;
   $colNumWidth: $width * 0.85;
   $currentClimberSize: $climberSize;
   $currentClimberBorder: $width * 1/20;
-  $mountainWidth: $width * 11;
+  $mountainWidth: $width * $numCols;
   $blockedSize: $width * 0.35;
 
   .mountain {
@@ -965,5 +1052,27 @@ $height: $width * $mountainRatio;
     * {
       border: 1px solid pink;
     }
+  }
+}
+
+// We reuse a bunch of components in the Rules, but we need to adjust some of the
+// parameters.
+.rules {
+  @include setDice(1rem);
+
+  .btnAction {
+    padding: 0 0.5rem;
+  }
+  @include cellSize(2rem, 3);
+
+  .climber {
+    margin: 0rem 0.1rem;
+    display: inline-block;
+  }
+
+  .ruleRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }

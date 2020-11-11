@@ -1,135 +1,17 @@
 import React from "react";
 import CantStop from "./Game";
+import Home from "./components/Home";
 import { CantStopBoard } from "./components/CantStopBoard";
 import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
 import { SocketIO, Local } from "boardgame.io/multiplayer";
 import { PlayerID } from "./types";
 import { Background } from "./components/Die";
-import { DiceBoard } from "./components/DiceBoard";
-import { SERVER } from "./constants";
+import { SERVER, MAX_PLAYERS } from "./constants";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
+import Page from "./components/PageTemplate";
+import HowToPlay from "./components/HowToPlay";
 // import { Debug } from 'boardgame.io/debug';
-
-const MAX_PLAYERS = 4;
-
-const Footer = (props) => {
-  return (
-    <footer>
-      <span className="muted-text small text-center">
-        Drop us a line! <br />
-        <a
-          href="mailto:info@cantstop.fun"
-          title="Questions / Feedback / Comments"
-        >
-          info@cantstop.fun
-        </a>
-      </span>
-    </footer>
-  );
-};
-
-class Home extends React.Component<{ onCreate: () => void }> {
-  diceValues: number[];
-  colorIdx: string;
-
-  constructor(props) {
-    super(props);
-    this.diceValues = Array(4)
-      .fill(null)
-      .map(() => Math.floor(Math.random() * 6) + 1);
-    this.colorIdx = Math.floor(Math.random() * 5).toString();
-  }
-
-  renderContent() {
-    const diceBoard = (
-      <div className="text-center">
-        <DiceBoard
-          diceValues={this.diceValues}
-          diceHighlight={[false, false, false, false]}
-          currentPlayer={this.colorIdx}
-        />
-      </div>
-    );
-
-    const ref = (
-      <p className="text-center">
-        This is an online version of the classic game{" "}
-        <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
-          Can't Stop
-        </a>
-        .
-      </p>
-    );
-
-    const instructions = (
-      <p className="small text-center">
-        You can learn how to play by watching{" "}
-        <a href="https://youtu.be/VUGvOQatVDc">this video</a>.
-      </p>
-    );
-
-    const playInternet = (
-      <div className="form-group">
-        <button
-          className="btn btn-primary"
-          onClick={() => this.props.onCreate()}
-        >
-          Create a new match
-        </button>
-        <small className="form-text text-muted">
-          You will be able to send an invitation link to your friends.
-        </small>
-      </div>
-    );
-
-    const playDevice = (
-      <div>
-        <p>Choose the number of players:</p>
-        {Array(MAX_PLAYERS)
-          .fill(null)
-          .map((_, i) => (
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                window.location.href = `${SERVER}/${i + 1}`;
-              }}
-              key={i}
-            >
-              {i + 1}
-            </button>
-          ))}
-      </div>
-    );
-
-    return (
-      <div className="homeContent">
-        <h1 className="homeTitle"> Can't Stop! </h1>
-        <div>
-          {diceBoard}
-          {ref}
-          {instructions}
-          <h2> Play over the internet </h2>
-          {playInternet}
-          <h2>Play on one device</h2>
-          {playDevice}
-        </div>
-      </div>
-    );
-  }
-
-  render() {
-    return (
-      <div className="backgroundWrap">
-        <div className="homeWrap">
-          {this.renderContent()}
-          <Footer />
-        </div>
-        <Background />
-      </div>
-    );
-  }
-}
 
 const PassAndPlayMatch = (props: { numPlayers: number }) => {
   // We use playerID=0 but we will let all the players play for everyone,
@@ -309,7 +191,15 @@ class App extends React.Component {
             }}
           />
 
-          {/* Redirect to the home page for anything else */}
+          {/* How to play */}
+          <Route path="/howtoplay">
+            <Page path="/howtoplay">
+              <HowToPlay />
+            </Page>
+          </Route>
+
+          {/* Redirect to the home page for anything else.
+              This has to be *after* all the other routes.*/}
           <Route
             path="/:other"
             render={(props) => {
@@ -318,7 +208,9 @@ class App extends React.Component {
           />
           {/* Home */}
           <Route path="/">
-            <Home onCreate={() => this.createMatch()} />
+            <Page path="/">
+              <Home onCreate={() => this.createMatch()} />
+            </Page>
           </Route>
         </Switch>
       </BrowserRouter>

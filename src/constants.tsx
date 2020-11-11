@@ -7,3 +7,5 @@ if (port) {
 }
 
 export const SERVER = server;
+
+export const MAX_PLAYERS = 4;

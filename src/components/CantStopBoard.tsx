@@ -10,6 +10,7 @@ import { GameType } from "../Game";
 import { PlayerID } from "../types";
 import { DieLogo } from "./Die";
 import { OddsCalculator } from "../math/probs";
+import Rules from "./Rules";
 
 export class Info extends React.Component<{
   info?: { code: string; playerID?: PlayerID };
@@ -136,6 +137,8 @@ interface CantStopBoardState {
   mouseOverPossibility?: { diceSplit: number; dicePairs: number[] };
   // Whenever or not the info pop is visible.
   infoVisible: boolean;
+  // Is the rules popup visible.
+  showRules: boolean;
 }
 
 interface CantStopBoardProps {
@@ -168,6 +171,7 @@ export class CantStopBoard extends React.Component<
     this.state = {
       mouseOverPossibility: undefined,
       infoVisible: true,
+      showRules: false,
     };
   }
 
@@ -185,6 +189,14 @@ export class CantStopBoard extends React.Component<
       () => this.setState({ infoVisible: false }),
       this.props.G.info?.code === "win" || this.itsYourTurn() ? 100000 : 5000
     );
+  }
+
+  hideRules(): void {
+    this.setState({ showRules: false });
+  }
+
+  showRules(): void {
+    this.setState({ showRules: true });
   }
 
   componentDidUpdate(prevProps) {
@@ -393,14 +405,56 @@ export class CantStopBoard extends React.Component<
       />
     ) : null;
 
+    const rulesModal = (
+      <div className="modal" tabIndex={-1}>
+        <div className="modal-dialog modal-lg modal-dialog-scrollable">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">How To Play</h5>
+              <button
+                type="button"
+                className="close"
+                data-dismiss="modal"
+                aria-label="Close"
+                onClick={() => this.hideRules()}
+              >
+                <span aria-hidden="false">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <Rules />
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-dismiss="modal"
+                onClick={() => this.hideRules()}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
     // The onClick is necessary to disable the double-click zoom on ios.
     // See stackoverflow.com/a/54753520/1067132
     return (
       <div className="cantStopBoard" onClick={() => {}}>
         {infoTag}
+        {this.state.showRules && rulesModal}
         <a href="/" title="Home" className="homeLink">
           <DieLogo />
         </a>
+        <div
+          className="howToPlayWrap"
+          title="How To Play"
+          onClick={() => this.setState({ showRules: !this.state.showRules })}
+        >
+          <div>?</div>
+        </div>
         <div className="megaWrap">
           <div className="bigHspace"></div>
           <div className="boardContent">
