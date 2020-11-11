@@ -146,7 +146,7 @@ button.bgcolor3:hover {
   align-items: center;
   justify-content: center;
   min-height: 100%;
-  padding: 2vw;
+  padding: 0.5rem;
 }
 
 .homeTitle {
@@ -156,6 +156,10 @@ button.bgcolor3:hover {
 
 .homeWrap h2 {
   padding-top: 1.5rem;
+}
+
+.homeContent .diceContainer {
+  width: auto;
 }
 
 .table {
