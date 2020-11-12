@@ -7,7 +7,7 @@ import GameSetup from "./GameSetup";
 import MoveButtons from "./MoveButtons";
 import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
-import { PlayerID } from "../types";
+import { PlayerID, PlayerInfo } from "../types";
 import { DieLogo } from "./Die";
 import { OddsCalculator } from "../math/probs";
 import Rules from "./Rules";
@@ -16,7 +16,8 @@ export class Info extends React.Component<{
   info?: { code: string; playerID?: PlayerID };
   lastAllowedColumns: number[];
   onClick: () => void;
-  playerNames: { [key: string]: string };
+  playerInfos: { [key: string]: PlayerInfo };
+
   // playerID of the client instance.
   playerID: PlayerID;
   // When it's your turn, we add it to the Info
@@ -37,18 +38,19 @@ export class Info extends React.Component<{
   }
 
   renderContent(): JSX.Element | undefined {
-    if (this.props?.info == null) {
+    const { info, playerInfos, itsYourTurn } = this.props;
+
+    if (info == null) {
       return undefined;
     }
 
-    const { info, playerNames, itsYourTurn } = this.props;
     const { code } = info;
 
     const itsMe = this.props.playerID === info.playerID;
 
     const playerName = itsMe
       ? "You"
-      : info.playerID && playerNames[info.playerID];
+      : info.playerID && playerInfos[info.playerID].name;
 
     // We compute it without needing it sometimes. Maybe a `switch` is a bad idea!
     const prob = this.getProbBust();
@@ -63,17 +65,28 @@ export class Info extends React.Component<{
         &nbsp;=&nbsp;<strong>{prob}</strong>%
       </div>
     );
-    const playerNameTag = (
-      <strong className={`infoPlayerName color${info.playerID}`}>
-        {playerName}
-      </strong>
-    );
 
     const itsYourTurnTag = itsYourTurn ? (
-      <div className={`itsYourTurn color${this.props.playerID}`}>
+      <div
+        className={`itsYourTurn color${playerInfos[this.props.playerID].color}`}
+      >
         It's your turn!
       </div>
     ) : undefined;
+
+    let playerNameTag: JSX.Element | undefined;
+
+    if (["bust", "stop", "win"].includes(code)) {
+      playerNameTag = (
+        <strong
+          className={`infoPlayerName color${
+            playerInfos[info.playerID as PlayerID].color
+          }`}
+        >
+          {playerName}
+        </strong>
+      );
+    }
 
     switch (code) {
       case "bust":
@@ -236,7 +249,7 @@ export class CantStopBoard extends React.Component<
       currentPositions,
       blockedSums,
       diceSumOptions,
-      playerNames,
+      playerInfos,
       diceValues,
       scores,
       numVictories,
@@ -254,11 +267,12 @@ export class CantStopBoard extends React.Component<
       return (
         <GameSetup
           {...{
-            playerNames,
+            playerInfos,
             playerID,
             moves,
             maxNumPlayers: numPlayers,
             matchID,
+            passAndPlay,
           }}
         />
       );
@@ -289,6 +303,7 @@ export class CantStopBoard extends React.Component<
           currentPlayer,
           diceSumOptions,
           mouseOverPossibility,
+          playerInfos,
         }}
       />
     );
@@ -297,7 +312,7 @@ export class CantStopBoard extends React.Component<
       <ScoreBoard
         {...{
           scores,
-          playerNames,
+          playerInfos,
           currentPlayer,
           playOrder,
           numVictories,
@@ -306,7 +321,14 @@ export class CantStopBoard extends React.Component<
     );
 
     const diceBoard = (
-      <DiceBoard {...{ diceValues, currentPlayer, diceHighlight, diceSplit }} />
+      <DiceBoard
+        {...{
+          diceValues,
+          color: playerInfos[currentPlayer].color,
+          diceHighlight,
+          diceSplit,
+        }}
+      />
     );
 
     const buttons =
@@ -317,7 +339,7 @@ export class CantStopBoard extends React.Component<
               this.props.moves.playAgain();
               this.hideInfo();
             }}
-            className={`btn btnAction bgcolor${this.props.ctx.currentPlayer}`}
+            className={`btn btnAction bgcolor${playerInfos[playerID].color}`}
           >
             Play
             <br />
@@ -331,6 +353,7 @@ export class CantStopBoard extends React.Component<
             ctx,
             G,
             playerID,
+            playerColor: playerInfos[playerID].color,
             onRoll: () => this.hideInfo(),
             onStop: () => this.hideInfo(),
           }}
@@ -395,7 +418,7 @@ export class CantStopBoard extends React.Component<
           info: G.info,
           lastAllowedColumns,
           onClick: () => this.hideInfo(),
-          playerNames,
+          playerInfos,
           // For pass and play we ignore the playerID.
           // This means we never right "You" but always "player name".
           playerID: passAndPlay ? -1 : playerID,

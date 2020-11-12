@@ -7,3 +7,8 @@ export type SumOption = {
   // In case there are 2, can we use both.
   split?: boolean;
 };
+
+export type PlayerInfo = {
+  name: string;
+  color: number;
+};

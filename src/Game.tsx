@@ -1,6 +1,7 @@
+import { NUM_COLORS } from "./constants";
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, getNumStepsForSum } from "./math";
-import { SumOption, PlayerID } from "./types";
+import { SumOption, PlayerID, PlayerInfo } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { getAllowedColumns } from "./math/probs";
 
@@ -30,8 +31,6 @@ export interface GameType {
   scores: { [key: number]: number };
   // Game mode without the need of a server.
   passAndPlay: boolean;
-  // playerID -> name
-  playerNames: { [key: string]: string };
   // By default we'll set the game to the *maximum* number of players, but maybe less
   // people will join.
   numPlayers: number;
@@ -40,6 +39,8 @@ export interface GameType {
   numVictories: { [key: string]: number };
   currentPlayerHasStarted: boolean;
   lastAllowedColumns: number[];
+  // PlayerID -> name, color, etc.
+  playerInfos: { [key: string]: PlayerInfo };
 }
 
 /*
@@ -205,29 +206,26 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     numVictories[i] = 0;
   }
 
-  const playerNames = {};
+  const playerInfos = {};
   // For pass-and-play games we set default player names.
   if (passAndPlay) {
     for (let i = 0; i < ctx.numPlayers; ++i) {
-      playerNames[i.toString()] = `Player ${i + 1}`;
+      playerInfos[i.toString()] = { name: `Player ${i + 1}`, color: i };
     }
   }
 
   const blockedSums = {};
 
-  //Those are for quick debugging
-  // checkpointPositions["0"] = { 6: 10, 7: 12, 8: 7 };
-  // checkpointPositions["1"] = { 6: 10, 7: 12, 8: 10 };
-  // checkpointPositions["2"] = { 6: 10, 7: 12, 8: 10, 9: 2 };
-  // checkpointPositions["3"] = { 7: 12, 8: 7, 9: 2 };
-  // scores["1"] = 2;
-  // scores["2"] = 1;
-  // playerNames["1"] = "simon lemieux 123";
-  // blockedSums[8] = "1";
-  // blockedSums[6] = "0";
-  // numVictories[0] = 12;
-  // numVictories[1] = 1;
-  // numVictories[2] = 2;
+  //Those are for quick debugging.
+  // for (let i = 0; i < ctx.numPlayers; ++i) {
+  //   const id = i.toString();
+  //   checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
+  //   scores[id] = i;
+
+  //   playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 2) % 4 };
+  //   blockedSums[2 * i] = id;
+  // }
+  // checkpointPositions['0'][3] = 4;
 
   return {
     /*
@@ -245,7 +243,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     blockedSums,
     scores,
     passAndPlay,
-    playerNames,
+    playerInfos,
     numPlayers: ctx.numPlayers,
     setupData,
     numVictories,
@@ -268,11 +266,6 @@ const CantStop = {
       next: "main",
       turn: {
         onBegin: (G: GameType, ctx) => {
-          // In pass-and-play mode we skip this phase.
-          if (G.passAndPlay) {
-            ctx.events.endPhase();
-            return;
-          }
           ctx.events.setActivePlayers({ all: "setup" });
         },
         // There is only one stage, but we need it for all the players to be able to
@@ -280,8 +273,66 @@ const CantStop = {
         stages: {
           setup: {
             moves: {
-              setName: (G: GameType, ctx, name: string) => {
-                G.playerNames[ctx.playerID] = name;
+              join: (G: GameType, ctx) => {
+                if (G.passAndPlay) {
+                  return INVALID_MOVE;
+                }
+                // Find the next available color.
+                const availableColors = Array(NUM_COLORS).fill(true);
+
+                Object.values(G.playerInfos).forEach(
+                  (playerInfo) => (availableColors[playerInfo.color] = false)
+                );
+
+                // We shouldn't need this fallback because there as more colors than
+                // players.
+                let newColor = 0;
+
+                availableColors.some((available, color) => {
+                  if (available) {
+                    newColor = color;
+                    return true;
+                  }
+                  return false;
+                });
+
+                G.playerInfos[ctx.playerID] = {
+                  name: `Player ${parseInt(ctx.playerID) + 1}`,
+                  color: newColor,
+                };
+              },
+              setName: (
+                G: GameType,
+                ctx,
+                name: string,
+                playerID: PlayerID = "0"
+              ) => {
+                playerID = G.passAndPlay ? playerID : ctx.playerID;
+                G.playerInfos[playerID].name = name;
+              },
+              setColor: (
+                G: GameType,
+                ctx,
+                color: number,
+                playerID: PlayerID = "0"
+              ) => {
+                playerID = G.passAndPlay ? playerID : ctx.playerID;
+
+                // If we are not actually changing the color we can ignore this.
+                // This happens when we click on the same color we already have.
+                if (G.playerInfos[playerID].color === color) {
+                  return;
+                }
+
+                // It's an invalid move if someone else already has that color.
+                if (
+                  Object.values(G.playerInfos).some(
+                    (info) => info.color === color
+                  )
+                ) {
+                  return INVALID_MOVE;
+                }
+                G.playerInfos[playerID].color = color;
               },
               startGame: (G: GameType, ctx) => {
                 if (ctx.playerID !== "0") {
@@ -290,12 +341,12 @@ const CantStop = {
 
                 // If some players are not ready, we can't start the game. Not ready is
                 // the same as writing down your name, at least for now.
-                if (Object.values(G.playerNames).some((name) => !name)) {
+                if (Object.values(G.playerInfos).some((info) => !info.name)) {
                   return INVALID_MOVE;
                 }
                 G.numPlayers = G.passAndPlay
                   ? ctx.numPlayers
-                  : Object.keys(G.playerNames).length;
+                  : Object.keys(G.playerInfos).length;
                 ctx.events.endPhase();
               },
             },
@@ -326,7 +377,7 @@ const CantStop = {
         playAgain: (G, ctx) => {
           // We need to keep some of the fields that were entered during the game, in the "setup"
           // phase.
-          const keepFields = ["playerNames", "numPlayers", "numVictories"];
+          const keepFields = ["playerInfos", "numPlayers", "numVictories"];
 
           // Create an object like G but with only the fields to keep.
           const GKeep = Object.keys(G)

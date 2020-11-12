@@ -1,18 +1,18 @@
 import React from "react";
 import { getNumStepsForSum } from "../math";
-import { PlayerID, SumOption } from "../types";
+import { PlayerID, SumOption, PlayerInfo } from "../types";
 
 export const Climber = (props: {
-  playerID?: PlayerID;
+  color?: number;
   current?: boolean;
   highlight?: boolean;
   downlight?: boolean;
 }) => {
   let className = "climber";
   if (!props.current) {
-    className += ` bgcolor${props.playerID}`;
+    className += ` bgcolor${props.color}`;
   } else {
-    className += ` climberCurrent border${props.playerID}`;
+    className += ` climberCurrent border${props.color}`;
   }
   if (props.highlight) {
     className += " highlight";
@@ -23,12 +23,12 @@ export const Climber = (props: {
 };
 
 export const ClimberPlaceholder = (props: {
-  playerID?: PlayerID;
+  color?: number;
   columnParity?: number;
 }) => {
   let className = ""; //"climberPlaceholder";
-  if (props.playerID != null) {
-    className += ` bgcolor${props.playerID} climberPlaceholderBlocked`;
+  if (props.color != null) {
+    className += ` bgcolor${props.color} climberPlaceholderBlocked`;
   } else if (props.columnParity != null) {
     className += ` climberPlaceholder climberPlaceholderParity${props.columnParity}`;
   }
@@ -39,12 +39,12 @@ export const ClimberPlaceholder = (props: {
   );
 };
 
-export const ColNum = (props: { colNum: number; blockedBy?: PlayerID }) => {
+export const ColNum = (props: { colNum: number; blockedColor?: number }) => {
   // Below row 0 we write the dice sum.
-  const { colNum, blockedBy } = props;
+  const { colNum, blockedColor } = props;
   let className = "badge colNumbers";
-  if (blockedBy != null) {
-    className += ` bgcolor${blockedBy}`;
+  if (blockedColor != null) {
+    className += ` bgcolor${blockedColor}`;
   } else {
     // className += columnParity ? ' colNumbersOdd' : ' colNumbersEven';
     className += ` colParity${colNum % 2}`;
@@ -61,6 +61,7 @@ export const ColNum = (props: { colNum: number; blockedBy?: PlayerID }) => {
 interface MountainProps {
   currentPositions: { [key: number]: number };
   checkpointPositions: object;
+  playerInfos: { [key: string]: PlayerInfo };
   blockedSums: { [key: number]: string };
   currentPlayer: PlayerID;
   diceSumOptions?: SumOption[];
@@ -75,7 +76,16 @@ interface MountainProps {
 
 export class Mountain extends React.Component<MountainProps> {
   render() {
-    let { currentPositions } = this.props;
+    const {
+      mouseOverPossibility,
+      diceSumOptions,
+      checkpointPositions,
+      currentPlayer,
+      currentPositions,
+      playerInfos,
+      blockedSums,
+    } = this.props;
+
     // First we need to copy the prop.
     const updatedCurrentPositions = {};
     Object.assign(updatedCurrentPositions, currentPositions);
@@ -86,12 +96,6 @@ export class Mountain extends React.Component<MountainProps> {
     minRow = minRow == null ? 0 : minRow;
     maxRow = maxRow == null ? 13 : maxRow;
 
-    const {
-      mouseOverPossibility,
-      diceSumOptions,
-      checkpointPositions,
-      currentPlayer,
-    } = this.props;
     // If we want to highlight, we'll compute where the new positions will be!
     let highlightSums: number[] = [];
     if (mouseOverPossibility != null && diceSumOptions != null) {
@@ -123,17 +127,19 @@ export class Mountain extends React.Component<MountainProps> {
         const totalNumSteps = getNumStepsForSum(col);
         const currentIsThere = currentPositions[col] === row;
         const currentWillBeHere = updatedCurrentPositions[col] === row;
-        const blockedBy = this.props.blockedSums[col];
+        const blockedBy = blockedSums[col];
 
         let climbers: JSX.Element[] = [];
         const columnParity = col % 2;
 
         if (row === 0 || row === totalNumSteps) {
-          content = <ColNum colNum={col} blockedBy={blockedBy} />;
+          content = (
+            <ColNum colNum={col} blockedColor={playerInfos[blockedBy]?.color} />
+          );
         } else if (row < totalNumSteps) {
           content = (
             <ClimberPlaceholder
-              playerID={blockedBy == null ? undefined : blockedBy}
+              color={playerInfos[blockedBy]?.color}
               key={0}
               {...{ columnParity }}
             />
@@ -148,7 +154,7 @@ export class Mountain extends React.Component<MountainProps> {
               <Climber
                 key={-1}
                 current={true}
-                playerID={this.props.currentPlayer}
+                color={playerInfos[currentPlayer].color}
               />
             );
           } else if (row >= 11 + Object.keys(currentPositions).length) {
@@ -156,7 +162,7 @@ export class Mountain extends React.Component<MountainProps> {
               <Climber
                 key={-1}
                 current={true}
-                playerID={this.props.currentPlayer}
+                color={playerInfos[currentPlayer].color}
                 downlight={true}
               />
             );
@@ -166,23 +172,23 @@ export class Mountain extends React.Component<MountainProps> {
         }
 
         // It's not efficient to do this every time by... javascript :shrug:
-        Object.entries(this.props.checkpointPositions).forEach(
-          ([playerID, positions]) => {
-            Object.entries(positions).forEach(([diceSumStr, numSteps]) => {
-              const diceSum = parseInt(diceSumStr);
-              if (diceSum === col && numSteps === row) {
-                climbers.push(<Climber playerID={playerID} key={playerID} />);
-              }
-            });
-          }
-        );
+        Object.entries(checkpointPositions).forEach(([playerID, positions]) => {
+          Object.entries(positions).forEach(([diceSumStr, numSteps]) => {
+            const diceSum = parseInt(diceSumStr);
+            if (diceSum === col && numSteps === row) {
+              climbers.push(
+                <Climber color={playerInfos[playerID].color} key={playerID} />
+              );
+            }
+          });
+        });
 
         if (currentIsThere) {
           climbers.push(
             <Climber
               key={-1}
               current={true}
-              playerID={this.props.currentPlayer}
+              color={playerInfos[currentPlayer].color}
               downlight={highlightSums.includes(col)}
             />
           );
@@ -191,7 +197,7 @@ export class Mountain extends React.Component<MountainProps> {
             <Climber
               key={-1}
               current={true}
-              playerID={this.props.currentPlayer}
+              color={playerInfos[currentPlayer].color}
               highlight={true}
             />
           );

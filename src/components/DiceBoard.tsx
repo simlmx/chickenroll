@@ -5,12 +5,12 @@ import { Die } from "./Die";
 /* The 4 dice in a 2x2 square */
 export class DiceBoard extends React.Component<{
   diceValues: number[];
-  currentPlayer?: string;
+  color?: number;
   diceHighlight: boolean[];
   diceSplit?: number;
 }> {
   getDie(index: number) {
-    const { diceValues, currentPlayer, diceHighlight, diceSplit } = this.props;
+    const { diceValues, color, diceHighlight, diceSplit } = this.props;
 
     // Hack for the diagonal dice split.
     let diceSplitStr;
@@ -22,7 +22,7 @@ export class DiceBoard extends React.Component<{
     return (
       <Die
         value={diceValues[index]}
-        currentPlayer={currentPlayer}
+        color={color}
         key={index}
         highlight={diceHighlight[index]}
         split={diceSplitStr}

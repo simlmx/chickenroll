@@ -1,31 +1,26 @@
 import React from "react";
 import { Die } from "./Die";
-import { PlayerID } from "../types";
 import { Climber, Mountain } from "./Mountain";
 
-interface RulesProps {
-  playerID?: PlayerID;
-}
-
 const Rules = (props) => {
-  const playerID = props.playerID == null ? "0" : props.playerID;
-  const makeDie = (value: number) => (
-    <Die value={value} currentPlayer={playerID} />
-  );
+  const playerID = "0";
+  const color = 0;
+
+  const makeDie = (value: number) => <Die {...{ value, color }} />;
   const dice = [1, 2, 3, 6].map((value) => makeDie(value));
   const runner = (
     <span title="Runner">
-      <Climber playerID={playerID} current={true} />
+      <Climber color={color} current={true} />
     </span>
   );
   const token = (
     <span title="Color Token">
-      <Climber playerID={playerID} />
+      <Climber color={color} />
     </span>
   );
 
   const actionBtn = (text: string) => (
-    <button className={`btn btnAction bgcolor${playerID}`}>{text}</button>
+    <button className={`btn btnAction bgcolor${color}`}>{text}</button>
   );
 
   const mountainOptions = {
@@ -35,6 +30,12 @@ const Rules = (props) => {
       "1": { "7": 5, "8": 3, "6": 6, "3": 1 },
       "2": { "12": 2, "10": 4, "3": 1, "6": 2 },
       "3": { "12": 2, "10": 5, "3": 1, "6": 2 },
+    },
+    playerInfos: {
+      "0": { name: "a", color: color },
+      "1": { name: "b", color: 1 },
+      "2": { name: "c", color: 2 },
+      "3": { name: "d", color: 3 },
     },
     blockedSums: {},
     currentPlayer: playerID,

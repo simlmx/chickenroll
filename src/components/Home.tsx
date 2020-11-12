@@ -4,14 +4,14 @@ import { SERVER, MAX_PLAYERS } from "../constants";
 
 class Home extends React.Component<{ onCreate: () => void }> {
   diceValues: number[];
-  colorIdx: string;
+  color: number;
 
   constructor(props) {
     super(props);
     this.diceValues = Array(4)
       .fill(null)
       .map(() => Math.floor(Math.random() * 6) + 1);
-    this.colorIdx = Math.floor(Math.random() * 5).toString();
+    this.color = Math.floor(Math.random() * 5);
   }
 
   render() {
@@ -20,7 +20,7 @@ class Home extends React.Component<{ onCreate: () => void }> {
         <DiceBoard
           diceValues={this.diceValues}
           diceHighlight={[false, false, false, false]}
-          currentPlayer={this.colorIdx}
+          color={this.color}
         />
       </div>
     );

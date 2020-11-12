@@ -6,7 +6,7 @@ import { SumOption, DiceSum, PlayerID } from "../types";
 class ActionButtons extends React.Component<{
   moves: any;
   itsMe: boolean;
-  currentPlayer: string;
+  color: number;
   currentPlayerHasStarted: boolean;
   onRoll: () => void;
   onStop: () => void;
@@ -15,7 +15,7 @@ class ActionButtons extends React.Component<{
     const {
       moves,
       onRoll,
-      currentPlayer,
+      color,
       itsMe,
       onStop,
       currentPlayerHasStarted,
@@ -27,7 +27,7 @@ class ActionButtons extends React.Component<{
             moves.rollDice();
             onRoll();
           }}
-          className={`btn btnAction bgcolor${currentPlayer}${
+          className={`btn btnAction bgcolor${color}${
             currentPlayerHasStarted ? "" : " flashVibrate"
           }`}
           disabled={!itsMe}
@@ -39,7 +39,7 @@ class ActionButtons extends React.Component<{
             moves.stop();
             onStop();
           }}
-          className={`btn btnAction bgcolor${currentPlayer}`}
+          className={`btn btnAction bgcolor${color}`}
           disabled={!itsMe}
         >
           Stop
@@ -58,7 +58,7 @@ class Possibilities extends React.Component<{
   itsMe: boolean;
   onMouseEnter: (diceSplit: number, dicePairs: number[]) => void;
   onMouseLeave: () => void;
-  currentPlayer: string;
+  color: number;
 }> {
   touch: boolean;
   constructor(props) {
@@ -95,7 +95,7 @@ class Possibilities extends React.Component<{
 
                   let buttonType: string;
                   if (this.props.itsMe) {
-                    buttonType = `bgcolor${this.props.currentPlayer}`;
+                    buttonType = `bgcolor${this.props.color}`;
                   } else if (wasSelected) {
                     buttonType = "btn-secondary lastChoiceOtherPlayer";
                   } else {
@@ -163,6 +163,7 @@ interface MoveButtonsProps {
   moves: any;
   G: GameType;
   playerID: PlayerID;
+  playerColor: number;
   onMouseEnter: (diceSplit: number, dicePairs: number[]) => void;
   onMouseLeave: () => void;
   onRoll: () => void;
@@ -177,11 +178,13 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
       onStop,
       onMouseEnter,
       onMouseLeave,
+      playerID,
       ctx,
+      playerColor,
     } = this.props;
     const currentPlayer = ctx.currentPlayer;
     const stage = ctx.activePlayers[currentPlayer];
-    const itsMe = this.props.playerID === currentPlayer;
+    const itsMe = playerID === currentPlayer;
     const {
       lastPickedDiceSumOption,
       diceSumOptions,
@@ -193,7 +196,7 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
           {...{
             moves,
             itsMe,
-            currentPlayer,
+            color: playerColor,
             currentPlayerHasStarted,
             onRoll,
             onStop,
@@ -210,7 +213,7 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
           {...{
             moves,
             itsMe,
-            currentPlayer,
+            color: playerColor,
             lastPickedDiceSumOption,
             diceSumOptions,
           }}

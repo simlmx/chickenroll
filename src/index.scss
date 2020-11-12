@@ -88,7 +88,7 @@ nav li {
   margin: 0 0.2rem;
 }
 
-$colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
+$colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7, #a8f7ea; //, #7d5241;
 
 @for $i from 1 through length($colors) {
   $color: nth($colors, $i);
@@ -114,20 +114,34 @@ $colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7;
   .border#{$i - 1} {
     border-color: $color;
   }
+
+  .dotColor#{$i - 1} {
+    fill: white;
+  }
 }
 
 /* third color - yellow - is special because too light. */
-.bgcolor3 {
+.bgcolor3,
+.bgcolor5 {
   color: black;
-  background-color: #f0e442;
+  /* background-color: #f0e442; */
   border-color: black;
 }
 
 button.bgcolor3,
-button.bgcolor3:hover {
+button.bgcolor3:hover,
+button.bgcolor5,
+button.bgcolor5:hover {
   color: black;
-  background-color: #f0e442;
+  /* background-color: #f0e442; */
   border-color: black;
+}
+
+.dotColor3,
+.dotColor5 {
+  fill: black;
+  stroke-width: 0;
+  stroke: black;
 }
 
 @mixin cellDim($cell-height, $cell-width) {
@@ -614,7 +628,8 @@ $diceSize: 3.4rem;
 }
 
 // The yellow player is too close to white, we make it a bit darker
-.infoPlayerName.color3 .itsYourTurn.color3 {
+.infoPlayerName.color3 .itsYourTurn.color3,
+.infoPlayerName.color5 .itsYourTurn.color5 {
   filter: brightness(0.9);
 }
 
@@ -700,15 +715,63 @@ $diceSize: 3.4rem;
   border-radius: 0.3rem;
   // No border not event for yellow
   border: 0px;
-  display: flex;
 
   padding: 0.3rem 0.5rem;
   margin: 0.2rem;
   box-shadow: 1px 1px 2px black;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .gameButtonWrap {
+    flex: 1;
+
+    display: flex;
+    justify-content: flex-end;
+  }
+  .playerNameInput,
+  .playerName {
+    flex: 2;
+    /* width: none; */
+    padding: 0;
+    padding-left: 0.5rem;
+    margin: 0;
+  }
+
+  position: relative;
+
+  .colorWrap {
+    position: relative;
+  }
+
+  .colorPopupWrap {
+    background-color: rgba(black, 0.5);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    display: flex;
+  }
+  .colorPopup {
+  }
+}
+.gameSetupColorButton {
+  min-width: 2rem;
+  min-height: 2rem;
+  border-radius: 0.3rem;
+  border: 1px solid black !important;
+  box-shadow: 0px 0px 3px black;
+  z-index: 20;
+  transition: none;
 }
 
-.gameSetupPlayer * {
-  margin: 0.1rem;
+.gameSetupColorButtonDisabled {
+  box-shadow: none;
+  border-color: transparent !important;
+  color: transparent !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
 }
 
 .gameSetupPlayerFree {
@@ -726,10 +789,6 @@ $diceSize: 3.4rem;
   max-width: 100vw;
   padding: 0.4rem;
   margin: 0;
-}
-
-.playerNameInput {
-  min-width: 0;
 }
 
 .inviteLinkWrap {
@@ -762,19 +821,6 @@ $diceSize: 3.4rem;
 .matchId {
   font-family: courier new;
   font-size: 12pt;
-}
-
-.dotColor0,
-.dotColor1,
-.dotColor2,
-.dotColor4 {
-  fill: white;
-}
-
-.dotColor3 {
-  fill: black;
-  stroke-width: 0;
-  stroke: black;
 }
 
 .dieSplit0 {

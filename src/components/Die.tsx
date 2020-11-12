@@ -63,10 +63,10 @@ const dots = [
 /*
  * Map the value and current player to a list of <circle> tags.
  */
-const diceDots = (value: number, currentPlayer?: string) => {
+const diceDots = (value: number, color?: number) => {
   let className = `dot`;
-  if (currentPlayer != null) {
-    className += ` dotColor${currentPlayer}`;
+  if (color != null) {
+    className += ` dotColor${color}`;
   }
   return dots[value - 1].map((dot, i) => (
     <circle {...dot} key={i} {...{ className }} />
@@ -74,7 +74,7 @@ const diceDots = (value: number, currentPlayer?: string) => {
 };
 
 interface DieProps {
-  currentPlayer?: string;
+  color?: number;
   value: number;
   highlight?: boolean;
   // 0: horizontal split
@@ -87,11 +87,11 @@ interface DieProps {
 
 export class Die extends React.Component<DieProps> {
   render() {
-    const { currentPlayer, value, highlight, split } = this.props;
+    const { color, value, highlight, split } = this.props;
 
     let className = "die";
-    if (currentPlayer != null) {
-      className += ` bgcolor${currentPlayer}`;
+    if (color != null) {
+      className += ` bgcolor${color}`;
     }
     if (highlight) {
       className += " dieHighlight";
@@ -107,7 +107,7 @@ export class Die extends React.Component<DieProps> {
         xmlns="http://www.w3.org/2000/svg"
         {...{ className }}
       >
-        <g fill="#000000">{diceDots(value, currentPlayer)}</g>
+        <g fill="#000000">{diceDots(value, color)}</g>
       </svg>
     );
   }
@@ -181,12 +181,12 @@ export const DieLogo = (props) => {
   return (
     <div className="logoWrap">
       <div className="logoRow">
-        <Die value={1} currentPlayer="0" />
-        <Die value={2} currentPlayer="1" />
+        <Die value={1} color={0} />
+        <Die value={2} color={1} />
       </div>
       <div className="logoRow">
-        <Die value={3} currentPlayer="2" />
-        <Die value={6} currentPlayer="3" />
+        <Die value={3} color={2} />
+        <Die value={6} color={3} />
       </div>
     </div>
   );
