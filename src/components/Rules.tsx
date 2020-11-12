@@ -170,9 +170,9 @@ const Rules = (props) => {
       <h2>Overview</h2>
       <p>
         You must climb the different columns faster than your opponents, by
-        rolling different dice sums for each column. You can keep rolling to
-        move faster but you might bust and lose your progress. Will you be able
-        to stop in time?
+        rolling the dice. You move up columns that correspond to the sums of
+        dice pairs. You can keep rolling to move faster but you might bust and
+        lose your progress. Will you be able to stop in time?
       </p>
       <div className="fullMountain">
         <Mountain {...mountainOptions} />
@@ -180,7 +180,7 @@ const Rules = (props) => {
       <h2>On your turn </h2>
       <p>
         You can either {actionBtn("Roll")} or {actionBtn("Stop")}. When rolling,
-        you try to make your (up to three) <strong>runners</strong> ({runner})
+        you try to make your active <strong>runners</strong> ({runner})
         progress. When stopping, you end your turn but keep the progress you
         made this turn using <strong>tokens</strong> of your color ({token}).
         You can {actionBtn("Roll")} as many times as you like until you either{" "}
@@ -188,33 +188,35 @@ const Rules = (props) => {
       </p>
       <h3>Roll</h3>
       <p>
-        You roll the four dice {dice} and split them into two pairs ({dice[0]}
+        You roll the four dice {dice} and split them into two pairs of your
+        choice (one of {dice[0]}
         {dice[1]}|{dice[2]}
         {dice[3]} or {dice[0]}
         {dice[2]}|{dice[1]}
         {dice[3]} or {dice[0]}
         {dice[3]}|{dice[1]}
-        {dice[2]}). For each pair, you can add or move a {runner} up on the
-        corresponding column. You can have up to three different {runner} par
-        turn.
+        {dice[2]}). For each of those two pairs you choose, you can add or move
+        a {runner} up on the corresponding columns. You can have up to three
+        different {runner} per turn.
       </p>
       {moveUpTable}
       <p>
         If you can't do any action for any pair, you {bust}. You lose the
         progress made by the {runner} and your turn ends.
       </p>
-
       <h3>Stop</h3>
       <p>
-        If you have a {runner} at the end of a column, the column is{" "}
-        <strong>blocked</strong> by you. From now on, no one can use it. The
+        If you have a {runner} at the end of a column, stopping will{" "}
+        <strong>block</strong> it. From now on, no one can use that column. The
         first player to <strong>block</strong> three columns{" "}
         <strong>wins</strong>.
       </p>
       <p>
         You change your {runner} into {token} and end your turn.
       </p>
-      <p></p>
+      <h2>Try it out</h2>
+      The simplest way to learn the game is to{" "}
+      <a href="/2">play against yourself</a>.
     </div>
   );
 };
