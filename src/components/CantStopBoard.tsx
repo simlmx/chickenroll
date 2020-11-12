@@ -186,7 +186,7 @@ export class CantStopBoard extends React.Component<
     this.infoTimeout && clearTimeout(this.infoTimeout);
     this.infoTimeout = setTimeout(
       () => this.setState({ infoVisible: false }),
-      this.props.G.info?.code === "win" || this.itsYourTurn() ? 100000 : 5000
+      this.props.G.info?.code === "win" || this.itsYourTurn() ? 100000 : 3000
     );
   }
 
