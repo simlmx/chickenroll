@@ -1,7 +1,7 @@
 import React from "react";
 import { Die } from "./Die";
 import { PlayerID } from "../types";
-import { Climber, ColNum, ClimberPlaceholder } from "./Mountain";
+import { Climber, Mountain } from "./Mountain";
 
 interface RulesProps {
   playerID?: PlayerID;
@@ -13,219 +13,178 @@ const Rules = (props) => {
     <Die value={value} currentPlayer={playerID} />
   );
   const dice = [1, 2, 3, 6].map((value) => makeDie(value));
-  const runner = <Climber playerID={playerID} current={true} />;
-  const token = <Climber playerID={playerID} />;
+  const runner = (
+    <span title="Runner">
+      <Climber playerID={playerID} current={true} />
+    </span>
+  );
+  const token = (
+    <span title="Color Token">
+      <Climber playerID={playerID} />
+    </span>
+  );
 
   const actionBtn = (text: string) => (
     <button className={`btn btnAction bgcolor${playerID}`}>{text}</button>
   );
 
+  const mountainOptions = {
+    currentPositions: { "9": 1 },
+    checkpointPositions: {
+      "0": { "2": 2, "5": 2 },
+      "1": { "7": 5, "8": 3, "6": 6, "3": 1 },
+      "2": { "12": 2, "10": 4, "3": 1, "6": 2 },
+      "3": { "12": 2, "10": 5, "3": 1, "6": 2 },
+    },
+    blockedSums: {},
+    currentPlayer: playerID,
+  };
+
   const placeAtBottom = (
-    <table className="table table-sm table-borderless mountain">
-      <tbody>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">{runner}</div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={4} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={5} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={6} />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div className="mountainWrap">
+      <Mountain
+        {...{
+          ...mountainOptions,
+          minCol: 6,
+          maxCol: 8,
+          maxRow: 3,
+          currentPositions: { 7: 1, 9: 1 },
+        }}
+      />
+    </div>
   );
 
   const placeAfter = (
-    <table className="table table-sm table-borderless mountain">
-      <tbody>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">{runner}</div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">{token}</div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={1} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={4} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={5} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={6} />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div className="mountainWrap">
+      <Mountain
+        {...{
+          ...mountainOptions,
+          minCol: 4,
+          maxCol: 6,
+          maxRow: 3,
+          currentPositions: { 5: 3 },
+        }}
+      />
+    </div>
   );
 
   const moveUp = (
-    <table className="table table-sm table-borderless mountain">
-      <tbody>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
+    <div className="mountainWrap">
+      <Mountain
+        {...{
+          ...mountainOptions,
+          minCol: 8,
+          maxCol: 10,
+          maxRow: 3,
+          // Ok now this is ugly
+          mouseOverPossibility: { diceSplit: 0, dicePairs: [0] },
+          diceSumOptions: [{ diceSums: [9, null] }],
+        }}
+      />
+    </div>
+  );
+
+  const both = (
+    <div className="mountainWrap">
+      <Mountain
+        {...{
+          ...mountainOptions,
+          minCol: 5,
+          maxCol: 7,
+          maxRow: 3,
+          currentPositions: { 5: 3, 7: 1 },
+        }}
+      />
+    </div>
+  );
+
+  const moveUpTable = (
+    <div className="container-fluid">
+      <div className="row movesWrap no-gutters">
+        <div className="col-sm-6">
+          <div className="movesBox">
+            <div className="movesLeft">
+              <p>Add a new {runner} at the bottom of a column.</p>
             </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">{runner}</div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
+            <div className="movesRight">
+              {dice[0]}
+              {dice[3]} &nbsp;→&nbsp;
+              {placeAtBottom}
             </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
+          </div>
+        </div>
+        <div className="col-sm-6">
+          <div className="movesBox">
+            <div className="movesLeft">
+              <p>Continue right above one of your {token}.</p>
             </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <Climber playerID={playerID} current={true} downlight={true} />
+            <div className="movesRight">
+              {dice[1]}
+              {dice[2]} &nbsp;→&nbsp; {placeAfter}
             </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
+          </div>
+        </div>
+        <div className="col-sm-6">
+          <div className="movesBox">
+            <div className="movesLeft">
+              <p>Move an already placed {runner} up one step.</p>
             </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
+            <div className="movesRight">
+              {dice[1]}
+              {dice[3]} &nbsp;→&nbsp;
+              {moveUp}
             </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">{token}</div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
+          </div>
+        </div>
+        <div className="col-sm-6">
+          <div className="movesBox">
+            <div className="movesLeft">
+              <p>If you can use both pairs, you must do it.</p>
             </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
+            <div className="movesRight">
+              <div className="doubleDiceWrap">
+                <div className="doubleDiceRow">
+                  {dice[1]} {dice[2]}
+                </div>
+                <hr />
+                <div className="doubleDiceRow">
+                  {dice[0]} {dice[3]}
+                </div>
+              </div>
+              &nbsp;→&nbsp; {both}
             </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={1} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ClimberPlaceholder columnParity={0} />
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={4} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={5} />
-            </div>
-          </td>
-          <td className="mountainCol">
-            <div className="mountainCell">
-              <ColNum colNum={6} />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const bust = (
+    <div className="bust badge badge-danger">
+      <strong>bust</strong>
+    </div>
   );
 
   return (
     <div className="rules">
+      <h2>Overview</h2>
       <p>
-        At your turn, you can either {actionBtn("Roll")} or {actionBtn("Stop")}.
-        When rolling, you try to make your <strong>runners</strong> ({runner})
-        progress. When stopping, you end your turn but keep your progress. You
-        can roll as many times as you like until you either{" "}
-        <strong>stop</strong> or <strong>bust</strong>.
+        You must climb the different columns faster than your opponents, by
+        rolling different dice sums for each column. You can keep rolling to
+        move faster but you might bust and lose your progress. Will you be able
+        to stop in time?
+      </p>
+      <div className="fullMountain">
+        <Mountain {...mountainOptions} />
+      </div>
+      <h2>On your turn </h2>
+      <p>
+        You can either {actionBtn("Roll")} or {actionBtn("Stop")}. When rolling,
+        you try to make your (up to three) <strong>runners</strong> ({runner})
+        progress. When stopping, you end your turn but keep the progress you
+        made this turn using <strong>tokens</strong> of your color ({token}).
+        You can {actionBtn("Roll")} as many times as you like until you either{" "}
+        {actionBtn("Stop")} or {bust}.{" "}
       </p>
       <h3>Roll</h3>
       <p>
@@ -235,65 +194,27 @@ const Rules = (props) => {
         {dice[2]}|{dice[1]}
         {dice[3]} or {dice[0]}
         {dice[3]}|{dice[1]}
-        {dice[2]}) such that you can do one of the following actions for at
-        least one of the pairs.
+        {dice[2]}). For each pair, you can add or move a {runner} up on the
+        corresponding column. You can have up to three different {runner} par
+        turn.
       </p>
-      <ul>
-        <li>
-          Add a new {runner} on the column corresponding to the sum of the pair.
-          You can have up to three {runner}.
-          <ul>
-            <li>
-              Place it at the bottom of the column if you don't have a colored
-              token in this column.
-              <div className="ruleRow">
-                {dice[1]}
-                {dice[2]} &nbsp;→&nbsp; {placeAtBottom}
-              </div>
-            </li>
-            <li>
-              Place it one step above your current colored token if you have
-              one.
-              <div className="ruleRow">
-                {dice[1]}
-                {dice[2]} &nbsp;→&nbsp; {placeAfter}
-              </div>
-            </li>
-          </ul>
-        </li>
-        <li>
-          Move an already placed <strong>runner</strong> up in the column
-          corresponding to the sum of the pair.
-          <div className="ruleRow">
-            {dice[1]}
-            {dice[2]} &nbsp;→&nbsp; {moveUp}
-          </div>
-        </li>
-      </ul>
-
+      {moveUpTable}
       <p>
-        If you can do one of the actions for both pairs, then you must do it.
-      </p>
-      <p>
-        If you can't do any action for any dice split, you <strong>bust</strong>
-        . You lose the progress made by the <strong>runners</strong> and your
-        turn ends.
+        If you can't do any action for any pair, you {bust}. You lose the
+        progress made by the {runner} and your turn ends.
       </p>
 
       <h3>Stop</h3>
       <p>
-        You change your <strong>runners</strong> into tokens of your color (
-        {runner} → {token}) and end your turn. Those will be your new
-        checkpoints in their respective columns.
-      </p>
-      <p>
-        If you get to the end of a column, it becomes <strong>blocked</strong>{" "}
-        by you. From now on no one can use it.
-      </p>
-      <p>
-        The first player to <strong>block</strong> three columns{" "}
+        If you have a {runner} at the end of a column, the column is{" "}
+        <strong>blocked</strong> by you. From now on, no one can use it. The
+        first player to <strong>block</strong> three columns{" "}
         <strong>wins</strong>.
       </p>
+      <p>
+        You change your {runner} into {token} and end your turn.
+      </p>
+      <p></p>
     </div>
   );
 };

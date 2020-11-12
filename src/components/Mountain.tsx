@@ -65,6 +65,12 @@ interface MountainProps {
   currentPlayer: PlayerID;
   diceSumOptions?: SumOption[];
   mouseOverPossibility?: { diceSplit: number; dicePairs: number[] };
+  // Those options were introduced to be used in the How To Play seciton.
+  // It's useful to show a subset of the Mountain.
+  minCol?: number;
+  maxCol?: number;
+  minRow?: number;
+  maxRow?: number;
 }
 
 export class Mountain extends React.Component<MountainProps> {
@@ -73,6 +79,12 @@ export class Mountain extends React.Component<MountainProps> {
     // First we need to copy the prop.
     const updatedCurrentPositions = {};
     Object.assign(updatedCurrentPositions, currentPositions);
+
+    let { minCol, maxCol, minRow, maxRow } = this.props;
+    minCol = minCol == null ? 2 : minCol;
+    maxCol = maxCol == null ? 12 : maxCol;
+    minRow = minRow == null ? 0 : minRow;
+    maxRow = maxRow == null ? 13 : maxRow;
 
     const {
       mouseOverPossibility,
@@ -103,9 +115,9 @@ export class Mountain extends React.Component<MountainProps> {
     }
 
     let rows: JSX.Element[] = [];
-    for (let row = 13; row >= 0; --row) {
+    for (let row = maxRow; row >= minRow; --row) {
       let cols: any[] = [];
-      for (let col = 2; col < 13; ++col) {
+      for (let col = minCol; col < maxCol + 1; ++col) {
         let content: JSX.Element | string | (JSX.Element | string)[];
 
         const totalNumSteps = getNumStepsForSum(col);

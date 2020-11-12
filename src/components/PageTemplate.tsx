@@ -54,7 +54,7 @@ const Page = (props: PageProps): JSX.Element => {
     <div className="backgroundWrap">
       <div className="pageContentWrap">
         <Header path={props.path} />
-        {props.children}
+        <div className="pageContent">{props.children}</div>
         <Footer />
       </div>
       <Background />

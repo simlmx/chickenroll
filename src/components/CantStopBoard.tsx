@@ -133,7 +133,6 @@ interface CantStopBoardState {
   // diceSplit: 0=horizontal, 1=vertical, 2=diagonal
   // dicePairs : Which of the pairs []: None, [0]: only the first?, [1]: only the second, [0, 1]:
   // both of then.
-  // diceSums: The actual sums of the pairs.
   mouseOverPossibility?: { diceSplit: number; dicePairs: number[] };
   // Whenever or not the info pop is visible.
   infoVisible: boolean;

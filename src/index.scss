@@ -141,16 +141,19 @@ button.bgcolor3:hover {
   padding: 0rem 0.5rem 0.5rem 0.5rem;
 }
 
-.pageContentWrap > div {
-  /* min-width: 70%; */
-}
 @include media-breakpoint-up(md) {
+  .pageContentWrap > div {
+    width: 80%;
+  }
+}
+@include media-breakpoint-up(lg) {
   .pageContentWrap > div {
     width: 70%;
   }
-
-  .pageContentWrap h1 {
-    /* margin: 1rem; */
+}
+@include media-breakpoint-up(xl) {
+  .pageContentWrap > div {
+    width: 60%;
   }
 }
 
@@ -217,12 +220,7 @@ nav .active {
   /* font-weight: bold !important; */
 }
 
-.rules p,
-.rules li {
-  text-align: justify;
-}
-
-.homeContent {
+.pageContent {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -241,7 +239,7 @@ h1 {
   text-align: center;
 }
 
-.homeContent h2 {
+.pageContent h2 {
   padding-top: 1.5rem;
 }
 
@@ -1058,12 +1056,29 @@ $height: $width * $mountainRatio;
 // We reuse a bunch of components in the Rules, but we need to adjust some of the
 // parameters.
 .rules {
+  font-size: 1rem;
+  p,
+  li {
+    text-align: justify;
+  }
+
   @include setDice(1rem);
 
   .btnAction {
+    font-size: 1rem;
     padding: 0 0.5rem;
   }
-  @include cellSize(2rem, 3);
+
+  @include cellSize(1.2rem, 3);
+  .mountainWrap {
+    @include cellSize(1.2rem, 3);
+  }
+
+  .fullMountain {
+    @include cellSize(1rem, 11);
+    display: flex;
+    justify-content: center;
+  }
 
   .climber {
     margin: 0rem 0.1rem;
@@ -1074,5 +1089,66 @@ $height: $width * $mountainRatio;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .bust {
+    font-size: 1rem;
+  }
+
+  .container-fluid {
+    padding: 0;
+  }
+
+  .movesWrap {
+    p {
+      margin: 0;
+    }
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 1rem;
+  }
+
+  .movesBox {
+    border: 2px solid black;
+    border-radius: 1rem;
+    background-color: rgba(white, 0.6);
+    padding: 0.5rem;
+    margin: 0.2rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    p {
+      max-width: 16rem;
+    }
+  }
+
+  .movesRight {
+    padding-left: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  hr {
+    margin: 0.2rem;
+    border: none;
+    height: 1px;
+    color: black;
+    background-color: black;
+  }
+  .doubleDiceWrap {
+    padding: 0;
+    margin: 0;
+  }
+
+  .doubleDiceRow {
+    display: flex;
+    padding: 0;
+    margin: 0;
   }
 }
