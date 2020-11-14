@@ -53,7 +53,7 @@ class Home extends React.Component<{ onCreate: () => void }> {
       <div>
         <p>
           Choose the number of players:
-          <div style={{ display: "inline-block" }}>
+          <span style={{ display: "inline-block" }}>
             {Array(MAX_PLAYERS)
               .fill(null)
               .map((_, i) => (
@@ -67,7 +67,7 @@ class Home extends React.Component<{ onCreate: () => void }> {
                   {i + 1}
                 </button>
               ))}
-          </div>
+          </span>
         </p>
       </div>
     );

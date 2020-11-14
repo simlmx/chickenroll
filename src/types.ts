@@ -11,4 +11,5 @@ export type SumOption = {
 export type PlayerInfo = {
   name: string;
   color: number;
+  ready: boolean;
 };

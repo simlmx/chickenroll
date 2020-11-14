@@ -11,7 +11,7 @@ const Header = (props: HeaderProps) => {
     <nav className="navbar navbar-expand navbar-primary">
       <ul className="navbar-nav">
         {Object.entries(navItems).map(([path, name]) => (
-          <li className="nav-item">
+          <li className="nav-item" key={name}>
             <a
               className={`nav-link ${props.path === path ? "active" : ""}`}
               href={path}

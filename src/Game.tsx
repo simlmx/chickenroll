@@ -210,7 +210,11 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // For pass-and-play games we set default player names.
   if (passAndPlay) {
     for (let i = 0; i < ctx.numPlayers; ++i) {
-      playerInfos[i.toString()] = { name: `Player ${i + 1}`, color: i };
+      playerInfos[i.toString()] = {
+        name: `Player ${i + 1}`,
+        color: i,
+        ready: false,
+      };
     }
   }
 
@@ -277,6 +281,10 @@ const CantStop = {
                 if (G.passAndPlay) {
                   return INVALID_MOVE;
                 }
+                // If we have already joined, we ignore this.
+                if (G.playerInfos.hasOwnProperty(ctx.playerID)) {
+                  return;
+                }
                 // Find the next available color.
                 const availableColors = Array(NUM_COLORS).fill(true);
 
@@ -299,6 +307,7 @@ const CantStop = {
                 G.playerInfos[ctx.playerID] = {
                   name: `Player ${parseInt(ctx.playerID) + 1}`,
                   color: newColor,
+                  ready: false,
                 };
               },
               setName: (
@@ -307,8 +316,26 @@ const CantStop = {
                 name: string,
                 playerID: PlayerID = "0"
               ) => {
+                // Nothing happens if the name is empty.
+                // This way we make sure a player without a name is not ready.
+                if (!name) {
+                  return;
+                }
+
                 playerID = G.passAndPlay ? playerID : ctx.playerID;
+
                 G.playerInfos[playerID].name = name;
+                // Setting the name and being ready is the same!
+                G.playerInfos[playerID].ready = true;
+
+                // In pass-and-play mode, when everyone is ready, we start the game.
+                // if (Object.values(G.playerInfos).every(info => info.ready)) {
+                // ctx.events.endPhase();
+                // }
+              },
+              setNotReady: (G: GameType, ctx, playerID: PlayerID): void => {
+                playerID = G.passAndPlay ? playerID : ctx.playerID;
+                G.playerInfos[playerID].ready = false;
               },
               setColor: (
                 G: GameType,

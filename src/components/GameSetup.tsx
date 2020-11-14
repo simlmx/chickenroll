@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { PlayerID, PlayerInfo } from "../types";
 import { SERVER, NUM_COLORS } from "../constants";
 import { DieLogo } from "./Die";
+import QRCode from "qrcode.react";
 
 // We need this to close the popup when we click outside.
 // https://stackoverflow.com/a/42234988
@@ -49,13 +50,17 @@ const ColorPicker = (props: ColorPickerProps) => {
   const [visible, setVisible] = useState(false);
   return (
     <div className="colorWrap">
-      <button
-        className={`btn gameSetupColorButton bgcolor${color} ${
-          props.disabled ? "gameSetupColorButtonDisabled" : ""
-        }`}
-        onClick={() => setVisible(true)}
-        disabled={props.disabled}
-      ></button>
+      <div className="gameSetupColorButtonWrap">
+        <button
+          className={`btn gameSetupColorButton bgcolor${color} ${
+            props.disabled ? "gameSetupColorButtonDisabled" : ""
+          }`}
+          onClick={() => setVisible(true)}
+          disabled={props.disabled}
+        >
+          <div>◢</div>
+        </button>
+      </div>
       {visible && (
         <OutsideAlerter onClickOutside={() => setVisible(false)}>
           <div className="colorPopupWrap">
@@ -70,6 +75,8 @@ const ColorPicker = (props: ColorPickerProps) => {
                       setVisible(false);
                     }}
                     key={i}
+                    autoFocus={i === 0}
+                    tabIndex={0}
                   ></button>
                 )
             )}
@@ -83,102 +90,104 @@ const ColorPicker = (props: ColorPickerProps) => {
 interface PlayerProps {
   moves: any;
   itsMe: boolean;
-  playerName: string;
+  playerInfo: PlayerInfo;
   playerID: PlayerID;
-  playerColor: number;
   colorAvailabilityMap: boolean[];
+  autoFocus: boolean;
 }
 
 export const Player = (props: PlayerProps): JSX.Element => {
   const {
     moves,
-    playerName,
+    playerInfo,
     itsMe,
     playerID,
-    playerColor,
     colorAvailabilityMap,
+    autoFocus,
   } = props;
 
-  const [currentName, setCurrentName] = useState(playerName);
-  const [editing, setEditing] = useState(itsMe && playerName === "");
+  const { name, color, ready } = playerInfo;
 
-  let className = `gameSetupPlayer border${playerColor} bgcolor${playerColor}`;
+  const [currentName, setCurrentName] = useState(name);
 
-  if (!itsMe && !playerName) {
+  const setReady = (ready: boolean): void => {
+    // This was the simplest way to not have any effects when clicking on other player's
+    // names.
+    if (!itsMe) {
+      return;
+    }
+
+    if (!ready) {
+      moves.setNotReady(playerID);
+    } else {
+      moves.setName(currentName, playerID);
+    }
+  };
+
+  let className = `gameSetupPlayer border${color} bgcolor${color}`;
+
+  if (!itsMe && !name) {
     className += " gameSetupPlayerWaiting";
   }
 
-  const doneEditing = () => {
-    moves.setName(currentName, playerID);
-    setEditing(false);
-  };
-
   let nameElement: JSX.Element;
-  let button: JSX.Element;
-  const fakeButton = (
-    <button className="btn btn-primary fakeButton" disabled>
-      .
-    </button>
-  );
 
-  if (editing) {
+  if (!ready && itsMe) {
     nameElement = (
       <input
         type="text"
-        className="form-control playerNameInput"
-        onChange={(event) => setCurrentName(event.target.value)}
+        className="form-control playerNameInput user-select-all"
+        onChange={(e) => setCurrentName(e.target.value)}
         placeholder="Enter your name"
-        autoFocus
         maxLength={16}
         value={currentName}
+        autoFocus={autoFocus}
+        // https://stackoverflow.com/a/40235334/1067132
+        ref={(input) => input && autoFocus && input.focus()}
+        onFocus={(e) => e.target.select()}
         onKeyDown={(e) => {
           // On <enter> same as clicking ready
           if (e.keyCode === 13) {
-            doneEditing();
+            setReady(true);
             return false;
           }
           return true;
         }}
       />
     );
-    button = itsMe ? (
-      <button
-        type="submit"
-        id="readyButton"
-        className="btn btn-primary"
-        onClick={(e) => {
-          e.preventDefault();
-          doneEditing();
-        }}
-        disabled={currentName === ""}
-      >
-        Done
-      </button>
-    ) : (
-      fakeButton
-    );
   } else {
-    nameElement = <div className="playerName">{playerName || "..."}</div>;
-    button = itsMe ? (
-      <button
-        id="editButton"
-        className="btn btn-primary"
-        onClick={(e) => {
-          e.preventDefault();
-          setEditing(true);
-        }}
-      >
-        Edit
-      </button>
-    ) : (
-      fakeButton
+    nameElement = (
+      <div className="playerName" onClick={(e) => setReady(false)}>
+        {name || "..."}
+      </div>
     );
   }
 
+  const readyButton = (
+    <div className="readyWrap">
+      <div className="readyText badge" onClick={(e) => setReady(!ready)}>
+        {ready ? "Ready" : "Not Ready"}
+      </div>
+      <div className="custom-control custom-switch">
+        <input
+          type="checkbox"
+          className="custom-control-input"
+          id={`customSwitch-${playerID}`}
+          checked={ready}
+          onChange={(e) => setReady(e.target.checked)}
+        />
+        <label
+          className="custom-control-label"
+          htmlFor={`customSwitch-${playerID}`}
+        ></label>
+      </div>
+    </div>
+  );
+
   const colorPicker = (
     <ColorPicker
-      initialColor={playerColor}
-      onColorChange={(color) => moves.setColor(color, playerID)}
+      initialColor={color}
+      onColorChange={(c) => moves.setColor(c, playerID)}
       colorAvailabilityMap={colorAvailabilityMap}
       disabled={!itsMe}
     />
@@ -188,7 +197,7 @@ export const Player = (props: PlayerProps): JSX.Element => {
     <div {...{ className }}>
       {colorPicker}
       {nameElement}
-      <div className="gameButtonWrap">{button}</div>
+      <div className="gameButtonWrap">{readyButton}</div>
     </div>
   );
 };
@@ -202,104 +211,133 @@ interface GameSetupProps {
   passAndPlay: boolean;
 }
 
-export default class GameSetup extends React.Component<GameSetupProps> {
-  constructor(props) {
-    super(props);
-    const { playerInfos, playerID } = props;
+const GameSetup = (props: GameSetupProps): JSX.Element => {
+  const {
+    playerInfos,
+    maxNumPlayers,
+    passAndPlay,
+    matchID,
+    moves,
+    playerID,
+  } = props;
 
+  // Using a state is how I made the auto-focus on the start button once everyone is
+  // ready possible.
+  const [allReady, setAllReady] = useState(false);
+
+  useEffect(() => {
     // If it's the first time we join that game, we tell the game. It's going to assign
     // us a default name and color.
     if (!playerInfos.hasOwnProperty(playerID)) {
-      props.moves.join();
+      moves.join();
     }
-  }
+    setAllReady(Object.values(playerInfos).every((info) => info.ready));
+  }, [playerInfos, moves, playerID]);
 
-  render() {
-    const {
-      playerInfos,
-      maxNumPlayers,
-      passAndPlay,
-      matchID,
-      moves,
-      playerID,
-    } = this.props;
+  const numPlayers = Object.values(playerInfos).length;
+  const numFreeSpots = maxNumPlayers - Object.keys(playerInfos).length;
+  const matchLink = `${SERVER}/match/${matchID}`;
 
-    const numPlayers = Object.values(playerInfos).length;
-    const numFreeSpots = maxNumPlayers - Object.keys(playerInfos).length;
-    const matchLink = `${SERVER}/match/${matchID}`;
-    return (
-      <div className="gameSetupWrap">
-        {passAndPlay && (
-          <a href="/" title="Home" className="homeLink">
-            <DieLogo />
-          </a>
-        )}
-        {!passAndPlay && (
-          <div className="gameSetupInviteWrap alert alert-success">
-            <div>
-              <b>Share this link to invite players</b>
-            </div>
-            <div className="inviteLinkWrap">
-              <span className="inviteLink badge badge-success user-select-all">
-                {matchLink}
-              </span>
-              <button
-                type="button"
-                className="btn btn-outline-success btn-sm copyBtn"
-                onClick={() => navigator.clipboard.writeText(matchLink)}
-              >
-                Copy
-              </button>
-            </div>
-          </div>
-        )}
-        <div className="gameSetupPlayersWrap">
-          {Object.entries(playerInfos).map(([currentPlayerID, playerInfo]) => {
-            // Find the available colors for that players, i.e. all those which are not
-            // taken already.
-            const colorAvailabilityMap = Array(NUM_COLORS).fill(true);
-            Object.values(playerInfos).forEach(
-              (playerInfo) => (colorAvailabilityMap[playerInfo.color] = false)
-            );
+  const logo = passAndPlay ? (
+    <a href="/" title="Home" className="homeLink">
+      <DieLogo />
+    </a>
+  ) : null;
 
-            return (
-              <Player
-                moves={moves}
-                playerName={playerInfo.name}
-                itsMe={passAndPlay || currentPlayerID === playerID}
-                playerID={currentPlayerID}
-                key={currentPlayerID}
-                playerColor={playerInfo.color}
-                colorAvailabilityMap={colorAvailabilityMap}
-              />
-            );
-          })}
-          {Array(numFreeSpots)
-            .fill(null)
-            .map((_, i) => (
-              <div
-                className="gameSetupPlayer gameSetupPlayerFree"
-                key={numPlayers + i}
-              >
-                Waiting for player to join
-              </div>
-            ))}
-          {playerID === "0" && (
-            <button
-              className="btn btn-primary startButton"
-              onClick={() => moves.startGame()}
-              disabled={Object.values(playerInfos).some((info) => !info.name)}
-              key="last"
-            >
-              {passAndPlay
-                ? "Start"
-                : `Start with ${numPlayers} player${
-                    numPlayers === 1 ? "" : "s"
-                  }!`}
-            </button>
-          )}
+  const inviteHeader = true ? (
+    <div className="gameSetupInviteWrap alert alert-success">
+      <div className="inviteLeft">
+        <b>Share this link to invite players</b>
+        <div className="inviteLinkWrap">
+          <span className="inviteLink badge badge-success user-select-all">
+            {matchLink}
+          </span>
+          <button
+            type="button"
+            className="btn btn-outline-success btn-sm copyBtn"
+            onClick={() => navigator.clipboard.writeText(matchLink)}
+          >
+            Copy
+          </button>
         </div>
       </div>
-    );
-  }
-}
+      <div className="inviteRight">
+        <QRCode className="qrcode" value={matchLink} />
+      </div>
+    </div>
+  ) : null;
+
+  // In pass-and-play mode, we can edit all the player's names. What we do is we
+  // auto-focus on the *first* one that is not ready.
+  // In remote mode we autofocus on everything because only one will be editable
+  // anyway.
+  let foundFirstNotReady = false;
+  const activePlayers = Object.entries(playerInfos).map(
+    ([currentPlayerID, playerInfo], i) => {
+      // Find the available colors for that players, i.e. all those which are not
+      // taken already.
+      const colorAvailabilityMap = Array(NUM_COLORS).fill(true);
+
+      Object.values(playerInfos).forEach(
+        (playerInfo) => (colorAvailabilityMap[playerInfo.color] = false)
+      );
+
+      let autoFocus: boolean;
+      if (!playerInfo.ready && !foundFirstNotReady) {
+        foundFirstNotReady = true;
+        autoFocus = true;
+      } else {
+        autoFocus = false;
+      }
+
+      return (
+        <Player
+          moves={moves}
+          playerInfo={playerInfo}
+          itsMe={passAndPlay || currentPlayerID === playerID}
+          playerID={currentPlayerID}
+          key={currentPlayerID}
+          colorAvailabilityMap={colorAvailabilityMap}
+          autoFocus={passAndPlay ? autoFocus : true}
+        />
+      );
+    }
+  );
+
+  const freeSpots = Array(numFreeSpots)
+    .fill(null)
+    .map((_, i) => (
+      <div className="gameSetupPlayer gameSetupPlayerFree" key={numPlayers + i}>
+        Waiting for player to join
+      </div>
+    ));
+
+  const startButton = playerID === "0" && (
+    <button
+      className="btn btn-primary startButton"
+      onClick={() => moves.startGame()}
+      // Disabled if not everyone is ready
+      disabled={!allReady}
+      key="last"
+      ref={(input) => input && allReady && input.focus()}
+    >
+      {passAndPlay
+        ? "Start the match!"
+        : `Start with ${numPlayers} player${numPlayers === 1 ? "" : "s"}!`}
+    </button>
+  );
+
+  return (
+    <div className="gameSetupWrap">
+      {logo}
+      {inviteHeader}
+      <div className="gameSetupPlayersWrap">
+        {activePlayers}
+        {freeSpots}
+        {startButton}
+      </div>
+    </div>
+  );
+};
+
+export default GameSetup;
