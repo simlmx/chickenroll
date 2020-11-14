@@ -225,6 +225,8 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   // ready possible.
   const [allReady, setAllReady] = useState(false);
 
+  const [showQr, setShowQr] = useState(false);
+
   useEffect(() => {
     // If it's the first time we join that game, we tell the game. It's going to assign
     // us a default name and color.
@@ -238,31 +240,49 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   const numFreeSpots = maxNumPlayers - Object.keys(playerInfos).length;
   const matchLink = `${SERVER}/match/${matchID}`;
 
-  const logo = passAndPlay ? (
+  const logo = (
     <a href="/" title="Home" className="homeLink">
       <DieLogo />
     </a>
-  ) : null;
+  );
 
-  const inviteHeader = true ? (
+  const qrcode = (
+    <OutsideAlerter onClickOutside={() => setShowQr(false)}>
+      <div className="qrcodeWrap" onMouseDown={() => setShowQr(false)}>
+        <QRCode className="qrcode" value={matchLink} />
+      </div>
+    </OutsideAlerter>
+  );
+
+  const inviteHeader = !passAndPlay ? (
     <div className="gameSetupInviteWrap alert alert-success">
-      <div className="inviteLeft">
-        <b>Share this link to invite players</b>
-        <div className="inviteLinkWrap">
-          <span className="inviteLink badge badge-success user-select-all">
-            {matchLink}
-          </span>
+      <div>
+        <div className="inviteContentWrap">
+          <b>Share this link to invite players</b>
+          <div className="inviteLinkWrap">
+            <span className="inviteLink badge badge-success user-select-all">
+              {matchLink}
+            </span>
+            <button
+              type="button"
+              className="btn btn-outline-success btn-sm copyBtn"
+              onClick={() => navigator.clipboard.writeText(matchLink)}
+            >
+              Copy
+            </button>
+          </div>
           <button
             type="button"
-            className="btn btn-outline-success btn-sm copyBtn"
-            onClick={() => navigator.clipboard.writeText(matchLink)}
+            className="btn btn-outline-dark btn-sm copyBtn"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              setShowQr(!showQr);
+            }}
           >
-            Copy
+            QR
           </button>
+          {showQr && qrcode}
         </div>
-      </div>
-      <div className="inviteRight">
-        <QRCode className="qrcode" value={matchLink} />
       </div>
     </div>
   ) : null;

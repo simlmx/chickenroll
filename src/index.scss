@@ -650,6 +650,7 @@ $diceSize: 3.4rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  z-index: 500;
 }
 
 .homeLink * {
@@ -862,29 +863,31 @@ $diceSize: 3.4rem;
 
 .gameSetupInviteWrap {
   width: 100%;
-  max-width: 100vw;
   padding: 0.4rem;
+  padding-left: 2.8rem;
   margin: 0;
-
-  display: flex;
-  flex-direction: row;
+  border: none;
 }
 
-.inviteLeft {
+.inviteOffset {
+  width: calc(100vw - 0.4rem - 2.8rem);
   flex: 1;
 }
 
-.inviteRight {
+.inviteContentWrap {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 .inviteLinkWrap {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  max-width: calc(100vw - 64px - 1rem);
+  max-width: calc(100vw - 0.4rem - 2.8rem);
+  justify-content: center;
 }
 
 .inviteLink {
@@ -895,9 +898,18 @@ $diceSize: 3.4rem;
   margin-bottom: 0.2rem;
 }
 
+.qrcodeWrap {
+  position: relative;
+  background-color: black;
+  text-align: center;
+}
 .qrcode {
-  width: 64px !important;
-  height: 64px !important;
+  position: absolute;
+  left: -64px;
+  top: calc(100% + 1rem);
+  width: 128px !important;
+  height: 128px !important;
+  z-index: 999;
 }
 
 .copyBtn {
@@ -1051,6 +1063,10 @@ $mountainRatio: 0.75;
 
 .diceButtonsMiddle {
   flex: 0.5;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 // Default is really tall not wide

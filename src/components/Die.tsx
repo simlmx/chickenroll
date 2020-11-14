@@ -83,11 +83,12 @@ interface DieProps {
   // ...
   // 23: diagonal split die 3
   split?: string;
+  onClick?: () => void;
 }
 
 export class Die extends React.Component<DieProps> {
   render() {
-    const { color, value, highlight, split } = this.props;
+    const { color, value, highlight, split, onClick } = this.props;
 
     let className = "die";
     if (color != null) {
@@ -100,12 +101,23 @@ export class Die extends React.Component<DieProps> {
       className += ` dieSplit${split}`;
     }
 
+    const opts = { className };
+
+    if (onClick) {
+      // onMousedown doesn't fall laggy compared to onClick
+      opts["onMouseDown"] = (e) => {
+        e.preventDefault();
+        onClick();
+      };
+      opts["className"] += " pointer";
+    }
+
     return (
       <svg
         viewBox="0 0 100 100"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
-        {...{ className }}
+        {...opts}
       >
         <g fill="#000000">{diceDots(value, color)}</g>
       </svg>
