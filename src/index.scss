@@ -140,8 +140,7 @@ button.bgcolor5:hover {
 .dotColor3,
 .dotColor5 {
   fill: black;
-  stroke-width: 0;
-  stroke: black;
+  stroke-width: 0 !important;
 }
 
 @mixin cellDim($cell-height, $cell-width) {
