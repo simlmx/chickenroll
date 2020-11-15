@@ -739,8 +739,6 @@ $diceSize: 3.4rem;
     margin-right: 0.7rem;
   }
 
-  position: relative;
-
   .colorWrap {
     position: relative;
   }
@@ -759,7 +757,6 @@ $diceSize: 3.4rem;
 }
 
 .gameSetupColorButton {
-  border: 1px solid red;
   min-width: 2rem;
   min-height: 2rem;
   max-width: 2rem;
@@ -769,10 +766,10 @@ $diceSize: 3.4rem;
   box-shadow: 0px 0px 3px black;
   z-index: 20;
   transition: none;
-  text-align: center;
+
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  text-align: center;
   align-items: center;
   padding-bottom: 0.6rem;
 

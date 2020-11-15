@@ -48,13 +48,17 @@ interface ColorPickerProps {
 const ColorPicker = (props: ColorPickerProps) => {
   const [color, setColor] = useState(props.initialColor);
   const [visible, setVisible] = useState(false);
+
+  let btnClassName = `btn gameSetupColorButton bgcolor${color}`;
+  if (props.disabled) {
+    btnClassName += " gameSetupColorButtonDisabled";
+  }
+
   return (
     <div className="colorWrap">
-      <div className="gameSetupColorButtonWrap">
+      <div>
         <button
-          className={`btn gameSetupColorButton bgcolor${color} ${
-            props.disabled ? "gameSetupColorButtonDisabled" : ""
-          }`}
+          className={btnClassName}
           onClick={() => setVisible(true)}
           disabled={props.disabled}
         >
@@ -64,8 +68,19 @@ const ColorPicker = (props: ColorPickerProps) => {
       {visible && (
         <OutsideAlerter onClickOutside={() => setVisible(false)}>
           <div className="colorPopupWrap">
-            {props.colorAvailabilityMap.map(
-              (available, i) =>
+            {props.colorAvailabilityMap.map((available, i) => {
+              // Skip colors that are not available.
+              if (!available) {
+                return null;
+              }
+
+              // If it's the first one we add auto-focus.
+              const opts = {};
+              if (i === 0) {
+                opts["autoFocus"] = true;
+              }
+
+              return (
                 (available || i === props.initialColor) && (
                   <button
                     className={`btn gameSetupColorButton bgcolor${i}`}
@@ -75,11 +90,12 @@ const ColorPicker = (props: ColorPickerProps) => {
                       setVisible(false);
                     }}
                     key={i}
-                    autoFocus={i === 0}
                     tabIndex={0}
+                    {...opts}
                   ></button>
                 )
-            )}
+              );
+            })}
           </div>
         </OutsideAlerter>
       )}
@@ -93,22 +109,23 @@ interface PlayerProps {
   playerInfo: PlayerInfo;
   playerID: PlayerID;
   colorAvailabilityMap: boolean[];
-  autoFocus: boolean;
+  autoFocus?: boolean;
 }
 
 export const Player = (props: PlayerProps): JSX.Element => {
-  const {
-    moves,
-    playerInfo,
-    itsMe,
-    playerID,
-    colorAvailabilityMap,
-    autoFocus,
-  } = props;
+  const { moves, playerInfo, itsMe, playerID, colorAvailabilityMap } = props;
 
   const { name, color, ready } = playerInfo;
 
   const [currentName, setCurrentName] = useState(name);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (props.autoFocus && inputRef && inputRef.current) {
+      inputRef.current.focus();
+    }
+  });
 
   const setReady = (ready: boolean): void => {
     // This was the simplest way to not have any effects when clicking on other player's
@@ -141,9 +158,7 @@ export const Player = (props: PlayerProps): JSX.Element => {
         placeholder="Enter your name"
         maxLength={16}
         value={currentName}
-        autoFocus={autoFocus}
-        // https://stackoverflow.com/a/40235334/1067132
-        ref={(input) => input && autoFocus && input.focus()}
+        ref={inputRef}
         onFocus={(e) => e.target.select()}
         onKeyDown={(e) => {
           // On <enter> same as clicking ready
