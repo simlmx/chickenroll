@@ -19,7 +19,7 @@ export const Climber = (props: {
   } else if (props.downlight) {
     className += " downlight";
   }
-  return <div {...{ className }}></div>;
+  return <span {...{ className }}></span>;
 };
 
 export const ClimberPlaceholder = (props: {

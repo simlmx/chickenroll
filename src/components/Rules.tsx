@@ -161,9 +161,9 @@ const Rules = (props) => {
   );
 
   const bust = (
-    <div className="bust badge badge-danger">
+    <span className="bust badge badge-danger">
       <strong>bust</strong>
-    </div>
+    </span>
   );
 
   return (

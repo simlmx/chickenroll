@@ -6,7 +6,6 @@ import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
 import { SocketIO, Local } from "boardgame.io/multiplayer";
 import { PlayerID } from "./types";
-import { Background } from "./components/Die";
 import { SERVER, MAX_PLAYERS } from "./constants";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Page from "./components/PageTemplate";
