@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Background } from "./Die";
 
 interface HeaderProps {
@@ -42,21 +42,48 @@ const Footer = (props) => {
 };
 
 interface PageProps {
-  path: string;
+  path?: string;
   children?: JSX.Element | JSX.Element[] | null;
+  // Should we `wrap` the children in a page with header/footer. If not we just add the
+  // background.
+  wrap?: boolean;
+  // title for the html page
+  title: string;
 }
 
 /*
  * Template for a typical page with background / footer and some content.
  */
 const Page = (props: PageProps): JSX.Element => {
-  return (
-    <div className="backgroundWrap">
+  // Defaults to true
+  let { wrap, children, path, title } = props;
+
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
+  if (wrap == null) {
+    wrap = true;
+  }
+
+  let content;
+  if (wrap) {
+    if (path == null) {
+      throw new Error("path of Page should be wrap=true");
+    }
+    content = (
       <div className="pageContentWrap">
-        <Header path={props.path} />
-        <div className="pageContent">{props.children}</div>
+        <Header path={path} />
+        <div className="pageContent">{children}</div>
         <Footer />
       </div>
+    );
+  } else {
+    content = children;
+  }
+  return (
+    <div className="backgroundWrap">
+      {content}
       <Background />
     </div>
   );

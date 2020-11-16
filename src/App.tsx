@@ -12,6 +12,8 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Page from "./components/PageTemplate";
 import HowToPlay from "./components/HowToPlay";
 // import { Debug } from 'boardgame.io/debug';
+//
+const TITLE = "Can't Stop!";
 
 const googleAnalyticsSendPage = (pathname: string, search: string): void => {
   const win = window as any;
@@ -25,21 +27,18 @@ const googleAnalyticsSendPage = (pathname: string, search: string): void => {
 const PassAndPlayMatch = (props: { numPlayers: number }) => {
   // We use playerID=0 but we will let all the players play for everyone,
   // because we are assuming players are passing the device around
+  //
+  const { numPlayers } = props;
   const CantStopClient = Client({
     game: CantStop,
-    numPlayers: props.numPlayers,
+    numPlayers: numPlayers,
     board: CantStopBoard,
     multiplayer: Local(),
     debug: false,
     // debug: true,
   });
 
-  return (
-    <div className="backgroundWrap">
-      <CantStopClient playerID="0" />
-      <Background />
-    </div>
-  );
+  return <CantStopClient playerID="0" />;
 };
 
 class Match extends React.Component<
@@ -136,14 +135,11 @@ class Match extends React.Component<
       return <div>Loading...</div>;
     } else {
       return (
-        <div className="backgroundWrap">
-          <this.CantStopClient
-            playerID={this.state.playerID}
-            matchID={this.props.matchID}
-            credentials={this.state.playerCredentials}
-          />
-          <Background />
-        </div>
+        <this.CantStopClient
+          playerID={this.state.playerID}
+          matchID={this.props.matchID}
+          credentials={this.state.playerCredentials}
+        />
       );
     }
   }
@@ -189,7 +185,16 @@ class App extends React.Component {
               const { pathname, search } = props;
               googleAnalyticsSendPage(pathname, search);
               const numPlayers = parseInt(props.match.params.numPlayers);
-              return <PassAndPlayMatch {...{ numPlayers }} />;
+              return (
+                <Page
+                  wrap={false}
+                  title={`Same Device Match With ${numPlayers} Player${
+                    numPlayers > 1 ? "s" : ""
+                  } - ${TITLE}`}
+                >
+                  <PassAndPlayMatch {...{ numPlayers }} />
+                </Page>
+              );
             }}
           />
 
@@ -200,7 +205,11 @@ class App extends React.Component {
               const { search } = props;
               googleAnalyticsSendPage("/match", search);
               const { matchID } = props.match.params;
-              return <Match {...{ matchID, lobbyClient }} />;
+              return (
+                <Page wrap={false} title={"Match - " + TITLE}>
+                  <Match {...{ matchID, lobbyClient }} />
+                </Page>
+              );
             }}
           />
 
@@ -211,7 +220,7 @@ class App extends React.Component {
               const { pathname, search } = props;
               googleAnalyticsSendPage(pathname, search);
               return (
-                <Page path="/howtoplay">
+                <Page path="/howtoplay" title={"How To Play - " + TITLE}>
                   <HowToPlay />
                 </Page>
               );
@@ -235,7 +244,7 @@ class App extends React.Component {
               const { pathname, search } = props;
               googleAnalyticsSendPage(pathname, search);
               return (
-                <Page path="/">
+                <Page path="/" title={TITLE}>
                   <Home onCreate={() => this.createMatch()} />
                 </Page>
               );

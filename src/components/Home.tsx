@@ -41,18 +41,23 @@ const Home = (props: { onCreate: () => void }): JSX.Element => {
   );
 
   const playInternet = (
-    <div className="form-group">
-      <button className="btn btn-primary" onClick={() => props.onCreate()}>
-        Create a new match
-      </button>
-      <small className="form-text text-muted">
+    <>
+      <p className="small text-muted">
         You will be able to send an invitation link to your friends.
-      </small>
-    </div>
+      </p>
+      <div className="form-group">
+        <button className="btn btn-primary" onClick={() => props.onCreate()}>
+          Create a new match
+        </button>
+      </div>
+    </>
   );
 
   const playDevice = (
-    <div>
+    <>
+      <p className="text-muted small">
+        You will pass the device between players after each turn.
+      </p>
       <p>
         Choose the number of players:
         <span style={{ display: "inline-block" }}>
@@ -71,7 +76,7 @@ const Home = (props: { onCreate: () => void }): JSX.Element => {
             ))}
         </span>
       </p>
-    </div>
+    </>
   );
 
   return (
@@ -82,7 +87,7 @@ const Home = (props: { onCreate: () => void }): JSX.Element => {
         {ref}
         <h2> Play over the internet </h2>
         {playInternet}
-        <h2>Play on one device</h2>
+        <h2>Play on the same device</h2>
         {playDevice}
       </div>
     </div>
