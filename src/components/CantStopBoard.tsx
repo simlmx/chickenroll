@@ -467,15 +467,17 @@ export class CantStopBoard extends React.Component<
       <div className="cantStopBoard" onClick={() => {}}>
         {infoTag}
         {this.state.showRules && rulesModal}
-        <a href="/" title="Home" className="homeLink">
-          <DieLogo />
-        </a>
-        <div
-          className="howToPlayWrap"
-          title="How To Play"
-          onClick={() => this.setState({ showRules: !this.state.showRules })}
-        >
-          <div>?</div>
+        <div className="homeLinkWrap">
+          <a href="/" title="Home" className="homeLink">
+            <DieLogo />
+          </a>
+          <div
+            className="howToPlayWrap"
+            title="How To Play"
+            onClick={() => this.setState({ showRules: !this.state.showRules })}
+          >
+            ?
+          </div>
         </div>
         <div className="megaWrap">
           <div className="bigHspace"></div>

@@ -176,27 +176,27 @@ button.bgcolor5:hover {
 
 .howToPlayWrap {
   position: absolute;
-  right: 0;
-  top: 0;
-  right: 0.3rem;
-  top: 0.3rem;
+  left: 0.7rem;
+  top: 3.1rem;
   display: flex;
 
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 
   border-radius: 999px;
 
-  height: 1rem;
-  width: 1rem;
+  height: 1.4rem;
+  width: 1.4rem;
 
   cursor: pointer;
 
-  background-color: grey;
-  color: white;
+  border: 3px solid rgba(black, 0.4);
+  background-color: rgba(black, 0.05);
+  color: rgba(black, 0.7);
 
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
