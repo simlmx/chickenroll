@@ -6,7 +6,8 @@ const About = () => {
       <h1>About</h1>
       <h2>&nbsp;</h2>
       <p>
-        We hope that you and your friends enjoy our version of{" "}
+        We hope that you and your friends enjoy our version of the classical
+        game{" "}
         <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
           Can't Stop
         </a>

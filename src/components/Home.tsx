@@ -30,16 +30,6 @@ const Home = (props: { onCreate: () => void }): JSX.Element => {
     </div>
   );
 
-  const ref = (
-    <p className="text-center">
-      This is an online version of the classic game{" "}
-      <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
-        Can't Stop
-      </a>
-      .
-    </p>
-  );
-
   const playInternet = (
     <>
       <p className="small text-muted">
@@ -59,13 +49,13 @@ const Home = (props: { onCreate: () => void }): JSX.Element => {
         You will pass the device between players after each turn.
       </p>
       <p>
-        Choose the number of players:
+        Number of players:
         <span style={{ display: "inline-block" }}>
           {Array(MAX_PLAYERS)
             .fill(null)
             .map((_, i) => (
               <button
-                className="btn btn-primary"
+                className="btn btn-primary btn-sm"
                 onClick={() => {
                   window.location.href = `${SERVER}/${i + 1}`;
                 }}
@@ -84,10 +74,9 @@ const Home = (props: { onCreate: () => void }): JSX.Element => {
       <h1> Can't Stop! </h1>
       <div>
         {diceBoard}
-        {ref}
-        <h2> Play over the internet </h2>
+        <h2> Play remotely </h2>
         {playInternet}
-        <h2>Play on the same device</h2>
+        <h2>Play locally</h2>
         {playDevice}
       </div>
     </div>
