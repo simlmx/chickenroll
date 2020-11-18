@@ -9,7 +9,7 @@ const Header = (props: HeaderProps) => {
   const navItems = {
     "/": "Home",
     "/howtoplay": "How To Play",
-    "https://www.buymeacoffee.com/simlmx": "Supporting",
+    "https://www.buymeacoffee.com/simlmx": "Support Us",
     "/about": "About",
   };
   return (
@@ -30,23 +30,30 @@ const Header = (props: HeaderProps) => {
   );
 };
 
-type FooterProps = {
-  showContact?: boolean;
-};
+type FooterProps = {};
 
 const Footer = (props) => {
-  let { showContact } = props;
-  if (showContact == null) {
-    showContact = false;
-  }
   return (
     <footer>
-      {showContact && (
-        <span className="muted-text small text-center">
-          Drop us a line! <br />
-          <a href="mailto:info@cantstop.fun">info@cantstop.fun</a>
-        </span>
-      )}
+      <div className="footerIcon">
+        <a
+          className="atIcon"
+          href="mailto:info@cantstop.fun"
+          title="info@cantstop.fun"
+        >
+          @
+        </a>
+      </div>
+      <div className="footerIcon">
+        <a href="https://github.com/simlmx/cantstop" title="Github">
+          <img src="gh.png" alt="github" />
+        </a>
+      </div>
+      <div className="footerIcon">
+        <a href="https://www.buymeacoffee.com/simlmx" title="Buy Me A Coffee">
+          <img src="bmc.svg" alt="buy me a coffee" />
+        </a>
+      </div>
     </footer>
   );
 };
@@ -68,7 +75,7 @@ interface PageProps {
  */
 const Page = (props: PageProps): JSX.Element => {
   // Defaults to true
-  let { wrap, children, path, title, showFooterContact } = props;
+  let { wrap, children, path, title } = props;
 
   useEffect(() => {
     document.title = title;
@@ -87,7 +94,7 @@ const Page = (props: PageProps): JSX.Element => {
       <div className="pageContentWrap">
         <Header path={path} />
         <div className="pageContent">{children}</div>
-        <Footer showContact={showFooterContact} />
+        <Footer />
       </div>
     );
   } else {

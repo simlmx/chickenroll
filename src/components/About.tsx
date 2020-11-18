@@ -12,6 +12,12 @@ const About = () => {
         </a>
         !
       </p>
+      <h2>Code</h2>
+      <p>
+        This project is open source. You can see the code on{" "}
+        <a href="https://github.com/simlmx/cantstop">github</a>.
+      </p>
+      <h2>Supporting Us</h2>
       <p>
         If you like what we do, consider supporting us by{" "}
         <a href="https://www.buymeacoffee.com/simlmx">
@@ -25,7 +31,7 @@ const About = () => {
         <a href="mailto:info@cantstop.fun"> info@cantstop.fun</a> with any{" "}
         <strong>comment</strong>, <strong>suggestion</strong>,{" "}
         <strong>feature request</strong>, <strong>bug</strong>,{" "}
-        <strong>question</strong> or just to <strong>say hello</strong>!
+        <strong>question</strong> or just to <strong>say hello</strong> 👋
       </p>
     </div>
   );

@@ -22,9 +22,36 @@ body {
 }
 
 footer {
-  padding: 0.3rem;
+  margin: 0;
+  margin-bottom: 0.4rem;
   display: flex;
   justify-content: center;
+}
+
+.footerIcon {
+  margin: 0 0.4rem;
+  width: 1.8rem;
+  height: 1.8rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footerIcon img {
+  max-height: 1.3rem;
+  max-width: 1.3rem;
+}
+
+.atIcon,
+.atIcon:hover,
+.atIcon:focus,
+.atIcon:active,
+.atIcon:visited,
+.atIcon:hover {
+  font-size: 1.6rem;
+  color: theme-color("dark");
+  text-decoration: none !important;
 }
 
 #root,
