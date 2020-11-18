@@ -15,15 +15,6 @@ import About from "./components/About";
 //
 const TITLE = "Can't Stop!";
 
-const googleAnalyticsSendPage = (pathname: string, search: string): void => {
-  const win = window as any;
-  if (typeof win.gtag === "function") {
-    win.gtag("set", "page", pathname + search);
-    win.gtag("send", "pageview");
-  }
-  return;
-};
-
 const PassAndPlayMatch = (props: { numPlayers: number }) => {
   // We use playerID=0 but we will let all the players play for everyone,
   // because we are assuming players are passing the device around
@@ -182,13 +173,11 @@ class App extends React.Component {
           <Route
             path="/:numPlayers([1234])"
             render={(props) => {
-              const { pathname, search } = props;
-              googleAnalyticsSendPage(pathname, search);
               const numPlayers = parseInt(props.match.params.numPlayers);
               return (
                 <Page
                   wrap={false}
-                  title={`Same Device Match With ${numPlayers} Player${
+                  title={`Local Match ${numPlayers} Player${
                     numPlayers > 1 ? "s" : ""
                   } - ${TITLE}`}
                 >
@@ -202,8 +191,6 @@ class App extends React.Component {
           <Route
             path="/match/:matchID"
             render={(props) => {
-              const { search } = props;
-              googleAnalyticsSendPage("/match", search);
               const { matchID } = props.match.params;
               return (
                 <Page wrap={false} title={"Match - " + TITLE}>
@@ -217,8 +204,6 @@ class App extends React.Component {
           <Route
             path="/howtoplay"
             render={(props) => {
-              const { pathname, search } = props;
-              googleAnalyticsSendPage(pathname, search);
               return (
                 <Page path="/howtoplay" title={"How To Play - " + TITLE}>
                   <HowToPlay />
@@ -231,8 +216,6 @@ class App extends React.Component {
           <Route
             path="/about"
             render={(props) => {
-              const { pathname, search } = props;
-              googleAnalyticsSendPage(pathname, search);
               return (
                 <Page path="/about" title={"About - " + TITLE}>
                   <About />
@@ -241,13 +224,13 @@ class App extends React.Component {
             }}
           />
 
+          <Route path="/patate" component={About} />
+
           {/* Redirect to the home page for anything else.
               This has to be *after* all the other routes.*/}
           <Route
             path="/:other"
             render={(props) => {
-              const { pathname, search } = props;
-              googleAnalyticsSendPage(pathname, search);
               window.location.replace(`${SERVER}`);
             }}
           />
@@ -255,8 +238,6 @@ class App extends React.Component {
           <Route
             path="/"
             render={(props) => {
-              const { pathname, search } = props;
-              googleAnalyticsSendPage(pathname, search);
               return (
                 <Page path="/" title={TITLE} showFooterContact={true}>
                   <Home onCreate={() => this.createMatch()} />

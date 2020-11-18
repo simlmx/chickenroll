@@ -46,12 +46,15 @@ const Footer = (props) => {
       </div>
       <div className="footerIcon">
         <a href="https://github.com/simlmx/cantstop" title="Github">
-          <img src="gh.png" alt="github" />
+          <img src={`${process.env.PUBLIC_URL}/gh.png`} alt="github" />
         </a>
       </div>
       <div className="footerIcon">
-        <a href="https://www.buymeacoffee.com/simlmx" title="Buy Me A Coffee">
-          <img src="bmc.svg" alt="buy me a coffee" />
+        <a href="https://www.buymeacoffee.com/simlmx" title="Buy me a coffee">
+          <img
+            src={`${process.env.PUBLIC_URL}/bmc.svg`}
+            alt="Buy me a coffee"
+          />
         </a>
       </div>
     </footer>
@@ -93,7 +96,7 @@ const Page = (props: PageProps): JSX.Element => {
     content = (
       <div className="pageContentWrap">
         <Header path={path} />
-        <div className="pageContent">{children}</div>
+        <div className="pageContent container">{children}</div>
         <Footer />
       </div>
     );

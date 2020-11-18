@@ -4,7 +4,7 @@ const About = () => {
   return (
     <div className="about">
       <h1>About</h1>
-      <h2>&nbsp;</h2>
+      <br />
       <p>
         We hope that you and your friends enjoy our version of the classical
         game{" "}
@@ -18,7 +18,7 @@ const About = () => {
         This project is open source. You can see the code on{" "}
         <a href="https://github.com/simlmx/cantstop">github</a>.
       </p>
-      <h2>Supporting Us</h2>
+      <h2>Support Us</h2>
       <p>
         If you like what we do, consider supporting us by{" "}
         <a href="https://www.buymeacoffee.com/simlmx">

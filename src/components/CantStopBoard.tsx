@@ -8,8 +8,8 @@ import MoveButtons from "./MoveButtons";
 import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
 import { PlayerID, PlayerInfo } from "../types";
-import { DieLogo } from "./Die";
 import { OddsCalculator } from "../math/probs";
+import InGameIcons from "./InGameIcons";
 import Rules from "./Rules";
 
 export class Info extends React.Component<{
@@ -461,24 +461,22 @@ export class CantStopBoard extends React.Component<
       </div>
     );
 
+    const inGameIcons = (
+      <InGameIcons
+        showCoffee={!passAndPlay}
+        howToPlayOnClick={() => {
+          this.setState({ showRules: !this.state.showRules });
+        }}
+      />
+    );
+
     // The onClick is necessary to disable the double-click zoom on ios.
     // See stackoverflow.com/a/54753520/1067132
     return (
       <div className="cantStopBoard" onClick={() => {}}>
         {infoTag}
         {this.state.showRules && rulesModal}
-        <div className="homeLinkWrap">
-          <a href="/" title="Home" className="homeLink">
-            <DieLogo />
-          </a>
-          <div
-            className="howToPlayWrap"
-            title="How To Play"
-            onClick={() => this.setState({ showRules: !this.state.showRules })}
-          >
-            ?
-          </div>
-        </div>
+        {inGameIcons}
         <div className="megaWrap">
           <div className="bigHspace"></div>
           <div className="boardContent">

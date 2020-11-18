@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { PlayerID, PlayerInfo } from "../types";
 import { SERVER, NUM_COLORS } from "../constants";
-import { DieLogo } from "./Die";
 import QRCode from "qrcode.react";
+import InGameIcons from "./InGameIcons";
 
 // We need this to close the popup when we click outside.
 // https://stackoverflow.com/a/42234988
@@ -157,6 +157,7 @@ export const Player = (props: PlayerProps): JSX.Element => {
         onChange={(e) => setCurrentName(e.target.value)}
         placeholder="Enter your name"
         maxLength={16}
+        size={3}
         value={currentName}
         ref={inputRef}
         onFocus={(e) => e.target.select()}
@@ -254,12 +255,6 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   const numPlayers = Object.values(playerInfos).length;
   const numFreeSpots = maxNumPlayers - Object.keys(playerInfos).length;
   const matchLink = `${SERVER}/match/${matchID}`;
-
-  const logo = (
-    <a href="/" title="Home" className="homeLink">
-      <DieLogo />
-    </a>
-  );
 
   const qrcode = (
     <OutsideAlerter onClickOutside={() => setShowQr(false)}>
@@ -364,7 +359,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
 
   return (
     <div className="gameSetupWrap">
-      {logo}
+      <InGameIcons />
       {inviteHeader}
       <div className="gameSetupPlayersWrap">
         {activePlayers}
