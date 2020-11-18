@@ -1,14 +1,20 @@
 # Development
 
-### Start a server *and* the client
+### Installing dependencies
 ```
-yarn build && yarn serve
+yarn install
 ```
 
 ### Start a client without a server
 ```
 yarn start
 ```
+
+### Start a server *and* the client
+```
+yarn build && yarn serve
+```
+
 
 
 ## Production
