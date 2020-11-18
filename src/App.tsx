@@ -10,6 +10,7 @@ import { SERVER, MAX_PLAYERS } from "./constants";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Page from "./components/PageTemplate";
 import HowToPlay from "./components/HowToPlay";
+import About from "./components/About";
 // import { Debug } from 'boardgame.io/debug';
 //
 const TITLE = "Can't Stop!";
@@ -226,6 +227,20 @@ class App extends React.Component {
             }}
           />
 
+          {/* About */}
+          <Route
+            path="/about"
+            render={(props) => {
+              const { pathname, search } = props;
+              googleAnalyticsSendPage(pathname, search);
+              return (
+                <Page path="/about" title={"About - " + TITLE}>
+                  <About />
+                </Page>
+              );
+            }}
+          />
+
           {/* Redirect to the home page for anything else.
               This has to be *after* all the other routes.*/}
           <Route
@@ -243,7 +258,7 @@ class App extends React.Component {
               const { pathname, search } = props;
               googleAnalyticsSendPage(pathname, search);
               return (
-                <Page path="/" title={TITLE}>
+                <Page path="/" title={TITLE} showFooterContact={true}>
                   <Home onCreate={() => this.createMatch()} />
                 </Page>
               );
