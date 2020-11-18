@@ -1,38 +1,25 @@
-# Webapp for the board game Cant's Stop
-
-Available at [`cantstop.fun`][csf].
+# [Can't Stop!][csf]
 
 
-## Background
+Web app of the board game [Can't Stop][wiki].
 
-[Can't stop][wiki] is a "push your luck" dice game.
-
-
-## Development
-
-### Start a server *and* the client
-```
-yarn build && yarn serve
-```
-
-### Start a client without a server
-```
-yarn start
-```
+Online at [`cantstop.fun`][csf].
 
 
-## Production
+## Supporting the project
 
-If the environment variable `CANTSTOP_DB_URI` is set, will use a postgresql backend.
-Otherwise we'll use [`https://boardgame.io/`'][bgio]s default.
+[Buy the developer a coffee][bmc]
 
 
-## About
+## Feedback
 
-Comments, questions, feature requests, bug reports, etc. all welcome in github issues or at [`info@cantstop.fun`][email].
+Comments, suggestions, feature requests, bugs, questions, etc.
+welcome at [info@cantstop.fun][email] or in the [issues section][issues].
+
 
 
 [csf]: https://cantstop.fun
 [wiki]: https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)
-[bgio]: https://boardgame.io/
 [email]: mailto:info@cantstop.fun
+[bmc]: https://www.buymeacoffee.com/simlmx
+[issues]: https://github.com/simlmx/cantstop/issues
