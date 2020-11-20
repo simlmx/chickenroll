@@ -6,12 +6,11 @@ const About = () => {
       <h1>About</h1>
       <br />
       <p>
-        We hope that you and your friends enjoy our version of the classical
-        game{" "}
         <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
           Can't Stop
-        </a>
-        !
+        </a>{" "}
+        is classical push-your-luck dice game. We hope that you and your friends
+        enjoy our version!
       </p>
       <h2>Code</h2>
       <p>
