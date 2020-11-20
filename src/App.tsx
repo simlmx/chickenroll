@@ -13,7 +13,7 @@ import HowToPlay from "./components/HowToPlay";
 import About from "./components/About";
 // import { Debug } from 'boardgame.io/debug';
 //
-const TITLE = "Can't Stop!";
+const TITLE = 'Can\'t Stop! - The classic "push your luck" dice game';
 
 const PassAndPlayMatch = (props: { numPlayers: number }) => {
   // We use playerID=0 but we will let all the players play for everyone,
@@ -179,7 +179,7 @@ class App extends React.Component {
                   wrap={false}
                   title={`Local Match ${numPlayers} Player${
                     numPlayers > 1 ? "s" : ""
-                  } - ${TITLE}`}
+                  } | ${TITLE}`}
                 >
                   <PassAndPlayMatch {...{ numPlayers }} />
                 </Page>
@@ -193,7 +193,7 @@ class App extends React.Component {
             render={(props) => {
               const { matchID } = props.match.params;
               return (
-                <Page wrap={false} title={"Match - " + TITLE}>
+                <Page wrap={false} title={"Match | " + TITLE}>
                   <Match {...{ matchID, lobbyClient }} />
                 </Page>
               );
@@ -205,7 +205,7 @@ class App extends React.Component {
             path="/howtoplay"
             render={(props) => {
               return (
-                <Page path="/howtoplay" title={"How To Play - " + TITLE}>
+                <Page path="/howtoplay" title={"How To Play | " + TITLE}>
                   <HowToPlay />
                 </Page>
               );
@@ -217,7 +217,7 @@ class App extends React.Component {
             path="/about"
             render={(props) => {
               return (
-                <Page path="/about" title={"About - " + TITLE}>
+                <Page path="/about" title={"About | " + TITLE}>
                   <About />
                 </Page>
               );
