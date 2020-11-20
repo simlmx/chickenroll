@@ -151,6 +151,8 @@ interface CantStopBoardState {
   infoVisible: boolean;
   // Is the rules popup visible.
   showRules: boolean;
+  // If true we'll show a "sorry you're too late" kind of message instead of the game.
+  gameStartedWithoutYou?: boolean;
 }
 
 interface CantStopBoardProps {
@@ -184,6 +186,7 @@ export class CantStopBoard extends React.Component<
       mouseOverPossibility: undefined,
       infoVisible: true,
       showRules: false,
+      gameStartedWithoutYou: undefined,
     };
   }
 
@@ -209,6 +212,18 @@ export class CantStopBoard extends React.Component<
 
   showRules(): void {
     this.setState({ showRules: true });
+  }
+
+  componentDidMount() {
+    // This verifies if the game has already started without us.
+    // Once the game is started, `G.numPlayers` is set to the number of players that
+    // have joined. If our playerID is bigger than that, it means we are not part of
+    // those players.
+    if (parseInt(this.props.playerID) >= this.props.G.numPlayers) {
+      this.setState({ gameStartedWithoutYou: true });
+    } else {
+      this.setState({ gameStartedWithoutYou: false });
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -257,11 +272,43 @@ export class CantStopBoard extends React.Component<
       passAndPlay,
     } = G;
     const { currentPlayer, phase, numPlayers, playOrder } = ctx;
-    const { mouseOverPossibility } = this.state;
+    const { mouseOverPossibility, gameStartedWithoutYou } = this.state;
 
     // If we are in pass-and-play mode, then the playerID is always "0". The
     // "currentPlayer" is what we mean.
     const playerID = passAndPlay ? currentPlayer : this.props.playerID;
+
+    const inGameIcons = (
+      <InGameIcons
+        showCoffee={!passAndPlay || gameStartedWithoutYou}
+        howToPlayOnClick={() => {
+          this.setState({ showRules: !this.state.showRules });
+        }}
+      />
+    );
+
+    // If the game has already started we show a sorry message with a crying cat.
+    if (gameStartedWithoutYou == null) {
+      return "Loading...";
+    } else if (gameStartedWithoutYou) {
+      return (
+        <>
+          {inGameIcons}
+          <div className="gameStartedWithoutYou container">
+            <div>
+              <p>
+                It seems like this match has already started... without you!
+              </p>
+              <h1>
+                <span role="img" aria-label="crying cat">
+                  😿
+                </span>
+              </h1>
+            </div>
+          </div>
+        </>
+      );
+    }
 
     if (phase === "setup") {
       return (
@@ -459,15 +506,6 @@ export class CantStopBoard extends React.Component<
           </div>
         </div>
       </div>
-    );
-
-    const inGameIcons = (
-      <InGameIcons
-        showCoffee={!passAndPlay}
-        howToPlayOnClick={() => {
-          this.setState({ showRules: !this.state.showRules });
-        }}
-      />
     );
 
     // The onClick is necessary to disable the double-click zoom on ios.
