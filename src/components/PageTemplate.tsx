@@ -6,25 +6,48 @@ interface HeaderProps {
 }
 
 const Header = (props: HeaderProps) => {
-  const navItems = {
-    "/": "Home",
-    "/howtoplay": "How To Play",
-    "https://www.buymeacoffee.com/simlmx": "Support Us",
-    "/about": "About",
-  };
+  const navItems = [
+    {
+      path: "/",
+      name: "Home",
+    },
+    {
+      path: "/howtoplay",
+      name: "How To Play",
+    },
+    {
+      path: "https://www.buymeacoffee.com/simlmx",
+      name: "Support Us",
+      external: true,
+    },
+    {
+      path: "/about",
+      name: "About",
+    },
+  ];
+
   return (
     <nav className="navbar navbar-expand navbar-primary">
       <ul className="navbar-nav">
-        {Object.entries(navItems).map(([path, name]) => (
-          <li className="nav-item" key={name}>
-            <a
-              className={`nav-link ${props.path === path ? "active" : ""}`}
-              href={path}
-            >
-              {name}
-            </a>
-          </li>
-        ))}
+        {navItems.map((navItem) => {
+          const opts: any = {
+            className: `nav-link ${
+              props.path === navItem.path ? "active" : ""
+            }`,
+            href: navItem.path,
+          };
+
+          if (navItem.external) {
+            opts.target = "_blank";
+            opts.rel = "noopener noreferrer";
+          }
+
+          return (
+            <li className="nav-item" key={navItem.name}>
+              <a {...opts}>{navItem.name}</a>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

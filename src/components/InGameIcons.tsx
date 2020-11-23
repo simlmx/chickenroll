@@ -20,7 +20,12 @@ const InGameIcons = (props: InGameIconsProps) => {
       </div>
       {showCoffee && (
         <div className="homeLinkIcon">
-          <a href="https://www.buymeacoffee.com/simlmx" title="Buy Me A Coffee">
+          <a
+            href="https://www.buymeacoffee.com/simlmx"
+            title="Buy Me A Coffee"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <img
               className="coffee"
               src={`${process.env.PUBLIC_URL}/bmc.svg`}
