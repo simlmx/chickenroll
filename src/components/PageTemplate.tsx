@@ -88,12 +88,10 @@ interface PageProps {
   path?: string;
   children?: JSX.Element | JSX.Element[] | null;
   // Should we `wrap` the children in a page with header/footer. If not we just add the
-  // background.
+  // background. Defaults to 'true'.
   wrap?: boolean;
   // title for the html page
   title: string;
-  // Should we show the
-  showFooterContact?: boolean;
 }
 
 /*

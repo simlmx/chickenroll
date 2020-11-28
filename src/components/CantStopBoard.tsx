@@ -304,6 +304,9 @@ export class CantStopBoard extends React.Component<
                   😿
                 </span>
               </h1>
+              <a className="btn btn-primary" href="/match">
+                Create a new match of your own!
+              </a>
             </div>
           </div>
         </>
@@ -491,7 +494,9 @@ export class CantStopBoard extends React.Component<
               </button>
             </div>
             <div className="modal-body">
-              <Rules />
+              <div className="rules">
+                <Rules />
+              </div>
             </div>
             <div className="modal-footer">
               <button

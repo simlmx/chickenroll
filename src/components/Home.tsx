@@ -5,7 +5,7 @@ import { SERVER, MAX_PLAYERS, NUM_COLORS } from "../constants";
 const pickColor = (): number => Math.floor(Math.random() * NUM_COLORS);
 const pickDiceValue = (): number => Math.floor(Math.random() * 6) + 1;
 
-const Home = (props: { onCreate: () => void }): JSX.Element => {
+const Home = (): JSX.Element => {
   const [colors, setColors] = useState([0, 1, 2, 3]);
   const [diceValues, setDiceValues] = useState([1, 2, 3, 6]);
 
@@ -36,9 +36,9 @@ const Home = (props: { onCreate: () => void }): JSX.Element => {
         You will be able to send an invitation link to your friends.
       </p>
       <div className="form-group">
-        <button className="btn btn-primary" onClick={() => props.onCreate()}>
+        <a className="btn btn-primary" href="/match">
           Create a new match
-        </button>
+        </a>
       </div>
     </>
   );

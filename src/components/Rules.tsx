@@ -167,7 +167,7 @@ const Rules = (props) => {
   );
 
   return (
-    <div className="rules">
+    <>
       <h2>Overview</h2>
       <p>
         You must climb the different columns faster than your opponents, by
@@ -215,10 +215,7 @@ const Rules = (props) => {
       <p>
         You change your {runner} into {token} and end your turn.
       </p>
-      <h2>Try it out</h2>
-      The simplest way to learn the game is to{" "}
-      <a href="/2">play against yourself</a>.
-    </div>
+    </>
   );
 };
 

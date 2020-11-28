@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CantStop from "./Game";
 import Home from "./components/Home";
 import { CantStopBoard } from "./components/CantStopBoard";
@@ -136,6 +136,20 @@ class Match extends React.Component<
   }
 }
 
+/*
+ * Component that does some `action` on the first render.
+ * action: some callback to call at the beginning
+ */
+const DoAction = (props: {
+  action: () => void;
+  children: JSX.Element | JSX.Element[] | string | null;
+}): JSX.Element => {
+  useEffect(() => {
+    props.action();
+  });
+  return <>{props.children}</>;
+};
+
 class App extends React.Component {
   lobbyClient: LobbyClient;
 
@@ -144,7 +158,7 @@ class App extends React.Component {
     this.lobbyClient = new LobbyClient({ server: SERVER });
   }
 
-  async createMatch(): Promise<void> {
+  async createMatch(): Promise<string | undefined> {
     let matchID;
     try {
       const resp = await this.lobbyClient.createMatch("cantstop", {
@@ -158,10 +172,10 @@ class App extends React.Component {
       matchID = resp.matchID;
     } catch (e) {
       alert("There was a problem creating the match. Please try again.");
+      return;
     }
-    if (matchID != null) {
-      window.location.href = `${SERVER}/match/${matchID}`;
-    }
+
+    return matchID;
   }
 
   render() {
@@ -182,6 +196,28 @@ class App extends React.Component {
                   } | ${TITLE}`}
                 >
                   <PassAndPlayMatch {...{ numPlayers }} />
+                </Page>
+              );
+            }}
+          />
+
+          {/* Create a match */}
+          <Route
+            path="/match"
+            exact={true}
+            render={() => {
+              return (
+                <Page wrap={false} title={"Creating Match | " + TITLE}>
+                  <DoAction
+                    action={async () => {
+                      const matchID = await this.createMatch();
+                      if (matchID != null) {
+                        window.location.replace(`${SERVER}/match/${matchID}`);
+                      }
+                    }}
+                  >
+                    Creating Match...
+                  </DoAction>
                 </Page>
               );
             }}
@@ -224,8 +260,6 @@ class App extends React.Component {
             }}
           />
 
-          <Route path="/patate" component={About} />
-
           {/* Redirect to the home page for anything else.
               This has to be *after* all the other routes.*/}
           <Route
@@ -239,8 +273,8 @@ class App extends React.Component {
             path="/"
             render={(props) => {
               return (
-                <Page path="/" title={TITLE} showFooterContact={true}>
-                  <Home onCreate={() => this.createMatch()} />
+                <Page path="/" title={TITLE}>
+                  <Home />
                 </Page>
               );
             }}

@@ -149,7 +149,6 @@ export function getSumOptions(
  * Get the number of steps for a given dice sum
  * e.g. 2 -> 3, 3 -> 5, .., 7 -> 13, ..
  */
-// TODO rename getNumStepsForSum
 export function getNumStepsForSum(sum: number): number {
   return -2 * Math.abs(sum - 7) + 13;
 }
