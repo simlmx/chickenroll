@@ -131,7 +131,7 @@ const Rules = (props) => {
               <p>Move an already placed {runner} up one step.</p>
             </div>
             <div className="movesRight">
-              {dice[1]}
+              {dice[2]}
               {dice[3]} &nbsp;→&nbsp;
               {moveUp}
             </div>
