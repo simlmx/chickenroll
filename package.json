@@ -29,7 +29,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "serve": "node -r esm build/server.js",
-    "clean": "yarn run prettier -w src *.json"
+    "clean": "yarn run prettier -w src *.json",
+    "build-scripts": "yarn run tsc --project tsconfig-scripts.json"
   },
   "eslintConfig": {
     "extends": "react-app"
