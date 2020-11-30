@@ -4,8 +4,8 @@ import React from "react";
  * Define the dots as circles in a 100x100 squre
  */
 
-const margin = 27;
-const R = 10;
+const margin = 20;
+const R = 11;
 
 const topLeft = {
   cx: margin,
@@ -43,7 +43,7 @@ const dots = [
     {
       cx: 50,
       cy: 50,
-      r: 18,
+      r: R,
     },
   ],
   [topLeft, bottomRight],
@@ -167,7 +167,7 @@ export class Background extends React.Component {
                   key={i}
                 >
                   <rect
-                    rx="15"
+                    rx="10"
                     width={size}
                     height={size}
                     fill="transparent"

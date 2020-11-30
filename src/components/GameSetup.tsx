@@ -265,17 +265,17 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   );
 
   const inviteHeader = !passAndPlay ? (
-    <div className="gameSetupInviteWrap alert alert-success">
+    <div className="gameSetupInviteWrap alert alert-primary">
       <div>
         <div className="inviteContentWrap">
           <b>Share this link to invite players</b>
           <div className="inviteLinkWrap">
-            <span className="inviteLink badge badge-success user-select-all">
+            <span className="inviteLink badge badge-primary user-select-all">
               {matchLink}
             </span>
             <button
               type="button"
-              className="btn btn-outline-success btn-sm copyBtn"
+              className="btn btn-outline-primary btn-sm copyBtn"
               onClick={() => navigator.clipboard.writeText(matchLink)}
             >
               Copy

@@ -216,7 +216,8 @@ class App extends React.Component {
                       }
                     }}
                   >
-                    Creating Match...
+                    {/* We need this <div> because our <Page> is not super happy with strings */}
+                    <div>Creating Match...</div>
                   </DoAction>
                 </Page>
               );

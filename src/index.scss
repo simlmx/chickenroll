@@ -1,8 +1,31 @@
-@import "node_modules/bootstrap/scss/bootstrap";
-@use "sass:math";
-
-/* $debug: true; */
 $debug: false;
+
+/* THEME */
+$primary: #468189;
+
+$black: #191516;
+$darkgrey: #403d39;
+$darkgrey: #252422;
+$bgcolor: #f7f6f2;
+
+html p {
+  color: $darkgrey;
+}
+
+html h1,
+html h2,
+html h3,
+html h4 {
+  color: $black;
+}
+
+$theme-colors: (
+  "primary": $primary,
+  "danger": #d70c0c,
+  "success": #0c8f29,
+);
+
+@import "node_modules/bootstrap/scss/bootstrap";
 
 // https://stackoverflow.com/questions/6654958/make-body-have-100-of-the-browser-height/25829844#25829844
 html {
@@ -54,7 +77,7 @@ footer {
 .atIcon:visited,
 .atIcon:hover {
   font-size: 1.6rem;
-  color: theme-color("dark");
+  color: $black;
   text-decoration: none !important;
 }
 
@@ -65,7 +88,6 @@ footer {
   width: 100%;
 }
 
-$bgcolor: #f7f6f2;
 .backgroundWrap {
   // https://stackoverflow.com/a/31267758/1067132
   display: inline-block;
@@ -76,8 +98,9 @@ $bgcolor: #f7f6f2;
 
 // Make sure the main content is on top of the background
 .backgroundWrap > div {
+  /* .pageContent { */
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 .backgroundWrap > svg {
   z-index: 1;
@@ -117,9 +140,27 @@ button {
 
 nav li {
   margin: 0 0.2rem;
+  font-weight: bold;
 }
 
-$colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7, #a8f7ea; //, #7d5241;
+p a {
+  font-weight: bold;
+}
+
+.nav-link.active {
+  text-decoration: underline;
+}
+
+.nav-link {
+  color: $black;
+  font-weight: normal;
+}
+
+.btn {
+  transition: none;
+}
+
+$colors: #07df9e, #0c90c0, #f78345, #fde662, #c7233f, #f35076, #973b84;
 
 @for $i from 1 through length($colors) {
   $color: nth($colors, $i);
@@ -151,28 +192,37 @@ $colors: #d55e00, #0072b2, #009e73, #f0e442, #cc79a7, #a8f7ea; //, #7d5241;
   }
 }
 
-/* third color - yellow - is special because too light. */
-.bgcolor3,
-.bgcolor5 {
-  color: black;
-  /* background-color: #f0e442; */
-  border-color: black;
+// For the pale colors, we adjust a few things, like make text black instead of white
+// when it's a background.
+@mixin setPaleColors($index) {
+  .bgcolor#{$index} {
+    color: black;
+    border-color: black;
+  }
+
+  button.bgcolor#{$index},
+  button.bgcolor#{$index}:hover {
+    color: black;
+    border: 0.05rem solid black;
+  }
+
+  .homeContent .die {
+    border-width: 0 !important;
+  }
+
+  .dotColor#{$index} {
+    fill: black;
+  }
+
+  // The pale players are too close to white, we make it a bit darker
+  .infoPlayerName.color#{$index} .itsYourTurn.color#{$index},
+  .infoPlayerName.color#{$index} .itsYourTurn.color#{$index} {
+    filter: brightness(0.9);
+  }
 }
 
-button.bgcolor3,
-button.bgcolor3:hover,
-button.bgcolor5,
-button.bgcolor5:hover {
-  color: black;
-  /* background-color: #f0e442; */
-  border-color: black;
-}
-
-.dotColor3,
-.dotColor5 {
-  fill: black;
-  stroke-width: 0 !important;
-}
+@include setPaleColors(0);
+@include setPaleColors(3);
 
 @mixin cellDim($cell-height, $cell-width) {
   min-height: $cell-height;
@@ -310,20 +360,47 @@ p:last-child {
   left: 0;
   height: 100%;
   width: 100%;
+
+  .die {
+    stroke-radius: 0;
+  }
 }
 
 // The media query fixes an issue on ios where the button at the same place as the last
 // clicked button is "hovered".
 @media (hover: hover) {
-  .btn:hover,
-  .btn:focus {
-    filter: brightness(1.2);
+  // this feels pretty hacky
+  .btn-primary:hover {
+    background-color: $primary;
+    filter: brightness(1.1) !important;
+  }
+
+  .btn:hover {
+    filter: brightness(1.1) !important;
+  }
+
+  .btnAction:hover {
+    filter: brightness(1.05) !important;
+  }
+
+  a:hover {
+    color: $primary;
+    text-decoration: underline;
+  }
+
+  .nav-link:hover {
+    color: $darkgrey;
+    text-decoration: underline;
   }
 }
 
 // Active is fine though!
 .btn:active {
-  filter: brightness(1.2);
+  filter: brightness(1.1);
+}
+
+.btnAction:hover {
+  filter: brightness(1.05);
 }
 
 .lastChoiceOtherPlayer:disabled {
@@ -336,12 +413,10 @@ p:last-child {
   .die {
     width: $diceSize;
     height: $diceSize;
-    border-radius: $diceSize / 8 + 0.1rem;
+    border-radius: 0.25rem;
     margin: $diceSize / 15;
-
-    box-shadow: $unit $unit $unit black, 2 * $unit 2 * $unit 2 * $unit black,
-      $unit $unit $unit / 2 black;
-    border: $unit solid black;
+    border-width: 0;
+    box-shadow: $unit $unit 4 * $unit -3 * $unit black;
   }
 
   .diceContainer {
@@ -412,11 +487,6 @@ $diceSize: 3.4rem;
   font-size: 20px;
 }
 
-.dot {
-  stroke-width: 0.1rem;
-  stroke: black;
-}
-
 .possibilitiesWrap {
   display: flex;
   flex-direction: column;
@@ -470,7 +540,7 @@ $diceSize: 3.4rem;
 }
 .scoreBoardPlayerName {
   width: 9rem;
-  border: 0.2rem solid transparent;
+  border: 0.05rem solid transparent;
 }
 
 .scoreBoardNumVictories {
@@ -481,7 +551,7 @@ $diceSize: 3.4rem;
 }
 
 .scoreBoardPlayerNameCurrent {
-  border: 0.2rem solid black;
+  border: 0.05rem solid black;
   box-shadow: 0 0 0.14rem black;
 }
 
@@ -506,13 +576,13 @@ $diceSize: 3.4rem;
     filter: brightness(0.9);
   }
   to {
-    filter: brightness(1.2);
+    filter: brightness(1.1);
   }
 }
 
 @keyframes littleFlash {
   from {
-    filter: brightness(0.95);
+    filter: brightness(0.9);
   }
   to {
     filter: brightness(1.1);
@@ -653,12 +723,6 @@ $diceSize: 3.4rem;
   justify-content: center;
 }
 
-// The yellow player is too close to white, we make it a bit darker
-.infoPlayerName.color3 .itsYourTurn.color3,
-.infoPlayerName.color5 .itsYourTurn.color5 {
-  filter: brightness(0.9);
-}
-
 .probMsgWrap {
   display: flex;
   align-items: center;
@@ -705,12 +769,16 @@ $diceSize: 3.4rem;
   display: flex;
 }
 
+.logoWrap {
+  margin: 0;
+}
+
 .logoWrap .die {
   height: 0.85rem;
   width: 0.85rem;
-  border-radius: 0.12rem;
-  box-shadow: 1px 1px 2px black;
-  margin: 1px;
+  border-radius: 0;
+  border: 0.02rem solid black;
+  margin: 0.03rem;
 }
 
 .diceBoardButtonWrap {
@@ -902,6 +970,8 @@ $diceSize: 3.4rem;
   padding-left: 2.8rem;
   margin: 0;
   border: none;
+  border-radius: 0;
+  box-shadow: 0px 0px 10px black;
 }
 
 .inviteOffset {
@@ -938,6 +1008,7 @@ $diceSize: 3.4rem;
   background-color: black;
   text-align: center;
 }
+
 .qrcode {
   position: absolute;
   left: -64px;
@@ -995,11 +1066,11 @@ $diceSize: 3.4rem;
 }
 
 .dieHighlight {
-  filter: brightness(1.2);
+  filter: brightness(1.1);
 }
 
 .highlight {
-  filter: brightness(1.2);
+  filter: brightness(1.1);
   box-shadow: 0px 0px 1px 1px black, 1px 3px 6px 1px black;
 }
 
@@ -1227,6 +1298,10 @@ $height: $width * $mountainRatio;
   }
 
   @include setDice(1rem);
+
+  .die {
+    border-radius: 0.1rem;
+  }
 
   .btnAction {
     font-size: 1rem;

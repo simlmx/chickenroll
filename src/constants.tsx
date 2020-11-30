@@ -14,4 +14,4 @@ export const SERVER = server;
 
 export const MAX_PLAYERS = 4;
 
-export const NUM_COLORS = 6;
+export const NUM_COLORS = 7;
