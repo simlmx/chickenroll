@@ -15,12 +15,12 @@
     "koa-sslify": "^4.0.3",
     "koa-static": "^5.0.0",
     "node-persist": "^3.1.0",
-    "node-sass": "^4.14.1",
     "qrcode.react": "^1.0.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.4",
+    "sass": "^1.30.0",
     "typescript": "~3.8"
   },
   "scripts": {

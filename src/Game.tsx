@@ -220,16 +220,21 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
 
   const blockedSums = {};
 
-  //Those are for quick debugging.
+  // Those are for quick debugging.
   // for (let i = 0; i < ctx.numPlayers; ++i) {
   //   const id = i.toString();
   //   checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  //   scores[id] = i;
+  //   scores[id] = i % 2;
 
-  //   playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 2) % 4 };
-  //   blockedSums[2 * i] = id;
+  //   playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
   // }
   // checkpointPositions['0'][3] = 4;
+  // checkpointPositions['2'][7] = 4;
+  // checkpointPositions['3'][7] = 5;
+  // checkpointPositions['1'][7] = 2;
+  // checkpointPositions['1'][8] = 2;
+  // blockedSums[4] = '0';
+  // blockedSums[5] = '2';
 
   return {
     /*

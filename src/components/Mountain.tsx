@@ -22,35 +22,76 @@ export const Climber = (props: {
   return <span {...{ className }}></span>;
 };
 
-export const ClimberPlaceholder = (props: {
+interface ClimberPlaceholderProps {
   color?: number;
-  columnParity?: number;
-}) => {
-  let className = ""; //"climberPlaceholder";
-  if (props.color != null) {
-    className += ` bgcolor${props.color} climberPlaceholderBlocked`;
-  } else if (props.columnParity != null) {
-    className += ` climberPlaceholder climberPlaceholderParity${props.columnParity}`;
+  top?: boolean;
+  bottom?: boolean;
+  side?: boolean;
+}
+
+export const ClimberPlaceholder = ({
+  color,
+  top,
+  bottom,
+  side,
+}: ClimberPlaceholderProps) => {
+  let className = "colFg colFgMiddle";
+  let wrapClass = "colBg";
+
+  if (top) {
+    wrapClass += " colBgTop";
+  } else if (bottom) {
+    wrapClass += " colBgBottom";
   }
+
+  if (color != null) {
+    className += ` bgcolor${color}`;
+    wrapClass += ` bgcolor${color}alpha40`;
+  } else {
+    className += " colFgNotBlocked";
+    if (!side) {
+      wrapClass += " colBgNotBlocked";
+    }
+  }
+
   return (
-    <div className="climberPlaceholderWrap">
+    <div className={wrapClass}>
       <div {...{ className }}></div>
     </div>
   );
 };
 
-export const ColNum = (props: { colNum: number; blockedColor?: number }) => {
+export const ColNum = (props: {
+  colNum: number;
+  blockedColor?: number;
+  top?: boolean;
+}) => {
   // Below row 0 we write the dice sum.
-  const { colNum, blockedColor } = props;
-  let className = "badge colNumbers";
+  const { colNum, blockedColor, top } = props;
+
+  let wrapClassName = "colBg";
+  let className = "";
+  if (top) {
+    className += " colFgTop";
+    wrapClassName += " colBgTop";
+  } else {
+    className += " colFgBottom";
+    wrapClassName += " colBgBottom";
+  }
   if (blockedColor != null) {
     className += ` bgcolor${blockedColor}`;
+    wrapClassName += ` bgcolor${blockedColor} bgcolor${blockedColor}alpha40`;
   } else {
-    // className += columnParity ? ' colNumbersOdd' : ' colNumbersEven';
-    className += ` colParity${colNum % 2}`;
+    className += " colFgNotBlocked";
+    wrapClassName += " colBgNotBlocked";
   }
+
+  if (colNum >= 10) {
+    className += " twoDigits";
+  }
+
   return (
-    <div className="colNumbersWrap">
+    <div className={wrapClassName}>
       <div {...{ className }} key={0}>
         {colNum}
       </div>
@@ -93,7 +134,7 @@ export class Mountain extends React.Component<MountainProps> {
     let { minCol, maxCol, minRow, maxRow } = this.props;
     minCol = minCol == null ? 2 : minCol;
     maxCol = maxCol == null ? 12 : maxCol;
-    minRow = minRow == null ? 0 : minRow;
+    minRow = minRow == null ? 1 : minRow;
     maxRow = maxRow == null ? 13 : maxRow;
 
     // If we want to highlight, we'll compute where the new positions will be!
@@ -130,25 +171,31 @@ export class Mountain extends React.Component<MountainProps> {
         const blockedBy = blockedSums[col];
 
         let climbers: JSX.Element[] = [];
-        const columnParity = col % 2;
 
-        if (row === 0 || row === totalNumSteps) {
+        if (row === 1 || row === totalNumSteps) {
           content = (
-            <ColNum colNum={col} blockedColor={playerInfos[blockedBy]?.color} />
+            <ColNum
+              colNum={col}
+              blockedColor={playerInfos[blockedBy]?.color}
+              top={row !== 1}
+            />
           );
         } else if (row < totalNumSteps) {
           content = (
-            <ClimberPlaceholder
-              color={playerInfos[blockedBy]?.color}
-              key={0}
-              {...{ columnParity }}
-            />
+            <ClimberPlaceholder color={playerInfos[blockedBy]?.color} key={0} />
           );
         } else if ([13, 12, 11].includes(row) && col === 12) {
           // We place the left climbers in the top left of the table.
           const numClimbersLeft =
             3 - Object.keys(updatedCurrentPositions).length;
-          content = <ClimberPlaceholder key={0} {...{ columnParity }} />;
+          content = (
+            <ClimberPlaceholder
+              key={0}
+              top={row === 13}
+              bottom={row === 11}
+              side={true}
+            />
+          );
           if (row >= 14 - numClimbersLeft) {
             climbers.push(
               <Climber
@@ -168,8 +215,10 @@ export class Mountain extends React.Component<MountainProps> {
             );
           }
         } else {
-          content = "";
+          content = <div className="colBg"></div>;
         }
+
+        content = <div className="colBgWrap">{content}</div>;
 
         // It's not efficient to do this every time by... javascript :shrug:
         Object.entries(checkpointPositions).forEach(([playerID, positions]) => {
@@ -205,30 +254,24 @@ export class Mountain extends React.Component<MountainProps> {
 
         if (climbers.length > 0) {
           content = (
-            <div className="mountainCell">
-              <div className="climberGroupBackground">{content}</div>
+            <>
+              {content}
               <div className="climberGroup" key={1}>
                 {climbers}
               </div>
-            </div>
+            </>
           );
-        } else {
-          content = <div className="mountainCell"> {content} </div>;
         }
 
-        cols.push(
-          <td key={col} className="mountainCol">
-            {content}
-          </td>
-        );
+        cols.push(<div className="mountainCell">{content}</div>);
       }
-      rows.push(<tr key={row}>{cols}</tr>);
+      rows.push(
+        <div className="mountainRow" key={row}>
+          {cols}
+        </div>
+      );
     }
 
-    return (
-      <table className="table table-sm table-borderless mountain">
-        <tbody>{rows}</tbody>
-      </table>
-    );
+    return <div className="mountain">{rows}</div>;
   }
 }

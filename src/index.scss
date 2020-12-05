@@ -1,7 +1,11 @@
+@use "sass:color";
+
+/* $debug: true; */
 $debug: false;
 
 /* THEME */
 $primary: #468189;
+/* $primary: #973b84; */
 
 $black: #191516;
 $darkgrey: #403d39;
@@ -98,10 +102,10 @@ footer {
 
 // Make sure the main content is on top of the background
 .backgroundWrap > div {
-  /* .pageContent { */
   position: relative;
   z-index: 10;
 }
+
 .backgroundWrap > svg {
   z-index: 1;
 }
@@ -114,12 +118,12 @@ body {
 
 @include media-breakpoint-up(xl) {
   html {
-    font-size: 23px;
+    font-size: 21px;
   }
 }
 @include media-breakpoint-down(lg) {
   html {
-    font-size: 20px;
+    font-size: 19px;
   }
 }
 @include media-breakpoint-down(md) {
@@ -152,7 +156,7 @@ p a {
 }
 
 .nav-link {
-  color: $black;
+  color: color.adjust($primary, $lightness: -20%);
   font-weight: normal;
 }
 
@@ -173,6 +177,11 @@ $colors: #07df9e, #0c90c0, #f78345, #fde662, #c7233f, #f35076, #973b84;
     background-color: $color;
     border: 0.05rem solid transparent;
     border-color: $color;
+  }
+
+  .bgcolor#{$i - 1}alpha40 {
+    background-color: color.adjust($color, $alpha: -0.6);
+    border: 0.05rem solid transparent;
   }
 
   button.bgcolor#{$i - 1},
@@ -218,6 +227,12 @@ $colors: #07df9e, #0c90c0, #f78345, #fde662, #c7233f, #f35076, #973b84;
   .infoPlayerName.color#{$index} .itsYourTurn.color#{$index},
   .infoPlayerName.color#{$index} .itsYourTurn.color#{$index} {
     filter: brightness(0.9);
+  }
+
+  // Not as pale for pale colors
+  .bgcolor#{$index}alpha40 {
+    background-color: color.adjust(nth($colors, $index + 1), $alpha: -0.55);
+    border: 0.05rem solid transparent;
   }
 }
 
@@ -284,6 +299,7 @@ nav {
   align-items: center;
   justify-content: center;
   min-height: 100%;
+  padding: 1rem;
 }
 
 .homeTitle {
@@ -307,10 +323,6 @@ p:last-child {
 
 .homeContent .diceContainer {
   width: auto;
-}
-
-.table {
-  margin-bottom: 0;
 }
 
 .rightWrap {
@@ -389,7 +401,7 @@ p:last-child {
   }
 
   .nav-link:hover {
-    color: $darkgrey;
+    color: $primary;
     text-decoration: underline;
   }
 }
@@ -492,18 +504,6 @@ $diceSize: 3.4rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.mountain {
-  font-family: arial, sans-serif;
-  padding: 0;
-  table-layout: fixed;
-}
-
-.mountainCol {
-  padding: 0 !important;
-  text-align: center;
-  /* border: 1px solid green !important; */
 }
 
 .diceBoard {
@@ -623,23 +623,20 @@ $diceSize: 3.4rem;
 }
 
 .mountainCell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  display: table-cell;
+  position: relative;
 }
 
 .climber {
-  box-shadow: 0px 0px 4px -1px black, 1px 2px 3px 0px black;
+  box-shadow: 0 0 0.2rem -0.05rem black, 0.05rem 0.1rem 0.15rem 0 black;
   z-index: 50;
-  opacity: 1;
   border-width: 0px;
   border-radius: 999px;
 }
 
 .climberCurrent {
   background-color: black;
-  box-shadow: 0px 0px 1px 1px black, 1px 3px 4px 0px black;
+  box-shadow: 0 0 0.05rem 0.05rem black, 0.05rem 0.15rem 0.2rem 0 black;
   border-style: solid;
 }
 
@@ -647,7 +644,24 @@ $diceSize: 3.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 10rem;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.climberGroupBackground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
 }
 
 .climberPlaceholder {
@@ -657,34 +671,29 @@ $diceSize: 3.4rem;
   height: 0.3rem;
 }
 
-.climberPlaceholderWrap,
-.colNumbersWrap {
+.colBgWrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
-.climberPlaceholderParity0 {
-  background-color: #555555;
+.colBgNotBlocked {
+  background-color: rgba(black, 0.25);
 }
 
-.climberPlaceholderParity1 {
-  background-color: #222222;
+.colFgNotBlocked {
+  background-color: white;
+  color: black;
 }
 
-.colNumbers {
-  border-radius: 0.4rem;
-  font-size: 0.8rem;
-}
-
-.colParity0 {
-  background-color: #555555;
-  color: white;
-}
-
-.colParity1 {
-  background-color: #222222;
-  color: white;
+.colFgMiddle.colFgNotBlocked {
+  background-color: rgba(black, 0.7);
 }
 
 .infoWrap {
@@ -1102,37 +1111,32 @@ $diceSize: 3.4rem;
   flex-direction: row;
 }
 
+.mountainRow {
+  display: table-row;
+}
+
 // height /width for one cell
-$mountainRatio: 0.75;
-@mixin cellSize($height, $numCols: 11) {
+$mountainRatio: 0.67;
+@mixin cellSize($height, $numCols: 11, $numRows: 13) {
   $width: $height / $mountainRatio;
 
-  $neg-margin: $width * -0.3;
+  $neg-margin: $width * -0.13;
   $climberSize: $width * 0.4;
-  $colNumWidth: $width * 0.85;
+  $colNumWidth: $width * 0.5;
   $currentClimberSize: $climberSize;
   $currentClimberBorder: $width * 1/20;
   $mountainWidth: $width * $numCols;
   $blockedSize: $width * 0.35;
 
   .mountain {
-    width: $mountainWidth;
-  }
-
-  .climberPlaceholderWrap,
-  .colNumbersWrap,
-  .climberGroup,
-  .mountainCell {
-    @include cellDim($height, $width);
-  }
-  .climberGroup {
-    margin-top: -$height;
+    display: table;
+    height: $height * $numRows;
+    width: $width * $numCols;
   }
 
   .climber {
     height: $climberSize;
     width: $climberSize;
-    /* box-shadow: 0px 0px 4px -1px black, 1px 2px 3px 0px black; */
     margin-right: $neg-margin;
     margin-left: $neg-margin;
   }
@@ -1143,18 +1147,44 @@ $mountainRatio: 0.75;
     border-width: $currentClimberBorder !important;
   }
 
-  .climberPlaceholderBlocked {
+  .colFgTop,
+  .colFgBottom {
+    width: $colNumWidth;
+    height: $colNumWidth;
+    font-size: $width / 2.5;
+    font-weight: bold;
+
     border-radius: 999px;
-    border: 0px solid transparent;
-    width: $blockedSize !important;
-    height: $blockedSize !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
   }
 
-  .colNumbers {
-    width: $colNumWidth;
-    font-size: $width / 3.5;
-    border-radius: $width / 7;
-    /* font-size: $width / 4; */
+  .colFgMiddle {
+    border: none;
+    width: $height / 10;
+    height: $height / 10;
+    border-radius: 999px;
+  }
+
+  .twoDigits {
+    font-size: $width / 3.2;
+  }
+
+  .colBg {
+    width: 65%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .colBgTop {
+    border-radius: 999px 999px 0 0;
+  }
+  .colBgBottom {
+    border-radius: 0 0 999px 999px;
   }
 }
 
@@ -1308,13 +1338,13 @@ $height: $width * $mountainRatio;
     padding: 0 0.5rem;
   }
 
-  @include cellSize(1.2rem, 3);
+  @include cellSize(1.2rem, 3, 3);
   .mountainWrap {
-    @include cellSize(1.2rem, 3);
+    @include cellSize(1rem, 3, 3);
   }
 
   .fullMountain {
-    @include cellSize(1rem, 11);
+    @include cellSize(1rem);
     display: flex;
     justify-content: center;
   }
