@@ -185,7 +185,7 @@ class App extends React.Component {
         <Switch>
           {/* Pass and play match */}
           <Route
-            path="/:numPlayers([1234])"
+            path="/:numPlayers([12345])"
             render={(props) => {
               const numPlayers = parseInt(props.match.params.numPlayers);
               return (

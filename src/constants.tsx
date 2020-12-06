@@ -12,6 +12,14 @@ if (typeof window !== "undefined") {
 }
 export const SERVER = server;
 
-export const MAX_PLAYERS = 4;
+export const MAX_PLAYERS = 5;
 
 export const NUM_COLORS = 7;
+
+export const AUTO_NUM_COLS_TO_WIN = new Map([
+  [1, 5],
+  [2, 5],
+  [3, 4],
+  [4, 3],
+  [5, 2],
+]);

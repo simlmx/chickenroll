@@ -1,4 +1,4 @@
-import { NUM_COLORS } from "./constants";
+import { NUM_COLORS, AUTO_NUM_COLS_TO_WIN } from "./constants";
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, getNumStepsForSum } from "./math";
 import { SumOption, PlayerID, PlayerInfo } from "./types";
@@ -41,6 +41,8 @@ export interface GameType {
   lastAllowedColumns: number[];
   // PlayerID -> name, color, etc.
   playerInfos: { [key: string]: PlayerInfo };
+  // Number of columns to complete to win.
+  numColsToWin: number | "auto";
 }
 
 /*
@@ -125,7 +127,7 @@ const turn = {
           });
 
           // Check if we should end the game,
-          if (G.scores[ctx.currentPlayer] >= 3) {
+          if (G.scores[ctx.currentPlayer] >= G.numColsToWin) {
             // Clean the board a bit.
             G.currentPositions = {};
             G.info = {
@@ -262,6 +264,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     // show the players things like "it's your turn" messages.
     currentPlayerHasStarted: false,
     lastAllowedColumns: [],
+    numColsToWin: "auto",
   };
 };
 
@@ -366,7 +369,7 @@ const CantStop = {
                 }
                 G.playerInfos[playerID].color = color;
               },
-              startGame: (G: GameType, ctx) => {
+              startMatch: (G: GameType, ctx) => {
                 if (ctx.playerID !== "0") {
                   return INVALID_MOVE;
                 }
@@ -376,10 +379,28 @@ const CantStop = {
                 if (Object.values(G.playerInfos).some((info) => !info.name)) {
                   return INVALID_MOVE;
                 }
+
+                // Set the number of players
                 G.numPlayers = G.passAndPlay
                   ? ctx.numPlayers
                   : Object.keys(G.playerInfos).length;
+
+                // Convert 'auto' number of columns to win to a number
+                if (G.numColsToWin === "auto") {
+                  G.numColsToWin = AUTO_NUM_COLS_TO_WIN.get(G.numPlayers) || 3;
+                }
+
                 ctx.events.endPhase();
+              },
+              setNumColsToWin: (
+                G: GameType,
+                ctx,
+                numColsToWin: number | "auto"
+              ) => {
+                if (ctx.playerID !== "0") {
+                  return INVALID_MOVE;
+                }
+                G.numColsToWin = numColsToWin;
               },
             },
           },
@@ -409,7 +430,12 @@ const CantStop = {
         playAgain: (G, ctx) => {
           // We need to keep some of the fields that were entered during the game, in the "setup"
           // phase.
-          const keepFields = ["playerInfos", "numPlayers", "numVictories"];
+          const keepFields = [
+            "playerInfos",
+            "numPlayers",
+            "numVictories",
+            "numColsToWin",
+          ];
 
           // Create an object like G but with only the fields to keep.
           const GKeep = Object.keys(G)

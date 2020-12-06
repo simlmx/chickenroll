@@ -7,20 +7,34 @@ interface ScoreBoardProps {
   playerInfos: { [key: string]: PlayerInfo };
   currentPlayer: PlayerID;
   playOrder: PlayerID[];
+  numColsToWin: number | "auto";
 }
 
 export class ScoreBoard extends React.Component<ScoreBoardProps> {
   render() {
-    const content = this.props.playOrder.map((playerID) => {
-      const name = this.props.playerInfos[playerID].name;
-      const color = this.props.playerInfos[playerID].color;
-      const points = this.props.scores[playerID];
-      // 3 is the maximum number of points but you can finish with up to 5
-      const tds = Array(5)
+    const {
+      playOrder,
+      playerInfos,
+      scores,
+      currentPlayer,
+      numVictories,
+      numColsToWin,
+    } = this.props;
+
+    if (numColsToWin === "auto") {
+      throw new Error("invalid num cols to win");
+    }
+
+    const content = playOrder.map((playerID) => {
+      const name = playerInfos[playerID].name;
+      const color = playerInfos[playerID].color;
+      const points = scores[playerID];
+      // 5 is the maximum number of points but you can finish with up to 8
+      const tds = Array(8)
         .fill(null)
         .map((_, i) => {
           const hasStar = points > i;
-          if (i >= 3 && !hasStar) {
+          if (i >= numColsToWin && !hasStar) {
             return null;
           }
           const className = hasStar ? ` color${color}` : ` emptyStar`;
@@ -33,14 +47,14 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
           );
         });
       let className = `scoreBoardPlayerName bgcolor${color}`;
-      if (playerID === this.props.currentPlayer) {
+      if (playerID === currentPlayer) {
         className += " scoreBoardPlayerNameCurrent littleFlash";
       }
       return (
         <tr key={playerID}>
           <td className="numVictoriesCol">
             <div className={`bgcolor${color} scoreBoardNumVictories`}>
-              {this.props.numVictories[playerID] || ""}
+              {numVictories[playerID] || ""}
             </div>
           </td>
           <td>

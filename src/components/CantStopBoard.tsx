@@ -270,6 +270,7 @@ export class CantStopBoard extends React.Component<
       numVictories,
       lastAllowedColumns,
       passAndPlay,
+      numColsToWin,
     } = G;
     const { currentPlayer, phase, numPlayers, playOrder } = ctx;
     const { mouseOverPossibility, gameStartedWithoutYou } = this.state;
@@ -323,6 +324,7 @@ export class CantStopBoard extends React.Component<
             maxNumPlayers: numPlayers,
             matchID,
             passAndPlay,
+            numColsToWin,
           }}
         />
       );
@@ -366,6 +368,7 @@ export class CantStopBoard extends React.Component<
           currentPlayer,
           playOrder,
           numVictories,
+          numColsToWin,
         }}
       />
     );

@@ -263,7 +263,11 @@ export class Mountain extends React.Component<MountainProps> {
           );
         }
 
-        cols.push(<div className="mountainCell">{content}</div>);
+        cols.push(
+          <div className="mountainCell" key={col}>
+            {content}
+          </div>
+        );
       }
       rows.push(
         <div className="mountainRow" key={row}>
