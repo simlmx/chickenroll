@@ -19,7 +19,7 @@ export const NUM_COLORS = 7;
 export const AUTO_NUM_COLS_TO_WIN = new Map([
   [1, 5],
   [2, 5],
-  [3, 4],
+  [3, 3],
   [4, 3],
   [5, 2],
 ]);
