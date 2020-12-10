@@ -166,12 +166,31 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   const [mouseOverPossibility, setMouseOverPossibility] = useState<
     { diceSplit: number; dicePairs: number[] } | undefined
   >(undefined);
+
+  const { moves, matchID, ctx, G } = props;
+  const {
+    checkpointPositions,
+    currentPositions,
+    blockedSums,
+    diceSumOptions,
+    playerInfos,
+    diceValues,
+    scores,
+    numVictories,
+    lastAllowedColumns,
+    passAndPlay,
+    numColsToWin,
+  } = G;
+  const { currentPlayer, phase, numPlayers, playOrder } = ctx;
+
   const [showInfo, setShowInfo] = useState(true);
   const [showRules, setShowRules] = useState(false);
   const [gameStartedWithoutYou, setGameStartedWithoutYou] = useState(false);
 
   const itsYourTurn =
-    !props.G.passAndPlay && props.ctx.currentPlayer === props.playerID;
+    phase === "main" &&
+    !props.G.passAndPlay &&
+    props.ctx.currentPlayer === props.playerID;
 
   useEffect(() => {
     // This verifies if the game has already started without us.
@@ -206,21 +225,30 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     };
   }, [infoCode, infoTs, itsYourTurn]);
 
-  const { moves, matchID, ctx, G } = props;
-  const {
-    checkpointPositions,
-    currentPositions,
-    blockedSums,
-    diceSumOptions,
-    playerInfos,
-    diceValues,
-    scores,
-    numVictories,
-    lastAllowedColumns,
-    passAndPlay,
-    numColsToWin,
-  } = G;
-  const { currentPlayer, phase, numPlayers, playOrder } = ctx;
+  // Make the web page's title flash when it's your turn!
+  useEffect(() => {
+    if (!itsYourTurn) {
+      return;
+    }
+    const title = document.title;
+    let interval;
+    if (itsYourTurn) {
+      const titles = ["It's your turn!", title];
+      // Call it right way to display "It's your turn!" as fast as possible. Then re-run
+      // every 1.5 seconds.
+      document.title = titles[0];
+      let i = 1;
+      interval = setInterval(() => {
+        document.title = titles[i];
+        i = 1 - i;
+      }, 1500);
+    }
+
+    return () => {
+      clearInterval(interval);
+      document.title = title;
+    };
+  }, [itsYourTurn]);
 
   // If we are in pass-and-play mode, then the playerID is always "0". The
   // "currentPlayer" is what we mean.
