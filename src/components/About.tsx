@@ -33,6 +33,10 @@ const About = () => {
         <strong>feature request</strong>, <strong>bug</strong>,{" "}
         <strong>question</strong> or just to <strong>say hello</strong> 👋
       </p>
+      <p>
+        You can also chat with us and other players on our{" "}
+        <a href="https://discord.gg/WtPjuAfETb">discord server</a>.
+      </p>
     </div>
   );
 };

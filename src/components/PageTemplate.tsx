@@ -68,15 +68,44 @@ const Footer = (props) => {
         </a>
       </div>
       <div className="footerIcon">
-        <a href="https://github.com/simlmx/cantstop" title="Github">
-          <img src={`${process.env.PUBLIC_URL}/gh.png`} alt="github" />
+        <a
+          href="https://github.com/simlmx/cantstop"
+          title="Github"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            className="icon"
+            src={`${process.env.PUBLIC_URL}/gh.png`}
+            alt="github"
+          />
         </a>
       </div>
       <div className="footerIcon">
-        <a href="https://www.buymeacoffee.com/simlmx" title="Buy me a coffee">
+        <a
+          href="https://www.buymeacoffee.com/simlmx"
+          title="Buy me a coffee"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <img
+            className="icon"
             src={`${process.env.PUBLIC_URL}/bmc.svg`}
             alt="Buy me a coffee"
+          />
+        </a>
+      </div>
+      <div className="footerIcon">
+        <a
+          href="https://discord.gg/WtPjuAfETb"
+          title="Discord"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            className="icon discordIcon"
+            src={`${process.env.PUBLIC_URL}/discord.svg`}
+            alt="Discord"
           />
         </a>
       </div>
