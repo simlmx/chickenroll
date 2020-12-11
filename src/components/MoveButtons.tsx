@@ -2,52 +2,52 @@ import React from "react";
 import { GameType } from "../Game";
 import { SumOption, DiceSum, PlayerID } from "../types";
 
-/* Roll / Stop buttons */
-class ActionButtons extends React.Component<{
+interface ActionButtonsProps {
   moves: any;
   itsMe: boolean;
   color: number;
   currentPlayerHasStarted: boolean;
   onRoll: () => void;
   onStop: () => void;
-}> {
-  render() {
-    const {
-      moves,
-      onRoll,
-      color,
-      itsMe,
-      onStop,
-      currentPlayerHasStarted,
-    } = this.props;
-    return (
-      <div className="actionButtons">
-        <button
-          onClick={() => {
-            moves.rollDice();
-            onRoll();
-          }}
-          className={`btn btnAction bgcolor${color}${
-            currentPlayerHasStarted ? "" : " flashVibrate"
-          }`}
-          disabled={!itsMe}
-        >
-          Roll
-        </button>
-        <button
-          onClick={() => {
-            moves.stop();
-            onStop();
-          }}
-          className={`btn btnAction bgcolor${color}`}
-          disabled={!itsMe}
-        >
-          Stop
-        </button>
-      </div>
-    );
-  }
 }
+/* Roll / Stop buttons */
+const ActionButtons = (props: ActionButtonsProps) => {
+  const {
+    moves,
+    onRoll,
+    color,
+    itsMe,
+    onStop,
+    currentPlayerHasStarted,
+  } = props;
+
+  return (
+    <div className="actionButtons">
+      <button
+        onClick={() => {
+          moves.rollDice();
+          onRoll();
+        }}
+        className={`btn btnAction bgcolor${color}${
+          currentPlayerHasStarted ? "" : " flashVibrate"
+        }`}
+        disabled={!itsMe}
+      >
+        Roll
+      </button>
+      <button
+        onClick={() => {
+          moves.stop();
+          onStop();
+        }}
+        className={`btn btnAction bgcolor${color}`}
+        disabled={!itsMe}
+      >
+        Stop
+      </button>
+    </div>
+  );
+};
 
 /* Dice sum possibilities we can choose from */
 class Possibilities extends React.Component<{

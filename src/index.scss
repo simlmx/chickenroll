@@ -770,22 +770,30 @@ $diceSize: 3.4rem;
 
   display: flex;
   flex-direction: column;
-  z-index: 500;
+  align-items: center;
 }
 
-.homeLinkIcon {
-  width: 2rem;
-  height: 2rem;
+.inGameIcon {
+  width: 1.6rem;
+  height: 1.6rem;
+
   display: flex;
   justify-content: center;
   align-items: center;
 
   margin: 0;
   margin-bottom: 0.5rem;
+
+  z-index: 500;
 }
 
-.homeLinkWrap > div:last-child {
+.inGameIcon > div:last-child {
   margin-bottom: 0;
+}
+
+.homeLinkIcon {
+  width: 2rem;
+  height: 2rem;
 }
 
 .coffee {
@@ -1473,4 +1481,23 @@ $height: $width * $mountainRatio;
   align-items: center;
   width: 100%;
   text-align: center;
+}
+
+.soundIconWrap {
+  width: 100%;
+  height: 100%;
+}
+
+.soundIconPathMain {
+  stroke: #111;
+  stroke-width: 5;
+  stroke-linejoin: round;
+  fill: #111;
+}
+
+.soundIconPath {
+  stroke: #111;
+  stroke-width: 5;
+  stroke-linecap: round;
+  fill: none;
 }

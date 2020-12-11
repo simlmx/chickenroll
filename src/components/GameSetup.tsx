@@ -3,6 +3,7 @@ import { PlayerID, PlayerInfo } from "../types";
 import { SERVER, NUM_COLORS, AUTO_NUM_COLS_TO_WIN } from "../constants";
 import QRCode from "qrcode.react";
 import InGameIcons from "./InGameIcons";
+import getSoundPlayer from "../audio";
 
 // We need this to close the popup when we click outside.
 // https://stackoverflow.com/a/42234988
@@ -121,6 +122,8 @@ export const Player = (props: PlayerProps): JSX.Element => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const soundPlayer = getSoundPlayer();
+
   useEffect(() => {
     if (props.autoFocus && inputRef && inputRef.current) {
       inputRef.current.focus();
@@ -133,6 +136,10 @@ export const Player = (props: PlayerProps): JSX.Element => {
     if (!itsMe) {
       return;
     }
+
+    // This is a hack for iphone (and more?) where we need to play some sound as part of
+    // a user interaction before we can play sound.
+    soundPlayer.init();
 
     if (!ready) {
       moves.setNotReady(playerID);

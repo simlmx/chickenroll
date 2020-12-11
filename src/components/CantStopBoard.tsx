@@ -11,6 +11,7 @@ import { PlayerID, PlayerInfo } from "../types";
 import { OddsCalculator } from "../math/probs";
 import InGameIcons from "./InGameIcons";
 import Rules from "./Rules";
+import getSoundPlayer from "../audio";
 
 export class Info extends React.Component<{
   info?: { code: string; playerID?: PlayerID };
@@ -187,6 +188,63 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   const [showRules, setShowRules] = useState(false);
   const [gameStartedWithoutYou, setGameStartedWithoutYou] = useState(false);
 
+  const soundPlayer = getSoundPlayer();
+
+  const getInitVolume = () => {
+    // Load the volume setting we have in storage.
+    const storedVolume = window.localStorage.getItem("volume");
+    let initVolume = storedVolume == null ? 2 : parseInt(storedVolume);
+    return initVolume;
+  };
+
+  const [volume, _setVolume] = useState(getInitVolume);
+
+  const setVolume = (value) => {
+    // This is to avoid infinite loops: we only do something if the volume is actually
+    // changing.
+    if (value === volume) {
+      return;
+    }
+
+    // We map our 0-3 volume non-linearly between 0. and 1.
+    let volumeInPlayer: number;
+    switch (value) {
+      case 0:
+        volumeInPlayer = 0.0;
+        break;
+      case 1:
+        volumeInPlayer = 0.1;
+        break;
+      case 2:
+        volumeInPlayer = 0.4;
+        break;
+      case 3:
+        volumeInPlayer = 1.0;
+        break;
+      default:
+        volumeInPlayer = 0.0;
+    }
+    soundPlayer.setVolume(volumeInPlayer);
+    _setVolume(value);
+    // Hack!
+    // On iOS, we can't modify the volume, so if after changing it, it's at 1.,
+    // we'll assume we are on iOS and move it all the way up to 1. However if we are going
+    // from 3 to 0, then we keep 0, which is muted anyway. The effect is that on iOS
+    // we can toggle mute/unmute, and on other devices we can choose between
+    // different volume levels.
+    // This is uglier because we have two volumes: one in the soundPlayer and one in
+    // here. Ideally we would have one global volume that everyone would point to.
+    if (soundPlayer._sound.volume === 1 && value !== 0) {
+      _setVolume(3);
+      window.localStorage.setItem("volume", "3");
+    } else {
+      window.localStorage.setItem("volume", value.toString());
+    }
+  };
+
+  // We must call it in case we need the iOS hack.
+  setVolume(volume);
+
   const itsYourTurn =
     phase === "main" &&
     !props.G.passAndPlay &&
@@ -250,6 +308,17 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     };
   }, [itsYourTurn]);
 
+  // Make a sound when it's your turn.
+  useEffect(() => {
+    if (!itsYourTurn || volume === 0) {
+      return;
+    }
+
+    soundPlayer.play("yourturn");
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itsYourTurn]);
+
   // If we are in pass-and-play mode, then the playerID is always "0". The
   // "currentPlayer" is what we mean.
   const playerID = passAndPlay ? currentPlayer : props.playerID;
@@ -260,6 +329,12 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
       howToPlayOnClick={() => {
         setShowRules(!showRules);
       }}
+      volume={volume}
+      changeVolume={() => {
+        const newVolume = (volume + 1) % 4;
+        setVolume(newVolume);
+      }}
+      showVolume={!passAndPlay}
     />
   );
 
