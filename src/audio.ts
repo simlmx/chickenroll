@@ -1,15 +1,17 @@
+/*
+ * We need this because on iOS we can only play an `Audio` element if it has been played
+ * by the user pressing a button. So we always use the same `Audio`.
+ */
 class SoundPlayer {
   _sound: HTMLAudioElement;
   _hasBeenInitialized: boolean;
 
   constructor() {
-    console.log("const");
     this._sound = new Audio();
     this._hasBeenInitialized = false;
   }
 
   async init(): Promise<void> {
-    console.log("init");
     if (this._hasBeenInitialized) {
       return;
     }
@@ -18,12 +20,11 @@ class SoundPlayer {
   }
 
   setVolume(volume: number): void {
-    console.log("setvol");
+    console.log(volume);
     this._sound.volume = volume;
   }
 
   play(soundName: string): void {
-    console.log("play");
     if (!this._hasBeenInitialized) {
       console.warn("sound player has not been initialized");
     }

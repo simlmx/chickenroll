@@ -11,6 +11,7 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Page from "./components/PageTemplate";
 import HowToPlay from "./components/HowToPlay";
 import About from "./components/About";
+import localStorage from "./utils/localStorage";
 // import { Debug } from 'boardgame.io/debug';
 //
 const TITLE = 'Can\'t Stop! - The classic "push your luck" dice game';
@@ -67,12 +68,12 @@ class Match extends React.Component<
       return;
     }
 
-    let playerID: string | null;
-    let playerCredentials: string | null;
+    let playerID: string | undefined;
+    let playerCredentials: string | undefined;
 
     // Try to get our login information from the local store if it's there
-    playerID = window.localStorage.getItem(`playerID for matchID=${matchID}`);
-    playerCredentials = window.localStorage.getItem(
+    playerID = localStorage.getItem(`playerID for matchID=${matchID}`);
+    playerCredentials = localStorage.getItem(
       `playerCredentials for matchID=${matchID}`
     );
     if (playerID != null && playerCredentials != null) {
@@ -114,8 +115,8 @@ class Match extends React.Component<
       playerCredentials,
       playerID,
     });
-    window.localStorage.setItem(`playerID for matchID=${matchID}`, playerID);
-    window.localStorage.setItem(
+    localStorage.setItem(`playerID for matchID=${matchID}`, playerID);
+    localStorage.setItem(
       `playerCredentials for matchID=${matchID}`,
       playerCredentials
     );

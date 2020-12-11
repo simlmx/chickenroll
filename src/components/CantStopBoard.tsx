@@ -12,6 +12,8 @@ import { OddsCalculator } from "../math/probs";
 import InGameIcons from "./InGameIcons";
 import Rules from "./Rules";
 import getSoundPlayer from "../audio";
+import localStorage from "../utils/localStorage";
+import { isIOS } from "../utils/platform";
 
 export class Info extends React.Component<{
   info?: { code: string; playerID?: PlayerID };
@@ -190,25 +192,10 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
 
   const soundPlayer = getSoundPlayer();
 
-  const getInitVolume = () => {
-    // Load the volume setting we have in storage.
-    const storedVolume = window.localStorage.getItem("volume");
-    let initVolume = storedVolume == null ? 2 : parseInt(storedVolume);
-    return initVolume;
-  };
-
-  const [volume, _setVolume] = useState(getInitVolume);
-
-  const setVolume = (value) => {
-    // This is to avoid infinite loops: we only do something if the volume is actually
-    // changing.
-    if (value === volume) {
-      return;
-    }
-
+  const setPlayerVolume = (volume: number): void => {
     // We map our 0-3 volume non-linearly between 0. and 1.
     let volumeInPlayer: number;
-    switch (value) {
+    switch (volume) {
       case 0:
         volumeInPlayer = 0.0;
         break;
@@ -223,27 +210,42 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
         break;
       default:
         volumeInPlayer = 0.0;
+        break;
     }
     soundPlayer.setVolume(volumeInPlayer);
-    _setVolume(value);
-    // Hack!
-    // On iOS, we can't modify the volume, so if after changing it, it's at 1.,
-    // we'll assume we are on iOS and move it all the way up to 1. However if we are going
-    // from 3 to 0, then we keep 0, which is muted anyway. The effect is that on iOS
-    // we can toggle mute/unmute, and on other devices we can choose between
-    // different volume levels.
-    // This is uglier because we have two volumes: one in the soundPlayer and one in
-    // here. Ideally we would have one global volume that everyone would point to.
-    if (soundPlayer._sound.volume === 1 && value !== 0) {
-      _setVolume(3);
-      window.localStorage.setItem("volume", "3");
-    } else {
-      window.localStorage.setItem("volume", value.toString());
-    }
   };
 
-  // We must call it in case we need the iOS hack.
-  setVolume(volume);
+  const getInitVolume = () => {
+    // Load the volume setting we have in storage.
+    const initVol = parseInt(
+      localStorage.getItem("volume", isIOS() ? "3" : "2") as string
+    );
+    // Use it to set the player's volume.
+    setPlayerVolume(initVol);
+
+    return initVol;
+  };
+
+  const [volume, _setVolume] = useState(getInitVolume);
+
+  const changeVolume = () => {
+    let newVolume;
+    if (isIOS()) {
+      // On iOS we just toggle on/off.
+      if (volume === 0) {
+        newVolume = 3;
+      } else {
+        newVolume = 0;
+      }
+    } else {
+      // On other devices we cycle between 0 and 3.
+      newVolume = (volume + 1) % 4;
+    }
+
+    setPlayerVolume(newVolume);
+    localStorage.setItem("volume", newVolume.toString());
+    _setVolume(newVolume);
+  };
 
   const itsYourTurn =
     phase === "main" &&
@@ -331,8 +333,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
       }}
       volume={volume}
       changeVolume={() => {
-        const newVolume = (volume + 1) % 4;
-        setVolume(newVolume);
+        changeVolume();
       }}
       showVolume={!passAndPlay}
     />
