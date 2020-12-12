@@ -188,7 +188,9 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
 
   const [showInfo, setShowInfo] = useState(true);
   const [showRules, setShowRules] = useState(false);
-  const [gameStartedWithoutYou, setGameStartedWithoutYou] = useState(false);
+  const [gameStartedWithoutYou, setGameStartedWithoutYou] = useState<
+    boolean | undefined
+  >(undefined);
 
   const soundPlayer = getSoundPlayer();
 
