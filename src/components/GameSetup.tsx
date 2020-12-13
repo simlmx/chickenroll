@@ -389,7 +389,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   if ([0, 1, 2].includes(numPlayers)) {
     numColsToWinValues = [2, 3, 4, "auto"];
   } else if (numPlayers === 3) {
-    numColsToWinValues = [2, 3, "auto"];
+    numColsToWinValues = [2, "auto", 4];
   } else if (numPlayers === 4) {
     numColsToWinValues = [2, "auto"];
   } else if (numPlayers === 5) {
