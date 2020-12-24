@@ -51,17 +51,17 @@ const Home = (): JSX.Element => {
       <p>
         Number of players:
         <span style={{ display: "inline-block" }}>
-          {Array(MAX_PLAYERS)
+          {Array(MAX_PLAYERS - 1)
             .fill(null)
             .map((_, i) => (
               <button
                 className="btn btn-primary btn-sm"
                 onClick={() => {
-                  window.location.href = `${SERVER}/${i + 1}`;
+                  window.location.href = `${SERVER}/${i + 2}`;
                 }}
                 key={i}
               >
-                {i + 1}
+                {i + 2}
               </button>
             ))}
         </span>

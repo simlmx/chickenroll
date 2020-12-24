@@ -11,6 +11,8 @@ $black: #191516;
 $darkgrey: #403d39;
 $darkgrey: #252422;
 $bgcolor: #f7f6f2;
+$danger: #d70c0c;
+$success: #0c8f29;
 
 html p {
   color: $darkgrey;
@@ -25,8 +27,8 @@ html h4 {
 
 $theme-colors: (
   "primary": $primary,
-  "danger": #d70c0c,
-  "success": #0c8f29,
+  "danger": $danger,
+  "success": $success,
 );
 
 @import "node_modules/bootstrap/scss/bootstrap";
@@ -838,7 +840,16 @@ $diceSize: 3.4rem;
   flex-direction: column;
 }
 
+.gameSetupContentWrapWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
 .gameSetupContentWrap {
+  max-width: 18rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -851,15 +862,13 @@ $diceSize: 3.4rem;
 }
 
 .gameSetupPlayer {
+  height: 2.8rem;
   width: 100%;
-  max-width: 22rem;
-  border-radius: 0.3rem;
-  // No border not event for yellow
-  border: 0px;
+  border-radius: 0.2rem;
+  background-color: white;
 
-  padding: 0.2rem 0.5rem;
-  margin: 0.2rem;
-  box-shadow: 1px 1px 2px black;
+  padding: 0.2rem 0.3rem;
+  margin: 0.3rem;
 
   display: flex;
   justify-content: space-between;
@@ -870,18 +879,26 @@ $diceSize: 3.4rem;
     height: 100%;
 
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
   }
-  .playerNameInput,
+
   .playerName {
+    flex: 1;
     padding: 0;
-    padding-left: 0.5rem;
+    padding-left: 0.3rem;
     margin-left: 0.3rem;
     margin-right: 0.7rem;
+    border: none;
+  }
+
+  .playerNameInput,
+  .playerNameInput > input {
+    flex: 1;
   }
 
   .colorWrap {
     position: relative;
+    padding-right: 0.4rem;
   }
 
   .colorPopupWrap {
@@ -902,9 +919,8 @@ $diceSize: 3.4rem;
   min-height: 2rem;
   max-width: 2rem;
   max-height: 2rem;
-  border-radius: 0.3rem;
-  border: 1px solid black !important;
-  box-shadow: 0px 0px 3px black;
+  border: none !important;
+  border-radius: 0.2rem;
   z-index: 20;
   transition: none;
 
@@ -914,8 +930,11 @@ $diceSize: 3.4rem;
   align-items: center;
   padding-bottom: 0.6rem;
 
-  color: black !important;
+  /* color: black !important; */
   font-size: 0.6rem;
+
+  // This is to ignore the effect bootstrap adds for disabled buttons.
+  opacity: 1 !important;
 }
 
 .gameSetupColorButton > div {
@@ -923,11 +942,11 @@ $diceSize: 3.4rem;
 }
 
 .gameSetupColorButtonDisabled {
-  box-shadow: none;
-  border-color: transparent !important;
   color: transparent !important;
-  border-color: transparent !important;
-  background-color: transparent !important;
+}
+
+.gameSetupColorButtonDisabled:hover {
+  filter: none !important;
 }
 
 .gameSetupPlayerFree {
@@ -941,7 +960,8 @@ $diceSize: 3.4rem;
 }
 
 .readyWrap {
-  width: 3rem;
+  width: 3.3rem;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -972,30 +992,18 @@ $diceSize: 3.4rem;
   cursor: pointer;
 }
 
-.custom-control-input:checked ~ .custom-control-label::before {
-  background-color: transparent !important;
-  border-radius: 0.25rem;
-  border: 2px solid black !important;
-  box-shadow: 0px 0px 3px black !important;
-  cursor: pointer;
-}
-
 .custom-switch {
+  // It's just off otherwise!
   padding-left: 2.7rem;
 }
 
-.custom-switch .custom-control-label::before {
-  background-color: theme-color("dark") !important;
-  box-shadow: 0px 0px 3px black !important;
-  border: 2px solid black !important;
-  border-radius: 0.25rem;
+.custom-control-input:checked ~ .custom-control-label::before {
+  background-color: $success !important;
+  border-color: $success !important;
   cursor: pointer;
 }
-
+.custom-switch .custom-control-label::before,
 .custom-switch .custom-control-label::after {
-  border-radius: 0.25rem;
-  border: 2px solid black !important;
-  background-color: white !important;
   cursor: pointer;
 }
 
@@ -1062,7 +1070,6 @@ $diceSize: 3.4rem;
 
 .settingsWrap {
   width: 100%;
-  max-width: 22rem;
   margin: 0.5rem 0;
 }
 

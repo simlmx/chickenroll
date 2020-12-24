@@ -20,7 +20,6 @@ class SoundPlayer {
   }
 
   setVolume(volume: number): void {
-    console.log(volume);
     this._sound.volume = volume;
   }
 

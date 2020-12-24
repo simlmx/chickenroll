@@ -1,7 +1,7 @@
 # [Can't Stop!][csf]
 
 
-Web app of the board game [Can't Stop][wiki].
+Open source web app of the board game [Can't Stop][wiki].
 
 Online at [`cantstop.fun`][csf].
 

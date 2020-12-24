@@ -4,6 +4,7 @@ import { SERVER, NUM_COLORS, AUTO_NUM_COLS_TO_WIN } from "../constants";
 import QRCode from "qrcode.react";
 import InGameIcons from "./InGameIcons";
 import getSoundPlayer from "../audio";
+import localStorage from "../utils/localStorage";
 
 // We need this to close the popup when we click outside.
 // https://stackoverflow.com/a/42234988
@@ -32,26 +33,34 @@ function useOutsideAlerter(ref, onClickOutside: () => void) {
 function OutsideAlerter(props: {
   onClickOutside: () => void;
   children: JSX.Element | JSX.Element[];
+  className?: string;
 }) {
-  const wrapperRef = useRef(null);
-  useOutsideAlerter(wrapperRef, props.onClickOutside);
+  const { className, children, onClickOutside } = props;
 
-  return <div ref={wrapperRef}>{props.children}</div>;
+  const wrapperRef = useRef(null);
+
+  useOutsideAlerter(wrapperRef, onClickOutside);
+
+  return (
+    <div {...{ className }} ref={wrapperRef}>
+      {children}
+    </div>
+  );
 }
 
 interface ColorPickerProps {
-  initialColor: number;
+  color: number;
   onColorChange?: (number) => void;
   colorAvailabilityMap: boolean[];
   disabled?: boolean;
 }
 
 const ColorPicker = (props: ColorPickerProps) => {
-  const [color, setColor] = useState(props.initialColor);
+  const { color, onColorChange, colorAvailabilityMap, disabled } = props;
   const [visible, setVisible] = useState(false);
 
   let btnClassName = `btn gameSetupColorButton bgcolor${color}`;
-  if (props.disabled) {
+  if (disabled) {
     btnClassName += " gameSetupColorButtonDisabled";
   }
 
@@ -61,7 +70,7 @@ const ColorPicker = (props: ColorPickerProps) => {
         <button
           className={btnClassName}
           onClick={() => setVisible(true)}
-          disabled={props.disabled}
+          disabled={disabled}
         >
           <div>◢</div>
         </button>
@@ -69,30 +78,21 @@ const ColorPicker = (props: ColorPickerProps) => {
       {visible && (
         <OutsideAlerter onClickOutside={() => setVisible(false)}>
           <div className="colorPopupWrap">
-            {props.colorAvailabilityMap.map((available, i) => {
+            {colorAvailabilityMap.map((available, i) => {
               // Skip colors that are not available.
               if (!available) {
                 return null;
               }
-
-              // If it's the first one we add auto-focus.
-              const opts = {};
-              if (i === 0) {
-                opts["autoFocus"] = true;
-              }
-
               return (
-                (available || i === props.initialColor) && (
+                (available || i === color) && (
                   <button
                     className={`btn gameSetupColorButton bgcolor${i}`}
                     onClick={() => {
-                      setColor(i);
-                      props.onColorChange && props.onColorChange(i);
+                      onColorChange && onColorChange(i);
                       setVisible(false);
                     }}
                     key={i}
                     tabIndex={0}
-                    {...opts}
                   ></button>
                 )
               );
@@ -110,25 +110,38 @@ interface PlayerProps {
   playerInfo: PlayerInfo;
   playerID: PlayerID;
   colorAvailabilityMap: boolean[];
-  autoFocus?: boolean;
+  passAndPlay: boolean;
 }
 
 export const Player = (props: PlayerProps): JSX.Element => {
-  const { moves, playerInfo, itsMe, playerID, colorAvailabilityMap } = props;
+  const {
+    moves,
+    playerInfo,
+    itsMe,
+    playerID,
+    colorAvailabilityMap,
+    passAndPlay,
+  } = props;
 
   const { name, color, ready } = playerInfo;
 
+  // Using an intenral state instead of only using the prop makes the changing more
+  // responsive.
   const [currentName, setCurrentName] = useState(name);
-
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [currentReady, setCurrentReady] = useState(ready);
+  const [editingName, setEditingName] = useState(false);
 
   const soundPlayer = getSoundPlayer();
 
+  // Update the name when it changes in the server.
   useEffect(() => {
-    if (props.autoFocus && inputRef && inputRef.current) {
-      inputRef.current.focus();
-    }
-  });
+    setCurrentName(name);
+  }, [name]);
+
+  // Same for the ready status.
+  useEffect(() => {
+    setCurrentReady(ready);
+  }, [ready]);
 
   const setReady = (ready: boolean): void => {
     // This was the simplest way to not have any effects when clicking on other player's
@@ -137,67 +150,94 @@ export const Player = (props: PlayerProps): JSX.Element => {
       return;
     }
 
+    setCurrentReady(ready);
+
     // This is a hack for iphone (and more?) where we need to play some sound as part of
     // a user interaction before we can play sound.
     soundPlayer.init();
 
-    if (!ready) {
-      moves.setNotReady(playerID);
-    } else {
-      moves.setName(currentName, playerID);
+    moves.setReady(playerID, ready);
+  };
+
+  /*
+   * Set the state's `currentName` as the player's name.
+   */
+  const setName = (): void => {
+    setEditingName(false);
+    moves.setName(currentName, playerID);
+    if (!passAndPlay && currentName !== name) {
+      localStorage.setItem("playerName", currentName);
     }
   };
 
-  let className = `gameSetupPlayer bgcolor${color}alpha40`;
-
-  if (!itsMe && !name) {
-    className += " gameSetupPlayerWaiting";
-  }
+  const setColor = (color: number): void => {
+    moves.setColor(color, playerID);
+    if (!passAndPlay) {
+      localStorage.setItem("playerColor", color.toString());
+    }
+  };
 
   let nameElement: JSX.Element;
 
-  if (!ready && itsMe) {
+  if (itsMe && editingName) {
     nameElement = (
-      <input
-        type="text"
-        className="form-control playerNameInput user-select-all"
-        onChange={(e) => setCurrentName(e.target.value)}
-        placeholder="Enter your name"
-        maxLength={16}
-        size={3}
-        value={currentName}
-        ref={inputRef}
-        onFocus={(e) => e.target.select()}
-        onKeyDown={(e) => {
-          // On <enter> same as clicking ready
-          if (e.keyCode === 13) {
-            setReady(true);
-            return false;
-          }
-          return true;
-        }}
-      />
+      <OutsideAlerter
+        className="playerNameInput"
+        onClickOutside={() => setName()}
+      >
+        <input
+          type="text"
+          className="form-control user-select-all"
+          onChange={(e) => setCurrentName(e.target.value)}
+          placeholder="Enter your name"
+          maxLength={16}
+          size={3}
+          value={currentName}
+          autoFocus={true}
+          onFocus={(e) => e.target.select()}
+          onKeyDown={(e) => {
+            if (e.keyCode === 13) {
+              setName();
+              return false;
+            }
+            return true;
+          }}
+        />
+      </OutsideAlerter>
     );
   } else {
     nameElement = (
-      <div className="playerName" onClick={(e) => setReady(false)}>
+      <div
+        className="playerName"
+        onClick={(e) => !currentReady && setEditingName(true)}
+      >
         {name || "..."}
       </div>
     );
   }
 
   const readyButton = (
-    <div className="readyWrap">
-      <div className="readyText badge" onClick={(e) => setReady(!ready)}>
-        {ready ? "Ready" : "Not Ready"}
+    <div
+      className="readyWrap pointer"
+      onClick={(e) => {
+        setReady(!currentReady);
+      }}
+    >
+      <div className="readyText badge">
+        {currentReady ? "Ready" : "Not Ready"}
       </div>
       <div className="custom-control custom-switch">
         <input
           type="checkbox"
-          className="custom-control-input"
+          className="custom-control-input pointer"
           id={`customSwitch-${playerID}`}
-          checked={ready}
-          onChange={(e) => setReady(e.target.checked)}
+          checked={currentReady}
+          readOnly={true}
+          onClick={(e) => {
+            // Not sure how this works but it does!
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         />
         <label
           className="custom-control-label"
@@ -209,18 +249,18 @@ export const Player = (props: PlayerProps): JSX.Element => {
 
   const colorPicker = (
     <ColorPicker
-      initialColor={color}
-      onColorChange={(c) => moves.setColor(c, playerID)}
+      color={color}
+      onColorChange={(c) => setColor(c)}
       colorAvailabilityMap={colorAvailabilityMap}
-      disabled={!itsMe}
+      disabled={!itsMe || ready}
     />
   );
 
   return (
-    <div {...{ className }}>
+    <div className="gameSetupPlayer">
       {colorPicker}
       {nameElement}
-      <div className="gameButtonWrap">{readyButton}</div>
+      {!passAndPlay && readyButton}
     </div>
   );
 };
@@ -271,8 +311,16 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   useEffect(() => {
     // If it's the first time we join that game, we tell the game. It's going to assign
     // us a default name and color.
+
     if (!playerInfos.hasOwnProperty(playerID)) {
-      moves.join();
+      // Use the name/color from localStorage if there is one.
+      const playerName = localStorage.getItem("playerName");
+      const playerColor = localStorage.getItem("playerColor");
+      let playerColorInt: number | undefined;
+      if (playerColor != null) {
+        playerColorInt = parseInt(playerColor);
+      }
+      moves.join(playerName, playerColorInt);
     }
     setAllReady(Object.values(playerInfos).every((info) => info.ready));
   }, [playerInfos, moves, playerID]);
@@ -327,7 +375,6 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   // auto-focus on the *first* one that is not ready.
   // In remote mode we autofocus on everything because only one will be editable
   // anyway.
-  let foundFirstNotReady = false;
   const activePlayers = Object.entries(playerInfos).map(
     ([currentPlayerID, playerInfo], i) => {
       // Find the available colors for that players, i.e. all those which are not
@@ -338,14 +385,6 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         (playerInfo) => (colorAvailabilityMap[playerInfo.color] = false)
       );
 
-      let autoFocus: boolean;
-      if (!playerInfo.ready && !foundFirstNotReady) {
-        foundFirstNotReady = true;
-        autoFocus = true;
-      } else {
-        autoFocus = false;
-      }
-
       return (
         <Player
           moves={moves}
@@ -354,7 +393,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
           playerID={currentPlayerID}
           key={currentPlayerID}
           colorAvailabilityMap={colorAvailabilityMap}
-          autoFocus={passAndPlay ? autoFocus : true}
+          passAndPlay={passAndPlay}
         />
       );
     }
@@ -368,18 +407,22 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
       </div>
     ));
 
+  const canStart = passAndPlay || (allReady && numPlayers >= 2);
+
   const startButton = imTheOwner && (
     <button
       className="btn btn-primary startButton"
       onClick={() => moves.startMatch()}
       // Disabled if not everyone is ready
-      disabled={!allReady}
+      disabled={!canStart}
       key="last"
       ref={(input) => input && allReady && input.focus()}
     >
       {passAndPlay
         ? "Start the match!"
-        : `Start with ${numPlayers} player${numPlayers === 1 ? "" : "s"}!`}
+        : numPlayers >= 2
+        ? `Start with ${numPlayers} players!`
+        : "You need at least 2 players"}
     </button>
   );
 
@@ -421,7 +464,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         <div className="gameSetupSettings input-group mb-3">
           <div className="input-group-prepend">
             <label className="input-group-text" htmlFor="numColsToWin">
-              Number of columns to win
+              Num of columns to win
             </label>
           </div>
           <select
@@ -452,11 +495,13 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
     <div className="gameSetupWrap">
       <InGameIcons />
       {inviteHeader}
-      <div className="gameSetupContentWrap container">
-        {activePlayers}
-        {freeSpots}
-        {settings}
-        {startButton}
+      <div className="container gameSetupContentWrapWrap">
+        <div className="gameSetupContentWrap">
+          {activePlayers}
+          {freeSpots}
+          {settings}
+          {startButton}
+        </div>
       </div>
     </div>
   );

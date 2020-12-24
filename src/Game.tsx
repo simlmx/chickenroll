@@ -268,6 +268,39 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   };
 };
 
+const setName = (G: GameType, ctx, name: string, playerID: PlayerID = "0") => {
+  // Nothing happens if the name is empty.
+  // This way we make sure a player without a name is not ready.
+  if (!name) {
+    return;
+  }
+
+  playerID = G.passAndPlay ? playerID : ctx.playerID;
+
+  G.playerInfos[playerID].name = name;
+};
+
+const setColor = (
+  G: GameType,
+  ctx,
+  color: number,
+  playerID: PlayerID = "0"
+) => {
+  playerID = G.passAndPlay ? playerID : ctx.playerID;
+
+  // If we are not actually changing the color we can ignore this.
+  // This happens when we click on the same color we already have.
+  if (G.playerInfos[playerID].color === color) {
+    return;
+  }
+
+  // It's an invalid move if someone else already has that color.
+  if (Object.values(G.playerInfos).some((info) => info.color === color)) {
+    return INVALID_MOVE;
+  }
+  G.playerInfos[playerID].color = color;
+};
+
 const CantStop = {
   name: "cantstop",
   setup,
@@ -285,7 +318,13 @@ const CantStop = {
         stages: {
           setup: {
             moves: {
-              join: (G: GameType, ctx) => {
+              // Join a new game with potentially a prefered name and color.
+              join: (
+                G: GameType,
+                ctx,
+                playerName: string | undefined,
+                playerColor: number | undefined
+              ) => {
                 if (G.passAndPlay) {
                   return INVALID_MOVE;
                 }
@@ -304,70 +343,42 @@ const CantStop = {
                 // players.
                 let newColor = 0;
 
-                availableColors.some((available, color) => {
-                  if (available) {
-                    newColor = color;
-                    return true;
-                  }
-                  return false;
-                });
+                if (playerColor != null && availableColors[playerColor]) {
+                  // If we supplied a prefered color and if it's available, we use that.
+                  newColor = playerColor;
+                } else {
+                  // Otherwise we take the next available color.
+                  availableColors.some((available, color) => {
+                    if (available) {
+                      newColor = color;
+                      return true;
+                    }
+                    return false;
+                  });
+                }
+
+                if (!playerName) {
+                  playerName = `Player ${parseInt(ctx.playerID) + 1}`;
+                }
 
                 G.playerInfos[ctx.playerID] = {
-                  name: `Player ${parseInt(ctx.playerID) + 1}`,
+                  name: playerName,
                   color: newColor,
                   ready: false,
                 };
               },
-              setName: (
+              setName,
+              setColor,
+              setReady: (
                 G: GameType,
                 ctx,
-                name: string,
-                playerID: PlayerID = "0"
+                playerID: PlayerID,
+                ready: boolean
               ) => {
-                // Nothing happens if the name is empty.
-                // This way we make sure a player without a name is not ready.
-                if (!name) {
-                  return;
-                }
-
-                playerID = G.passAndPlay ? playerID : ctx.playerID;
-
-                G.playerInfos[playerID].name = name;
-                // Setting the name and being ready is the same!
-                G.playerInfos[playerID].ready = true;
-
-                // In pass-and-play mode, when everyone is ready, we start the game.
-                // if (Object.values(G.playerInfos).every(info => info.ready)) {
-                // ctx.events.endPhase();
-                // }
-              },
-              setNotReady: (G: GameType, ctx, playerID: PlayerID): void => {
-                playerID = G.passAndPlay ? playerID : ctx.playerID;
-                G.playerInfos[playerID].ready = false;
-              },
-              setColor: (
-                G: GameType,
-                ctx,
-                color: number,
-                playerID: PlayerID = "0"
-              ) => {
-                playerID = G.passAndPlay ? playerID : ctx.playerID;
-
-                // If we are not actually changing the color we can ignore this.
-                // This happens when we click on the same color we already have.
-                if (G.playerInfos[playerID].color === color) {
-                  return;
-                }
-
-                // It's an invalid move if someone else already has that color.
-                if (
-                  Object.values(G.playerInfos).some(
-                    (info) => info.color === color
-                  )
-                ) {
+                if (G.passAndPlay) {
                   return INVALID_MOVE;
                 }
-                G.playerInfos[playerID].color = color;
+                G.playerInfos[playerID].ready = ready;
               },
               startMatch: (G: GameType, ctx) => {
                 if (ctx.playerID !== "0") {

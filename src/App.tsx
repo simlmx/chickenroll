@@ -186,15 +186,13 @@ class App extends React.Component {
         <Switch>
           {/* Pass and play match */}
           <Route
-            path="/:numPlayers([12345])"
+            path="/:numPlayers([2345])"
             render={(props) => {
               const numPlayers = parseInt(props.match.params.numPlayers);
               return (
                 <Page
                   wrap={false}
-                  title={`Local Match ${numPlayers} Player${
-                    numPlayers > 1 ? "s" : ""
-                  } | ${TITLE}`}
+                  title={`Local Match ${numPlayers} Players | ${TITLE}`}
                 >
                   <PassAndPlayMatch {...{ numPlayers }} />
                 </Page>
