@@ -184,7 +184,7 @@ export class Mountain extends React.Component<MountainProps> {
           content = (
             <ClimberPlaceholder color={playerInfos[blockedBy]?.color} key={0} />
           );
-        } else if ([13, 12, 11].includes(row) && col === 12) {
+        } else if ([13, 12, 11].includes(row) && col === 11) {
           // We place the left climbers in the top left of the table.
           const numClimbersLeft =
             3 - Object.keys(updatedCurrentPositions).length;
