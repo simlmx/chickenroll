@@ -230,13 +230,17 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
 
   //   playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
   // }
-  // checkpointPositions['0'][3] = 4;
-  // checkpointPositions['2'][7] = 4;
-  // checkpointPositions['3'][7] = 5;
-  // checkpointPositions['1'][7] = 2;
-  // checkpointPositions['1'][8] = 2;
-  // blockedSums[4] = '0';
-  // blockedSums[5] = '2';
+  // numVictories[0] = 1;
+  // numVictories[3] = 2;
+  // numVictories[2] = 1;
+  // numVictories[1] = 7
+  // checkpointPositions["0"][3] = 4;
+  // checkpointPositions["2"][7] = 4;
+  // checkpointPositions["3"][7] = 5;
+  // checkpointPositions["1"][7] = 2;
+  // checkpointPositions["1"][8] = 2;
+  // blockedSums[4] = "0";
+  // blockedSums[5] = "2";
 
   return {
     /*

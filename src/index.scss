@@ -185,7 +185,7 @@ p a {
   transition: none;
 }
 
-$colors: #07df9e, #0c90c0, #f78345, #fde662, #c7233f, #f35076, #973b84;
+$colors: #07df9e, #0c90c0, #f78345, #f5dc00, #c7233f, #f35076, #973b84;
 
 @for $i from 1 through length($colors) {
   $color: nth($colors, $i);
@@ -198,6 +198,11 @@ $colors: #07df9e, #0c90c0, #f78345, #fde662, #c7233f, #f35076, #973b84;
     background-color: $color;
     border: 0.05rem solid transparent;
     border-color: $color;
+    fill: $color;
+  }
+
+  .textColor#{$i - 1} {
+    color: white;
   }
 
   .bgcolor#{$i - 1}alpha40 {
@@ -230,6 +235,10 @@ $colors: #07df9e, #0c90c0, #f78345, #fde662, #c7233f, #f35076, #973b84;
     border-color: black;
   }
 
+  .textColor#{$index} {
+    color: black;
+  }
+
   button.bgcolor#{$index},
   button.bgcolor#{$index}:hover {
     color: black;
@@ -250,9 +259,7 @@ $colors: #07df9e, #0c90c0, #f78345, #fde662, #c7233f, #f35076, #973b84;
     filter: brightness(0.9);
   }
 
-  // Not as pale for pale colors
   .bgcolor#{$index}alpha40 {
-    background-color: color.adjust(nth($colors, $index + 1), $alpha: -0.55);
     border: 0.05rem solid transparent;
   }
 }
@@ -1148,14 +1155,59 @@ $diceSize: 3.4rem;
 }
 
 .numVictoriesCol {
-  min-width: 2.5rem;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.numVictoriesCol div {
+.trophyWrap {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  margin-right: 0.1rem;
+}
+
+.trophyWrap > svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.trophyValue {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  line-height: 1.05rem;
+  text-align: center;
+  z-index: 1;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.trophyDoubleDigits {
+  font-size: 0.7rem;
+  line-height: 1rem;
+}
+
+.trophyGold {
+  fill: url(#goldGradient);
+}
+
+.trophyGoldValue {
+  color: white;
+  text-shadow: 0 0.05rem 0.05rem black;
+}
+
+.darkgold {
+  stop-color: #5e4f20;
+}
+.lightgold {
+  stop-color: #e3bc3d;
 }
 
 .megaWrap {
