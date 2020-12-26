@@ -9,12 +9,12 @@ const Rules = (props) => {
   const makeDie = (value: number) => <Die {...{ value, color }} />;
   const dice = [1, 2, 3, 6].map((value) => makeDie(value));
   const runner = (
-    <span title="Runner">
+    <span title="black token">
       <Climber color={color} current={true} />
     </span>
   );
   const token = (
-    <span title="Color Token">
+    <span title="colored token">
       <Climber color={color} />
     </span>
   );
@@ -105,7 +105,10 @@ const Rules = (props) => {
         <div className="col-sm-6">
           <div className="movesBox">
             <div className="movesLeft">
-              <p>Add a new {runner} at the bottom of a column.</p>
+              <p>
+                Add a new <strong>black token</strong> at the bottom of a
+                column.
+              </p>
             </div>
             <div className="movesRight">
               {dice[0]}
@@ -117,7 +120,10 @@ const Rules = (props) => {
         <div className="col-sm-6">
           <div className="movesBox">
             <div className="movesLeft">
-              <p>Continue right above one of your {token}.</p>
+              <p>
+                Continue right above one of your <strong>colored tokens</strong>
+                .
+              </p>
             </div>
             <div className="movesRight">
               {dice[1]}
@@ -128,7 +134,9 @@ const Rules = (props) => {
         <div className="col-sm-6">
           <div className="movesBox">
             <div className="movesLeft">
-              <p>Move an already placed {runner} up one step.</p>
+              <p>
+                Move an already placed <strong>black token</strong> up one step.
+              </p>
             </div>
             <div className="movesRight">
               {dice[2]}
@@ -181,10 +189,11 @@ const Rules = (props) => {
       <h2>On your turn </h2>
       <p>
         You can either {actionBtn("Roll")} or {actionBtn("Stop")}. When rolling,
-        you try to make your active <strong>runners</strong> ({runner})
-        progress. When stopping, you end your turn but keep the progress you
-        made this turn using <strong>tokens</strong> of your color ({token}).
-        You can {actionBtn("Roll")} as many times as you like until you either{" "}
+        you try to make your <strong>black tokens</strong> ({runner}) progress.
+        When stopping, you end your turn but keep the progress you made this
+        turn using <strong>colored tokens</strong>{" "}
+        <span style={{ display: "inlineBlock" }}>({token})</span>. You can{" "}
+        {actionBtn("Roll")} as many times as you like until you either{" "}
         {actionBtn("Stop")} or {bust}.{" "}
       </p>
       <h3>Roll</h3>
@@ -197,23 +206,24 @@ const Rules = (props) => {
         {dice[3]} or {dice[0]}
         {dice[3]}|{dice[1]}
         {dice[2]}). For each of those two pairs you choose, you can add or move
-        a {runner} up on the corresponding columns. You can have up to three
-        different {runner} per turn.
+        a <strong>black token</strong> up on the corresponding columns. You can
+        have up to three per turn.
       </p>
       {moveUpTable}
       <p>
         If you can't do any action for any pair, you {bust}. You lose the
-        progress made by the {runner} and your turn ends.
+        progress made by the <strong>black tokens</strong> and your turn ends.
       </p>
       <h3>Stop</h3>
       <p>
-        If you have a {runner} at the end of a column, stopping will{" "}
-        <strong>block</strong> it. From now on, no one can use that column. The
-        first player to <strong>block</strong> three columns{" "}
+        If you have a <strong>black token</strong> at the end of a column,
+        stopping will <strong>block</strong> it. From now on, no one can use
+        that column. The first player to <strong>block</strong> three columns{" "}
         <strong>wins</strong>.
       </p>
       <p>
-        You change your {runner} into {token} and end your turn.
+        You change your <strong>black tokens</strong> into{" "}
+        <strong>colored tokens</strong> and end your turn.
       </p>
     </>
   );
