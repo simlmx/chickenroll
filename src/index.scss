@@ -185,7 +185,7 @@ p a {
   transition: none;
 }
 
-$colors: #07df9e, #0c90c0, #f78345, #f5dc00, #c7233f, #f35076, #973b84;
+$colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
 
 @for $i from 1 through length($colors) {
   $color: nth($colors, $i);
