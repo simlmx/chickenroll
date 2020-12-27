@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { PlayerID, PlayerInfo } from "../types";
-import { SERVER, NUM_COLORS, AUTO_NUM_COLS_TO_WIN } from "../constants";
+import {
+  SERVER,
+  NUM_COLORS,
+  AUTO_NUM_COLS_TO_WIN,
+  PLAYER_NAME_MAX_LEN,
+} from "../constants";
 import QRCode from "qrcode.react";
 import InGameIcons from "./InGameIcons";
 import getSoundPlayer from "../audio";
@@ -190,7 +195,7 @@ export const Player = (props: PlayerProps): JSX.Element => {
           className="form-control user-select-all"
           onChange={(e) => setCurrentName(e.target.value)}
           placeholder="Enter your name"
-          maxLength={16}
+          maxLength={PLAYER_NAME_MAX_LEN}
           size={3}
           value={currentName}
           autoFocus={true}

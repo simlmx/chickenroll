@@ -16,6 +16,8 @@ export const MAX_PLAYERS = 5;
 
 export const NUM_COLORS = 7;
 
+export const PLAYER_NAME_MAX_LEN = 16;
+
 // TODO and warning: changing those is not enough, you need to also fix the possibles
 // options in GameSetup.tsx
 export const AUTO_NUM_COLS_TO_WIN = new Map([

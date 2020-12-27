@@ -1,4 +1,8 @@
-import { NUM_COLORS, AUTO_NUM_COLS_TO_WIN } from "./constants";
+import {
+  NUM_COLORS,
+  AUTO_NUM_COLS_TO_WIN,
+  PLAYER_NAME_MAX_LEN,
+} from "./constants";
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, getNumStepsForSum } from "./math";
 import { SumOption, PlayerID, PlayerInfo } from "./types";
@@ -281,7 +285,7 @@ const setName = (G: GameType, ctx, name: string, playerID: PlayerID = "0") => {
 
   playerID = G.passAndPlay ? playerID : ctx.playerID;
 
-  G.playerInfos[playerID].name = name;
+  G.playerInfos[playerID].name = name.substring(0, PLAYER_NAME_MAX_LEN);
 };
 
 const setColor = (
