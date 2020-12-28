@@ -189,8 +189,9 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   const { currentPlayer, phase, numPlayers, playOrder } = ctx;
 
   const [showInfo, setShowInfo] = useState(true);
-  const [showRules, setShowRules] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  const [modal, setModal] = useState<undefined | "history" | "rules">(
+    undefined
+  );
   const [gameStartedWithoutYou, setGameStartedWithoutYou] = useState<
     boolean | undefined
   >(undefined);
@@ -326,20 +327,32 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itsYourTurn]);
 
+  // Add listener to close modals on "escape".
+  useEffect(() => {
+    const escHandler = (e) => {
+      if (e.keyCode === 27) {
+        setModal(undefined);
+      }
+    };
+    window.addEventListener("keydown", escHandler);
+    return () => window.removeEventListener("keydown", escHandler);
+  }, []);
+
   // If we are in pass-and-play mode, then the playerID is always "0". The
   // "currentPlayer" is what we mean.
   const playerID = passAndPlay ? currentPlayer : props.playerID;
 
   const inGameIcons = (
     <InGameIcons
-      showCoffee={!passAndPlay || gameStartedWithoutYou}
-      howToPlayOnClick={() => setShowRules(!showRules)}
+      howToPlayOnClick={() => setModal(modal === "rules" ? undefined : "rules")}
       volume={volume}
       changeVolume={() => {
         changeVolume();
       }}
       showVolume={!passAndPlay}
-      historyOnClick={() => setShowHistory(!showHistory)}
+      historyOnClick={() =>
+        setModal(modal === "history" ? undefined : "history")
+      }
     />
   );
 
@@ -542,7 +555,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
               className="close"
               data-dismiss="modal"
               aria-label="Close"
-              onClick={() => setShowRules(false)}
+              onClick={() => setModal(undefined)}
             >
               <span aria-hidden="false">&times;</span>
             </button>
@@ -557,7 +570,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
               type="button"
               className="btn btn-primary"
               data-dismiss="modal"
-              onClick={() => setShowRules(false)}
+              onClick={() => setModal(undefined)}
             >
               Close
             </button>
@@ -578,7 +591,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
               className="close"
               data-dismiss="modal"
               aria-label="Close"
-              onClick={() => setShowHistory(false)}
+              onClick={() => setModal(undefined)}
             >
               <span aria-hidden="false">&times;</span>
             </button>
@@ -595,7 +608,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
               type="button"
               className="btn btn-primary"
               data-dismiss="modal"
-              onClick={() => setShowHistory(false)}
+              onClick={() => setModal(undefined)}
             >
               Close
             </button>
@@ -610,8 +623,8 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   return (
     <div className="cantStopBoard" onClick={() => {}}>
       {infoTag}
-      {showRules && rulesModal}
-      {showHistory && historyModal}
+      {modal === "rules" && rulesModal}
+      {modal === "history" && historyModal}
       {inGameIcons}
       <div className="megaWrap">
         <div className="bigHspace"></div>
