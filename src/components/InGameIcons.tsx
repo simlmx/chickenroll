@@ -88,10 +88,10 @@ const InGameIcons = (props: InGameIconsProps) => {
         <div className="inGameIcon">
           <div
             className="howToPlayWrap"
-            title="Moves Log"
+            title="Move History"
             onClick={() => historyOnClick && historyOnClick()}
           >
-            L
+            h
           </div>
         </div>
       )}

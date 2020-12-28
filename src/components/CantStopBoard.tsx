@@ -585,7 +585,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
       <div className="modal-dialog moveHistoryModal modal-sm modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Moves Log</h5>
+            <h5 className="modal-title">Move History</h5>
             <button
               type="button"
               className="close"
