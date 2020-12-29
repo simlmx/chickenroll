@@ -1,10 +1,22 @@
 import { getNumStepsForSum } from "../math";
+import { NUM_COLORS } from "../constants";
 
 type Dice2sums = { [key: string]: Set<number> };
 
 // https://stackoverflow.com/a/12628791/1067132
 const _f = (a, b) => [].concat(...a.map((d) => b.map((e) => [].concat(d, e))));
 export const cartesian = (...c) => c.reduce(_f);
+
+export const diceValues2sums = (diceValues: number[]): Set<number> => {
+  const sums: Set<number> = new Set();
+  for (let i = 0; i < diceValues.length - 1; i++) {
+    // This is where you'll capture that last value
+    for (let j = i + 1; j < diceValues.length; j++) {
+      sums.add(diceValues[i] + diceValues[j]);
+    }
+  }
+  return sums;
+};
 
 export class OddsCalculator {
   numDice: number;
@@ -36,7 +48,7 @@ export class OddsCalculator {
           sums.add(diceValues[i] + diceValues[j]);
         }
       }
-      dice2sums[diceValues] = sums;
+      dice2sums[diceValues] = diceValues2sums(diceValues);
     });
 
     return dice2sums;
@@ -87,3 +99,13 @@ export function getAllowedColumns(currentPositions, blockedSums) {
   const allowed = all.filter((s) => !blockedSumsSet.has(s));
   return allowed;
 }
+
+/* Roll a die */
+export const rollDie = (): number => Math.floor(Math.random() * 6) + 1;
+
+/* Roll n dice */
+export const rollDice = (n: number): number[] =>
+  Array(n).fill(null).map(rollDie);
+
+/* Randomly pick a color */
+export const pickColor = (): number => Math.floor(Math.random() * NUM_COLORS);

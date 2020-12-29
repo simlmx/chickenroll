@@ -33,13 +33,18 @@ const Header = (props: HeaderProps) => {
   return (
     <nav className="navbar navbar-expand navbar-primary">
       <ul className="navbar-nav">
-        {navItems.map((navItem) => {
+        {navItems.map((navItem, i) => {
           const opts: any = {
             className: `nav-link ${
               props.path === navItem.path ? "active" : ""
             }`,
             href: navItem.path,
           };
+
+          // We add some emphasis for the first link, "Play"
+          if (i === 0) {
+            opts.className += " playEmphasis";
+          }
 
           if (navItem.external) {
             opts.target = "_blank";

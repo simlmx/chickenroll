@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { OddsCalculator } from "../math/probs";
+import { Die } from "./Die";
+import { rollDice, pickColor, diceValues2sums } from "../math/probs";
+
+const DEFAULT_SELECTED = [
+  false,
+  false,
+  false,
+  false,
+  true, // 6
+  true, // 7
+  true, // 8
+  false,
+  false,
+  false,
+  false,
+];
 
 interface NumberProps {
   value: number;
@@ -12,7 +28,8 @@ interface NumberProps {
 const Number = (props: NumberProps) => {
   const { value, selected, isAllowedMode, onMouseDown } = props;
 
-  let className = "colFgBottom colFgNotBlocked mathNumber user-select-none";
+  let className =
+    "colFgBottom colFgNotBlocked mathNumber user-select-none pointer";
 
   if (selected) {
     // className += " mathNumberSelected";
@@ -25,14 +42,38 @@ const Number = (props: NumberProps) => {
   return <div {...{ className, onMouseDown }}>{value}</div>;
 };
 
+const getIndices = (selected: boolean[], expectedValue?: boolean): number[] => {
+  if (expectedValue == null) {
+    expectedValue = true;
+  }
+
+  return selected.reduce((acc: number[], value, index) => {
+    if (value === expectedValue) {
+      acc.push(index + 2);
+    }
+    return acc;
+  }, []);
+};
+
+const MathDie = (props: { value: number; color: number }) => {
+  const { value, color } = props;
+
+  return <Die {...{ value, color }} />;
+};
+
 const Math = () => {
   const [isAllowedMode, setIsAllowedMode] = useState(true);
-  const [selected, setSelected] = useState(Array(11).fill(false));
+  // const [selected, setSelected] = useState(Array(11).fill(false));
+  const [selected, setSelected] = useState<boolean[]>(DEFAULT_SELECTED);
   const [oddsCalculator, setOddsCalculator] = useState<
     OddsCalculator | undefined
   >(undefined);
 
-  const [prob1, setProb1] = useState(0);
+  const [diceColor, setDiceColor] = useState(pickColor());
+  const [diceValues, setDiceValues] = useState(rollDice(4));
+  const [diceSums, setDiceSums] = useState<number[] | undefined>(undefined); //diceValues2sums(diceValues))
+
+  const [prob, setProb] = useState(0);
 
   useEffect(() => {
     setOddsCalculator(new OddsCalculator());
@@ -41,31 +82,35 @@ const Math = () => {
   // Update the probs when something changes.
   useEffect(() => {
     if (oddsCalculator == null) {
-      setProb1(0);
+      setProb(0);
       return;
     }
 
     if (isAllowedMode) {
-      const allowed = selected.reduce((acc, value, index) => {
+      const allowed = selected.reduce((acc: number[], value, index) => {
         if (value) {
           acc.push(index + 2);
         }
         return acc;
       }, []);
-      const prob2 = oddsCalculator.oddsBust(allowed);
-      setProb1(1 - prob2);
+      const prob = oddsCalculator.oddsBust(allowed);
+      setProb(1 - prob);
     } else {
-      const allowed = selected.reduce((acc, value, index) => {
+      const allowed = selected.reduce((acc: number[], value, index) => {
         if (!value) {
           acc.push(index + 2);
         }
         return acc;
       }, []);
 
-      const prob2 = oddsCalculator.oddsBust(allowed);
-      setProb1(1 - prob2);
+      const prob = oddsCalculator.oddsBust(allowed);
+      setProb(prob);
     }
   }, [isAllowedMode, oddsCalculator, selected]);
+
+  useEffect(() => {
+    setDiceSums(Array.from(diceValues2sums(diceValues)).sort((a, b) => a - b));
+  }, [diceValues]);
 
   const changeMode = () => {
     setIsAllowedMode(!isAllowedMode);
@@ -121,23 +166,14 @@ const Math = () => {
 
   const modeButton = (
     <button
-      className={isAllowedMode ? "btn btn-success" : "btn btn-danger"}
+      className={
+        isAllowedMode ? "btn btn-sm btn-success" : "btn btn-sm btn-danger"
+      }
       onClick={() => changeMode()}
     >
-      {isAllowedMode ? "Allowed" : "Blocked"}
+      {isAllowedMode ? "Climbing Columns" : "Blocked Columns"}
     </button>
   );
-
-  const modeEl = (isAllowedMode: boolean): JSX.Element => {
-    return (
-      <span
-        className={`text-${isAllowedMode ? "success" : "danger"}`}
-        style={{ fontWeight: "bold" }}
-      >
-        {isAllowedMode ? "allowed" : "blocked"}
-      </span>
-    );
-  };
 
   const probAsEl = (prob: number): JSX.Element => {
     return (
@@ -152,72 +188,128 @@ const Math = () => {
   const probBustEl = (bust: boolean) => {
     return (
       <>
-        <b>Prob(</b>
         {bust ? "" : "not "}
-        <span role="img" aria-label="bust">
+        <span role="img" aria-label="bust" title="Probability of busting">
           💥
         </span>
-        <b>)</b>
       </>
     );
   };
 
-  if (isAllowedMode) {
-    probEl = (
-      <>
+  const selectedIndices = getIndices(selected);
+
+  const probEltext = isAllowedMode
+    ? selectedIndices.length === 1
+      ? "Rolling a sum of"
+      : "Rolling at least one sum from"
+    : "Rolling only sums of";
+
+  probEl = (
+    <>
+      {selectedIndices.length > 0 && (
         <p>
-          {probBustEl(true)} = <b>Prob(</b>none of {modeEl(isAllowedMode)}
-          <b>)</b> = {probAsEl(1 - prob1)}
+          <>
+            {probEltext}{" "}
+            {selectedIndices
+              .map<React.ReactNode>((t, i) => (
+                <span
+                  className={`${
+                    isAllowedMode ? "text-success" : "text-danger"
+                  }`}
+                  key={i}
+                >
+                  <b>{t}</b>
+                </span>
+              ))
+              .reduce((prev, curr) => [prev, ", ", curr])}
+          </>
+          {/* In red mode we add the probability to bust inline */}
+          {!isAllowedMode && <> = {probBustEl(true)}</>} = {probAsEl(prob)}
         </p>
+      )}
+      {/* In green mode we add the probability to bust in a differente line */}
+      {selectedIndices.length > 0 && isAllowedMode && (
         <p>
-          {probBustEl(false)} = <b>Prob(</b>at least one {modeEl(isAllowedMode)}
-          <b>)</b> = {probAsEl(prob1)}
+          {probBustEl(true)} = {probAsEl(1 - prob)}
         </p>
-      </>
-    );
-  } else {
-    probEl = (
-      <>
-        <p>
-          {probBustEl(true)} = <b>Prob(</b>only {modeEl(isAllowedMode)}
-          <b>)</b> = {probAsEl(1 - prob1)}
-        </p>
-        <p>
-          {probBustEl(false)} = <b>Prob(</b>at least one <b>not</b>{" "}
-          {modeEl(isAllowedMode)}
-          <b>)</b> = {probAsEl(prob1)}
-        </p>
-      </>
-    );
-  }
+      )}
+    </>
+  );
+
+  const diceOnClick = () => {
+    setDiceValues(rollDice(4));
+    setDiceColor(pickColor());
+  };
+
+  const modeExplanationEl = isAllowedMode ? (
+    <>
+      <p>
+        What is the probability of rolling <b>at least one</b> of the{" "}
+        <span className="text-success">
+          <b>selected</b>
+        </span>{" "}
+        sums when rolling 4 dice?
+      </p>
+      <p>
+        This is also the probability of <b>not busting</b> when you can only
+        climb those columns.
+      </p>
+    </>
+  ) : (
+    <>
+      <p>
+        What is the probability of rolling <b>only</b> the{" "}
+        <span className="text-danger">
+          <b>selected</b>
+        </span>{" "}
+        sums when rolling 4 dice?
+      </p>
+      <p>
+        This is also the probability of <b>busting on your first roll</b> when
+        those columns are blocked.
+      </p>
+    </>
+  );
 
   return (
-    <div className="math">
-      <h1>Math</h1>
+    <div className="mathPage">
+      <h1>
+        The Math Behind <i>Can't Stop</i>
+      </h1>
       <br />
 
+      <h2>Probabilities of rolling different sums</h2>
       <p>
-        We have summarized the answers to some frequently asked probability
-        questions about <i>Can't Stop!</i> in an interactive way.
+        Here you can interactively find the probabilities of rolling given sums
+        when rolling 4 dice.
       </p>
-
-      <h2>Probability of obtaining given sums</h2>
+      <div className="diceSums user-select-none">
+        <span className="pointer" onMouseDown={diceOnClick}>
+          {diceValues.map((value, i) => (
+            <MathDie value={value} color={diceColor} key={i} />
+          ))}{" "}
+        </span>
+        &nbsp;→&nbsp;
+        <span className="pointer" onMouseDown={diceOnClick}>
+          {diceSums
+            ?.map<React.ReactNode>((t, i) => <b key={i}>{t}</b>)
+            .reduce((prev, curr) => [prev, ", ", curr])}
+        </span>
+      </div>
       <p>
-        This will give your the probability of busting if you are only{" "}
-        {modeEl(true)} given sums or alternatively if given sums are{" "}
-        {modeEl(false)}.
+        <label>
+          <b>Mode: </b>
+        </label>
+        {modeButton}
       </p>
-      <p>
-        <b>Click</b> numbers that are {modeEl(isAllowedMode)}.
-      </p>
+      {modeExplanationEl}
       <div className="mathWrapWrap">
         <div className="mathWrap row no-gutters">
           <div className="col-sm" />
           <div className="rowsWrap manipulation col-sm">{rows}</div>
           <div className="modeWrap col-sm d-flex flex-sm-column flex-row">
-            {modeButton}
-            {clearButton}
             {allButton}
+            {clearButton}
           </div>
           <div className="col-sm" />
         </div>

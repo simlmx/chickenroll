@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { DiceBoard } from "./DiceBoard";
-import { SERVER, MAX_PLAYERS, NUM_COLORS } from "../constants";
-
-const pickColor = (): number => Math.floor(Math.random() * NUM_COLORS);
-const pickDiceValue = (): number => Math.floor(Math.random() * 6) + 1;
+import { SERVER, MAX_PLAYERS } from "../constants";
+import { rollDie, pickColor } from "../math/probs";
 
 const Home = (): JSX.Element => {
   const [colors, setColors] = useState([0, 1, 2, 3]);
@@ -23,7 +21,7 @@ const Home = (): JSX.Element => {
           setColors(newColors);
 
           const newDiceValues = [...diceValues];
-          newDiceValues[index] = pickDiceValue();
+          newDiceValues[index] = rollDie();
           setDiceValues(newDiceValues);
         }}
       />
