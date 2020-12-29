@@ -9,7 +9,7 @@ const Header = (props: HeaderProps) => {
   const navItems = [
     {
       path: "/",
-      name: "Home",
+      name: "Play",
     },
     {
       path: "/howtoplay",
