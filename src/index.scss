@@ -46,7 +46,7 @@ body {
   display: table-cell;
 }
 
-.cantStopBoard {
+.manipulation {
   touch-action: manipulation;
 }
 
@@ -1606,4 +1606,62 @@ $height: $width * $mountainRatio;
     display: flex;
     align-items: center;
   }
+}
+
+.mathNumber {
+  width: 3rem;
+  height: 3rem;
+  font-size: 2rem;
+  margin: 0.4rem;
+
+  border: 0.2rem solid black;
+}
+
+.mathNumber2Digits {
+  font-size: 1.7rem;
+}
+
+.mathNumberAllowed {
+  color: $success;
+  border-color: $success;
+}
+
+.mathNumberForbidden {
+  color: $danger;
+  border-color: $danger;
+}
+
+.mathRow {
+  display: flex;
+}
+
+.mathWrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  max-width: 30rem;
+}
+
+.modeWrap {
+  min-width: 9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rowsWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mathWrapWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
 }

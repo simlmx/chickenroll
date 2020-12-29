@@ -16,6 +16,10 @@ const Header = (props: HeaderProps) => {
       name: "How To Play",
     },
     {
+      path: "/math",
+      name: "Math",
+    },
+    {
       path: "https://www.buymeacoffee.com/simlmx",
       name: "Support Us",
       external: true,

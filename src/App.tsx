@@ -11,6 +11,7 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Page from "./components/PageTemplate";
 import HowToPlay from "./components/HowToPlay";
 import About from "./components/About";
+import Math from "./components/Math";
 import localStorage from "./utils/localStorage";
 // import { Debug } from 'boardgame.io/debug';
 //
@@ -255,6 +256,18 @@ class App extends React.Component {
               return (
                 <Page path="/about" title={"About | " + TITLE}>
                   <About />
+                </Page>
+              );
+            }}
+          />
+
+          {/* Math */}
+          <Route
+            path="/math"
+            render={(props) => {
+              return (
+                <Page path="/math" title={"Math | " + TITLE}>
+                  <Math />
                 </Page>
               );
             }}

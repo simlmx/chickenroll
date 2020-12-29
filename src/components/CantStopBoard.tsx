@@ -621,7 +621,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   // The onClick is necessary to disable the double-click zoom on ios.
   // See stackoverflow.com/a/54753520/1067132
   return (
-    <div className="cantStopBoard" onClick={() => {}}>
+    <div className="cantStopBoard manipulation" onClick={() => {}}>
       {infoTag}
       {modal === "rules" && rulesModal}
       {modal === "history" && historyModal}
