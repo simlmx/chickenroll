@@ -41,13 +41,6 @@ export class OddsCalculator {
 
     // For each possibilty, we'll find the set of sums of 2 dice that can be made with those dice.
     allDiceValues.forEach((diceValues) => {
-      const sums: Set<number> = new Set();
-      for (let i = 0; i < diceValues.length - 1; i++) {
-        // This is where you'll capture that last value
-        for (let j = i + 1; j < diceValues.length; j++) {
-          sums.add(diceValues[i] + diceValues[j]);
-        }
-      }
       dice2sums[diceValues] = diceValues2sums(diceValues);
     });
 

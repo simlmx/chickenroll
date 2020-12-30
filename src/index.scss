@@ -333,7 +333,6 @@ nav {
 .pageContent {
   flex: 1;
   display: flex;
-  /* flex-direction: column; */
   align-items: center;
   justify-content: center;
   min-height: 100%;
@@ -1693,8 +1692,6 @@ $height: $width * $mountainRatio;
   }
 }
 
-.mathPage {
-}
 .diceSums {
   padding-bottom: 1rem;
 }
