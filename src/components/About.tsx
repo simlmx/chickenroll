@@ -10,7 +10,7 @@ const About = () => {
           Can't Stop
         </a>{" "}
         is a classic "push your luck" dice game. We hope that you and your
-        friends enjoy our version!
+        friends enjoy our online version!
       </p>
       <h2>Code</h2>
       <p>

@@ -4,7 +4,7 @@ import Rules from "./Rules";
 const HowToPlay = (props) => {
   return (
     <div>
-      <h1> How to play </h1>
+      <h1>How To Play</h1>
       <div className="rules">
         <Rules />
         <h2>Try it out</h2>

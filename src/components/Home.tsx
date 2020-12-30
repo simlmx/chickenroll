@@ -33,9 +33,13 @@ const Home = (): JSX.Element => {
       <p className="small text-muted">
         You will be able to send an invitation link to your friends.
       </p>
-      <div className="form-group">
-        <a className="btn btn-primary" href="/match">
-          Create a new match
+      <div className="text-center">
+        <a
+          style={{ width: "50%", fontSize: "1.5rem" }}
+          className="btn btn-primary"
+          href="/match"
+        >
+          Play
         </a>
       </div>
     </>

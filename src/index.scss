@@ -50,8 +50,18 @@ body {
   touch-action: manipulation;
 }
 
+.nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  padding: 0.2rem;
+}
+
 .navbar {
   padding: 0;
+  height: 3rem;
 }
 
 .playEmphasis {

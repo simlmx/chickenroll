@@ -10,6 +10,9 @@ const Header = (props: HeaderProps) => {
     {
       path: "/",
       name: "Play",
+      component: (
+        <button className="btn btn-primary btn-sm playEmphasis">Play</button>
+      ),
     },
     {
       path: "/howtoplay",
@@ -34,17 +37,11 @@ const Header = (props: HeaderProps) => {
     <nav className="navbar navbar-expand navbar-primary">
       <ul className="navbar-nav">
         {navItems.map((navItem, i) => {
+          const active = props.path === navItem.path;
           const opts: any = {
-            className: `nav-link ${
-              props.path === navItem.path ? "active" : ""
-            }`,
+            className: `nav-link ${active ? "active" : ""}`,
             href: navItem.path,
           };
-
-          // We add some emphasis for the first link, "Play"
-          if (i === 0) {
-            opts.className += " playEmphasis";
-          }
 
           if (navItem.external) {
             opts.target = "_blank";
@@ -53,7 +50,12 @@ const Header = (props: HeaderProps) => {
 
           return (
             <li className="nav-item" key={navItem.name}>
-              <a {...opts}>{navItem.name}</a>
+              {/* If it's a component we use it only when it's not selected. Currently only for the Play link. */}
+              <a {...opts}>
+                {navItem.component && !active
+                  ? navItem.component
+                  : navItem.name}
+              </a>
             </li>
           );
         })}
