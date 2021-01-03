@@ -391,13 +391,11 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
     }
   );
 
-  const freeSpots = Array(numFreeSpots)
-    .fill(null)
-    .map((_, i) => (
-      <div className="gameSetupPlayer gameSetupPlayerFree" key={numPlayers + i}>
-        Waiting for player to join
-      </div>
-    ));
+  const freeSpot = numFreeSpots > 0 && (
+    <div className="gameSetupPlayer gameSetupPlayerFree">
+      Waiting for player to join
+    </div>
+  );
 
   const canStart = passAndPlay || (allReady && numPlayers >= 2);
 
@@ -499,7 +497,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         <div className="gameSetupContentWrap">
           <div className="sectionName">Players</div>
           {activePlayers}
-          {freeSpots}
+          {freeSpot}
           <div className="sectionName">Options</div>
           {settings}
           {startButton}
