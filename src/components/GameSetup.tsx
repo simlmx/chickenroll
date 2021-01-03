@@ -10,6 +10,7 @@ import QRCode from "qrcode.react";
 import InGameIcons from "./InGameIcons";
 import getSoundPlayer from "../audio";
 import localStorage from "../utils/localStorage";
+import { ShowProbsType } from "../Game";
 
 // We need this to close the popup when we click outside.
 // https://stackoverflow.com/a/42234988
@@ -270,20 +271,6 @@ export const Player = (props: PlayerProps): JSX.Element => {
   );
 };
 
-const Gear = () => {
-  return (
-    <svg
-      className="gear"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-    >
-      <path d="M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z" />
-    </svg>
-  );
-};
-
 interface GameSetupProps {
   playerInfos: { [key: string]: PlayerInfo };
   playerID: PlayerID;
@@ -292,6 +279,7 @@ interface GameSetupProps {
   matchID: string;
   passAndPlay: boolean;
   numColsToWin: number | "auto";
+  showProbs: ShowProbsType;
 }
 
 const GameSetup = (props: GameSetupProps): JSX.Element => {
@@ -303,6 +291,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
     moves,
     playerID,
     numColsToWin,
+    showProbs,
   } = props;
 
   // Using a state is how I made the auto-focus on the start button once everyone is
@@ -310,8 +299,6 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   const [allReady, setAllReady] = useState(false);
 
   const [showQr, setShowQr] = useState(false);
-
-  const [showOptions, setShowOptions] = useState(false);
 
   useEffect(() => {
     // If it's the first time we join that game, we tell the game. It's going to assign
@@ -457,42 +444,50 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
 
   const settings = (
     <div className="settingsWrap">
-      <div className="settingsButtonWrap">
-        <span
-          className="settingsButton pointer"
-          onClick={() => setShowOptions(!showOptions)}
+      <div className="form-group">
+        <label htmlFor="numColsToWin">Num of columns to win</label>
+        <select
+          className="custom-select custom-select-sm"
+          id="numColsToWin"
+          disabled={!imTheOwner}
+          onChange={(e) =>
+            moves.setNumColsToWin(
+              e.target.value === "auto" ? "auto" : parseInt(e.target.value)
+            )
+          }
+          value={numColsToWin}
         >
-          <Gear />
-        </span>
+          {numColsToWinValues.map((value) => {
+            return (
+              <option value={value} key={value}>
+                {value === "auto" ? `Auto (${autoValue})` : value}
+              </option>
+            );
+          })}
+        </select>
       </div>
-      {showOptions && (
-        <div className="gameSetupSettings input-group mb-3">
-          <div className="input-group-prepend">
-            <label className="input-group-text" htmlFor="numColsToWin">
-              Num of columns to win
-            </label>
-          </div>
-          <select
-            className="custom-select"
-            id="numColsToWin"
-            disabled={!imTheOwner}
-            onChange={(e) =>
-              moves.setNumColsToWin(
-                e.target.value === "auto" ? "auto" : parseInt(e.target.value)
-              )
-            }
-            value={numColsToWin}
-          >
-            {numColsToWinValues.map((value) => {
-              return (
-                <option value={value} key={value}>
-                  {value === "auto" ? `Auto (${autoValue})` : value}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-      )}
+      <div className="form-group mb-3">
+        <label htmlFor="showProbs">Show probability of busting</label>
+        <select
+          className="custom-select custom-select-sm"
+          id="showProbs"
+          disabled={!imTheOwner}
+          onChange={(e) => moves.setShowProbs(e.target.value)}
+          value={showProbs}
+        >
+          {[
+            ["before", "Before every roll"],
+            ["after", "At the of the turn"],
+            ["never", "Never"],
+          ].map(([optionName, optionLabel]) => {
+            return (
+              <option value={optionName} key={optionName}>
+                {optionLabel}
+              </option>
+            );
+          })}
+        </select>
+      </div>
     </div>
   );
 
@@ -502,8 +497,10 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
       {inviteHeader}
       <div className="container gameSetupContentWrapWrap">
         <div className="gameSetupContentWrap">
+          <div className="sectionName">Players</div>
           {activePlayers}
           {freeSpots}
+          <div className="sectionName">Options</div>
           {settings}
           {startButton}
         </div>

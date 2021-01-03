@@ -31,6 +31,9 @@ $theme-colors: (
   "success": $success,
 );
 
+$buttonsWidth: 150px;
+$buttonsHeight: 175px;
+
 @import "node_modules/bootstrap/scss/bootstrap";
 
 // https://stackoverflow.com/questions/6654958/make-body-have-100-of-the-browser-height/25829844#25829844
@@ -48,6 +51,13 @@ body {
 
 .manipulation {
   touch-action: manipulation;
+}
+
+.transparent {
+  color: transparent;
+  background-color: transparent;
+  fill: transparent;
+  user-select: none;
 }
 
 .nav-item {
@@ -474,8 +484,10 @@ p:last-child {
   }
 
   .diceContainer {
-    width: $diceSize * 2.5;
-    height: $diceSize * 2.5;
+    width: $buttonsHeight;
+    height: $buttonsHeight;
+    /* width: $diceSize * 2.5; */
+    /* height: $diceSize * 2.5; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -536,16 +548,35 @@ $diceSize: 3.4rem;
 .btnAction {
   margin: 0.1rem;
   padding: 10px;
+
   padding-right: 20px;
   padding-left: 20px;
   font-size: 20px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.rollBust {
+  font-size: 0.8rem;
+}
+
+.possibilitiesRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .possibilitiesWrap {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: center; //space-between;
   align-items: center;
+
+  height: $buttonsHeight;
+  width: $buttonsWidth;
 }
 
 .diceBoard {
@@ -775,9 +806,6 @@ $diceSize: 3.4rem;
 }
 
 .probMsgWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 0.8rem;
 }
 
@@ -876,6 +904,14 @@ $diceSize: 3.4rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  .sectionName {
+    align-self: flex-start !important;
+    font-weight: bold;
+    margin-top: 0.7rem;
+    font-size: 1.2rem;
+    color: $primary;
+  }
 }
 
 .startButton {
@@ -1094,10 +1130,6 @@ $diceSize: 3.4rem;
   margin: 0.5rem 0;
 }
 
-.settingsButtonWrap {
-  text-align: right;
-}
-
 .settingsButton .gear {
   margin: 0.3rem;
   height: 1.5rem;
@@ -1166,6 +1198,12 @@ $diceSize: 3.4rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  height: $buttonsHeight;
+  width: $buttonsWidth;
+}
+
+.actionButtons,
+.possibilitiesWrap {
 }
 
 .numVictoriesCol {

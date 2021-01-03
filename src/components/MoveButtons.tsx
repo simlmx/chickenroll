@@ -1,6 +1,7 @@
 import React from "react";
-import { GameType } from "../Game";
+import { GameType, ShowProbsType } from "../Game";
 import { SumOption, DiceSum, PlayerID } from "../types";
+import { BustProb } from "./Bust";
 
 interface ActionButtonsProps {
   moves: any;
@@ -9,6 +10,8 @@ interface ActionButtonsProps {
   currentPlayerHasStarted: boolean;
   onRoll: () => void;
   onStop: () => void;
+  showProbs: ShowProbsType;
+  bustProb: number;
 }
 /* Roll / Stop buttons */
 const ActionButtons = (props: ActionButtonsProps) => {
@@ -19,6 +22,8 @@ const ActionButtons = (props: ActionButtonsProps) => {
     itsMe,
     onStop,
     currentPlayerHasStarted,
+    showProbs,
+    bustProb,
   } = props;
 
   return (
@@ -33,7 +38,12 @@ const ActionButtons = (props: ActionButtonsProps) => {
         }`}
         disabled={!itsMe}
       >
-        Roll
+        <div>Roll</div>
+        {showProbs === "before" && bustProb > 0 && (
+          <span className="rollBust">
+            <BustProb prob={bustProb} />
+          </span>
+        )}
       </button>
       <button
         onClick={() => {
@@ -80,83 +90,87 @@ class Possibilities extends React.Component<{
             const sumsList = sumOption?.split
               ? sumOption.diceSums.map((x: DiceSum | null) => [x])
               : [sumOption.diceSums];
-            return (
-              <div key={i}>
-                {sumsList.map((sums, j) => {
-                  const filteredSums = sums.filter((x) => x != null);
-                  if (filteredSums.length === 0) {
-                    return null;
+
+            const buttons: JSX.Element[] = [];
+
+            sumsList.forEach((sums, j) => {
+              const filteredSums = sums.filter((x) => x != null);
+              if (filteredSums.length === 0) {
+                return;
+              }
+
+              const wasSelected =
+                last != null && last[0] === i && last[1] === j;
+
+              let className = "btn btnAction ";
+
+              let buttonType: string;
+              if (this.props.itsMe) {
+                buttonType = `bgcolor${this.props.color}`;
+              } else if (wasSelected) {
+                buttonType = "btn-secondary lastChoiceOtherPlayer";
+              } else {
+                buttonType = "btn-secondary";
+              }
+
+              className += buttonType;
+              className += " sum";
+
+              // If we are not in a split case, we'll highlight the non null
+              // options.
+              // If we are in a split case, then we'll highlight only the j-th dice
+              // split.
+              const diceComboIndices = (!sumOption?.split
+                ? sums
+                    .map((sum, i) => (sum == null ? null : i))
+                    .filter((x) => x != null)
+                : [j]) as number[];
+
+              if (sums.length === 0) {
+                return;
+              }
+
+              buttons.push(
+                <button
+                  type="button"
+                  key={j}
+                  onClick={() => {
+                    this.props.moves.pickSumOption(i, j);
+                    this.props.onMouseLeave();
+                  }}
+                  // Using mouse over and mouse out because the behaviour is
+                  // nicer!
+                  onMouseOver={() =>
+                    !this.touch && this.props.onMouseEnter(i, diceComboIndices)
                   }
+                  onMouseLeave={() => {
+                    !this.touch && this.props.onMouseLeave();
+                  }}
+                  onTouchStart={() => {
+                    this.touch = true;
+                  }}
+                  onTouchEnd={() => {
+                    this.touch = false;
+                  }}
+                  disabled={!this.props.itsMe}
+                  {...{ className }}
+                >
+                  {sums
+                    .filter((x) => x != null)
+                    .map(String)
+                    .join(" · ")}
+                </button>
+              );
+            });
 
-                  const wasSelected =
-                    last != null && last[0] === i && last[1] === j;
-
-                  let className = "btn btnAction ";
-
-                  let buttonType: string;
-                  if (this.props.itsMe) {
-                    buttonType = `bgcolor${this.props.color}`;
-                  } else if (wasSelected) {
-                    buttonType = "btn-secondary lastChoiceOtherPlayer";
-                  } else {
-                    buttonType = "btn-secondary";
-                  }
-
-                  className += buttonType;
-                  className += " sum";
-
-                  // If we are not in a split case, we'll highlight the non null
-                  // options.
-                  // If we are in a split case, then we'll highlight only the j-th dice
-                  // split.
-                  const diceComboIndices = (!sumOption?.split
-                    ? sums
-                        .map((sum, i) => (sum == null ? null : i))
-                        .filter((x) => x != null)
-                    : [j]) as number[];
-
-                  return (
-                    sums.length > 0 && (
-                      <button
-                        type="button"
-                        key={j}
-                        onClick={() => {
-                          this.props.moves.pickSumOption(i, j);
-                          this.props.onMouseLeave();
-                        }}
-                        // Using mouse over and mouse out because the behaviour is
-                        // nicer!
-                        onMouseOver={() =>
-                          !this.touch &&
-                          this.props.onMouseEnter(i, diceComboIndices)
-                        }
-                        onMouseLeave={() => {
-                          !this.touch && this.props.onMouseLeave();
-                        }}
-                        onTouchStart={() => {
-                          this.touch = true;
-                        }}
-                        onTouchEnd={() => {
-                          this.touch = false;
-                        }}
-                        disabled={!this.props.itsMe}
-                        {...{ className }}
-                      >
-                        {sums
-                          .filter((x) => x != null)
-                          .map(String)
-                          .join(" · ")}
-                      </button>
-                    )
-                  );
-                })}
-              </div>
-            );
+            return buttons.length > 0 ? (
+              <div className="possibilitiesRow">{buttons}</div>
+            ) : null;
           })}
       </div>
-    );
-  }
-}
+    ); // render return
+  } // render
+} // class
 
 interface MoveButtonsProps {
   ctx: any;
@@ -168,6 +182,8 @@ interface MoveButtonsProps {
   onMouseLeave: () => void;
   onRoll: () => void;
   onStop: () => void;
+  showProbs: ShowProbsType;
+  bustProb: number;
 }
 
 export default class MoveButtons extends React.Component<MoveButtonsProps> {
@@ -181,6 +197,8 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
       playerID,
       ctx,
       playerColor,
+      showProbs,
+      bustProb,
     } = this.props;
     const currentPlayer = ctx.currentPlayer;
     const stage = ctx.activePlayers[currentPlayer];
@@ -200,6 +218,8 @@ export default class MoveButtons extends React.Component<MoveButtonsProps> {
             currentPlayerHasStarted,
             onRoll,
             onStop,
+            showProbs,
+            bustProb,
           }}
         />
       );

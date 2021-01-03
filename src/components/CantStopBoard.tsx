@@ -9,40 +9,25 @@ import MoveHistory from "./MoveHistory";
 import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
 import { PlayerID, PlayerInfo } from "../types";
-import { OddsCalculator } from "../math/probs";
 import InGameIcons from "./InGameIcons";
 import Rules from "./Rules";
 import getSoundPlayer from "../audio";
 import localStorage from "../utils/localStorage";
 import { isIOS } from "../utils/platform";
+import { BustProb } from "./Bust";
 
 export class Info extends React.Component<{
   info?: { code: string; playerID?: PlayerID };
-  lastAllowedColumns: number[];
+  endOfTurnBustProb?: number;
   onClick: () => void;
   playerInfos: { [key: string]: PlayerInfo };
-
   // playerID of the client instance.
   playerID: PlayerID;
-  // When it's your turn, we add it to the Info
+  // When it's your turn, we add it to the Info.
   itsYourTurn: boolean;
 }> {
-  oddsCalculator: OddsCalculator;
-
-  constructor(props) {
-    super(props);
-    this.oddsCalculator = new OddsCalculator();
-  }
-
-  getProbBust(): string {
-    const { lastAllowedColumns } = this.props;
-    const prob = this.oddsCalculator.oddsBust(lastAllowedColumns);
-    const probStr = (Math.round(prob * 1000) / 10).toFixed(1);
-    return probStr;
-  }
-
   renderContent(): JSX.Element | undefined {
-    const { info, playerInfos, itsYourTurn } = this.props;
+    const { info, playerInfos, itsYourTurn, endOfTurnBustProb } = this.props;
 
     if (info == null) {
       return undefined;
@@ -56,17 +41,14 @@ export class Info extends React.Component<{
       ? "You"
       : info.playerID && playerInfos[info.playerID].name;
 
-    // We compute it without needing it sometimes. Maybe a `switch` is a bad idea!
-    const prob = this.getProbBust();
-    const probMsg = (
-      <div
-        className="probMsgWrap"
-        title={`The probability of busting was ${prob}%`}
-      >
-        <span role="img" aria-label="bust">
-          💥
-        </span>
-        &nbsp;=&nbsp;<strong>{prob}</strong>%
+    const probMsg = endOfTurnBustProb != null && (
+      <div className="probMsgWrap">
+        <BustProb
+          prob={endOfTurnBustProb}
+          prob2text={(prob) =>
+            `The probability of busting was ${(prob * 100).toFixed(1)}%`
+          }
+        />
       </div>
     );
 
@@ -181,10 +163,12 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     diceValues,
     scores,
     numVictories,
-    lastAllowedColumns,
+    bustProb,
+    endOfTurnBustProb,
     passAndPlay,
     numColsToWin,
     moveHistory,
+    showProbs,
   } = G;
   const { currentPlayer, phase, numPlayers, playOrder } = ctx;
 
@@ -362,7 +346,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   } else if (gameStartedWithoutYou) {
     return (
       <>
-        {inGameIcons}
+        <InGameIcons />
         <div className="gameStartedWithoutYou container">
           <div>
             <p>It seems like this match has already started... without you!</p>
@@ -391,6 +375,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           matchID,
           passAndPlay,
           numColsToWin,
+          showProbs,
         }}
       />
     );
@@ -475,6 +460,8 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           playerColor: playerInfos[playerID].color,
           onRoll: () => setShowInfo(false),
           onStop: () => setShowInfo(false),
+          showProbs,
+          bustProb,
         }}
         onMouseEnter={(diceSplit, dicePairs) =>
           setMouseOverPossibility({ diceSplit, dicePairs })
@@ -485,55 +472,12 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
       />
     );
 
-  // We use 3x2 placeholder buttons to make sure the <div> containing them stays the
-  // same dimensions. We need them disabled to prevent the mouse changing on mouse
-  // over (it happens even if they have dimensions 0x? or ?x0). We also need to make
-  // them invisible to prevent some weird click behviour for the buttons next to it.
-  const fakeButtons = (
-    <div className="fakeButtons">
-      <div>
-        <button
-          className="btn btn-success fakeButton btnAction invisible"
-          disabled
-        >
-          1
-        </button>
-      </div>
-      <div>
-        <button
-          className="btn btn-success fakeButton btnAction invisible"
-          disabled
-        >
-          1
-        </button>
-      </div>
-      <div>
-        <button
-          className="btn btn-success fakeButton btnAction invisible"
-          disabled
-        >
-          1
-        </button>
-      </div>
-    </div>
-  );
-
-  const fakeButtonsInside = (
-    <div className="fakeButtonInsideWrap">
-      <button className="btn btnAction fakeButtonInside invisible" disabled>
-        11
-      </button>
-      <button className="btn btnAction fakeButtonInside invisible" disabled>
-        12
-      </button>
-    </div>
-  );
-
   const infoTag = showInfo ? (
     <Info
       {...{
         info: G.info,
-        lastAllowedColumns,
+        endOfTurnBustProb:
+          showProbs === "never" ? undefined : endOfTurnBustProb,
         onClick: () => setShowInfo(false),
         playerInfos,
         // For pass and play we ignore the playerID.
@@ -645,14 +589,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
               {diceBoard}
               <div className="diceButtonsMiddle"></div>
               {/* Buttons */}
-              <div className="fakeButtonsWrap">
-                {/* We insert fake transparent buttons with 0 width xor height as placeholders to make sure the container stays the same size */}
-                {fakeButtons}
-                <div className="buttonsWrap">
-                  {fakeButtonsInside}
-                  {buttons}
-                </div>
-              </div>
+              <div className="buttonsWrap">{buttons}</div>
               <div className="diceButtonsBefore"></div>
             </div>
           </div>

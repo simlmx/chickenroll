@@ -8,8 +8,13 @@ const Trophy = (props: { value: number; color: number | "gold" }) => {
   let trophyClassName = "trophyPath";
   // only for the golden effect.
   let gradient;
-  // We treat the special case where we want the trophy to be golden.
-  if (color === "gold") {
+
+  if (value === 0) {
+    // value == 0 means no trophy. We still put one transparent there as a placeholder.
+    valueClassName += " transparent";
+    trophyClassName += " transparent";
+  } else if (color === "gold") {
+    // We treat the special case where we want the trophy to be golden.
     valueClassName += " trophyGoldValue";
     trophyClassName += " trophyGold";
     gradient = (
@@ -101,12 +106,10 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
       return (
         <tr key={playerID}>
           <td className="numVictoriesCol">
-            {numVictoriesPlayer > 0 && (
-              <Trophy
-                value={numVictoriesPlayer}
-                color={numVictoriesPlayer === maxNumVictories ? "gold" : color}
-              />
-            )}
+            <Trophy
+              value={numVictoriesPlayer}
+              color={numVictoriesPlayer === maxNumVictories ? "gold" : color}
+            />
           </td>
           <td>
             <div {...{ className }}>{name}</div>

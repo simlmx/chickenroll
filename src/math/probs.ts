@@ -102,3 +102,12 @@ export const rollDice = (n: number): number[] =>
 
 /* Randomly pick a color */
 export const pickColor = (): number => Math.floor(Math.random() * NUM_COLORS);
+
+let oddsCalculator;
+/* OddsCalculator Singleton */
+export const getOddsCalculator = () => {
+  if (oddsCalculator == null) {
+    oddsCalculator = new OddsCalculator();
+  }
+  return oddsCalculator;
+};

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { BustProb } from "./Bust";
 import { OddsCalculator } from "../math/probs";
 
 const DEFAULT_SELECTED = [
@@ -48,20 +49,11 @@ const getIndices = (selected: boolean[], expectedValue?: boolean): number[] => {
   }, []);
 };
 
-const probAsEl = (prob: number): JSX.Element => {
-  return (
-    <b>
-      <span title={prob.toString()}>{(100 * prob)?.toFixed(1)}%</span>
-    </b>
-  );
-};
-
 const probLine = (
   text: JSX.Element,
   values: number[],
   colorClassName: string,
-  emoji: JSX.Element,
-  prob: number
+  emojiProbEl: JSX.Element
 ) => {
   return (
     <p>
@@ -75,7 +67,7 @@ const probLine = (
               </span>
             ))
             .reduce((prev, curr) => [prev, ", ", curr])}
-      <b>{"}"}</b> = {emoji} = {probAsEl(prob)}
+      <b>{"}"}</b> = {emojiProbEl}
     </p>
   );
 };
@@ -154,18 +146,6 @@ const Math = () => {
     </button>
   );
 
-  const bustEmoji = (
-    <span role="img" aria-label="bust" title="Probability of busting">
-      💥
-    </span>
-  );
-
-  const okEmoji = (
-    <span role="img" aria-label="bust" title="Probability of busting">
-      👍
-    </span>
-  );
-
   const selectedIndices = getIndices(selected);
   const unselectdIndices = getIndices(selected, false);
 
@@ -175,8 +155,7 @@ const Math = () => {
     </>,
     selectedIndices,
     "text-success",
-    okEmoji,
-    prob
+    <BustProb bust={false} prob={prob} />
   );
   const probLine2 = probLine(
     <>
@@ -184,8 +163,7 @@ const Math = () => {
     </>,
     unselectdIndices,
     "text-danger",
-    bustEmoji,
-    1 - prob
+    <BustProb bust={true} prob={1 - prob} />
   );
 
   return (

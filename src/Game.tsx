@@ -7,7 +7,7 @@ import { Stage } from "boardgame.io/core";
 import { getSumOptions, getNumStepsForSum } from "./math";
 import { SumOption, PlayerID, PlayerInfo } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
-import { getAllowedColumns } from "./math/probs";
+import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 
 interface Info {
   // Player that is referred by the message.
@@ -35,6 +35,8 @@ export interface Move {
   playerID: string;
 }
 
+export type ShowProbsType = "before" | "after" | "never";
+
 type GameMode = "pass-and-play" | "remote";
 
 export interface GameType {
@@ -55,13 +57,18 @@ export interface GameType {
   // Number of victories for the current match.
   numVictories: { [key: string]: number };
   currentPlayerHasStarted: boolean;
-  lastAllowedColumns: number[];
   // PlayerID -> name, color, etc.
   playerInfos: { [key: string]: PlayerInfo };
   // Number of columns to complete to win.
   numColsToWin: number | "auto";
   // History of all the moves.
   moveHistory: Move[];
+  showProbs: ShowProbsType;
+  // Probability of busting.
+  bustProb: number;
+  // Probability of busting at the end of the last turn. This is for the 'after' mode of
+  // showing the probabilities.
+  endOfTurnBustProb: number;
 }
 
 /*
@@ -81,9 +88,12 @@ const gotoStage = (G: GameType, ctx, newStage: string): void => {
   ctx.events.setActivePlayers(activePlayers);
 };
 
-const endRollingTurn = (G: GameType, ctx): void => {
-  G.lastAllowedColumns = getAllowedColumns(G.currentPositions, G.blockedSums);
-  ctx.events.endTurn();
+const updateBustProb = (G: GameType, endOfTurn: boolean): void => {
+  if (endOfTurn) {
+    G.endOfTurnBustProb = G.bustProb;
+  }
+  const allowedColumns = getAllowedColumns(G.currentPositions, G.blockedSums);
+  G.bustProb = getOddsCalculator().oddsBust(allowedColumns);
 };
 
 /*
@@ -94,6 +104,7 @@ const turn = {
     G.currentPositions = {};
     gotoStage(G, ctx, "rolling");
     G.currentPlayerHasStarted = false;
+    updateBustProb(G, /* endOfTurn */ true);
   },
   order: {
     first: (G: GameType, ctx) => 0,
@@ -135,11 +146,12 @@ const turn = {
               playerID: ctx.currentPlayer,
               ts: new Date().getTime(),
             };
-            endRollingTurn(G, ctx);
+            ctx.events.endTurn();
             move.bust = true;
+          } else {
+            G.currentPlayerHasStarted = true;
+            gotoStage(G, ctx, "moving");
           }
-          G.currentPlayerHasStarted = true;
-          gotoStage(G, ctx, "moving");
 
           G.moveHistory.push(move);
         },
@@ -177,7 +189,7 @@ const turn = {
               playerID: ctx.currentPlayer,
               ts: new Date().getTime(),
             };
-            endRollingTurn(G, ctx);
+            ctx.events.endTurn();
           }
         },
       },
@@ -227,6 +239,7 @@ const turn = {
               G.currentPositions[s] = checkpoint + 1;
             }
           });
+          updateBustProb(G, /* endOfTurn */ false);
           gotoStage(G, ctx, "rolling");
         },
       },
@@ -266,11 +279,11 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
 
   // Those are for quick debugging.
   // for (let i = 0; i < ctx.numPlayers; ++i) {
-  //   const id = i.toString();
-  //   checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  //   scores[id] = i % 2;
+  // const id = i.toString();
+  // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
+  // scores[id] = i % 2;
 
-  //   playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
+  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
   // }
   // numVictories[0] = 1;
   // numVictories[3] = 2;
@@ -309,9 +322,11 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     // This tells us if the current player has started playing. When this is true we'll
     // show the players things like "it's your turn" messages.
     currentPlayerHasStarted: false,
-    lastAllowedColumns: [],
     numColsToWin: "auto",
     moveHistory: [],
+    showProbs: "after",
+    bustProb: 0,
+    endOfTurnBustProb: 0,
   };
 };
 
@@ -459,6 +474,12 @@ const CantStop = {
                   return INVALID_MOVE;
                 }
                 G.numColsToWin = numColsToWin;
+              },
+              setShowProbs: (G: GameType, ctx, showProbs: ShowProbsType) => {
+                if (ctx.playerID !== "0") {
+                  return INVALID_MOVE;
+                }
+                G.showProbs = showProbs;
               },
             },
           },
