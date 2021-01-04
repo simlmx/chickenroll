@@ -1493,6 +1493,7 @@ $height: $width * $mountainRatio;
   .btnAction {
     font-size: 1rem;
     padding: 0 0.5rem;
+    display: inline-block;
   }
 
   @include cellSize(1.2rem, 3, 3);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { GameType, ShowProbsType } from "../Game";
 import { SumOption, DiceSum, PlayerID } from "../types";
 import { BustProb } from "./Bust";
@@ -26,6 +26,20 @@ const ActionButtons = (props: ActionButtonsProps) => {
     bustProb,
   } = props;
 
+  let className = "btn btnAction";
+
+  if (itsMe) {
+    className += ` bgcolor${color}`;
+  } else {
+    className += " btn-secondary";
+  }
+
+  let rollClassName = className;
+
+  if (!currentPlayerHasStarted && itsMe) {
+    rollClassName += " flashVibrate";
+  }
+
   return (
     <div className="actionButtons">
       <button
@@ -33,9 +47,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
           moves.rollDice();
           onRoll();
         }}
-        className={`btn btnAction bgcolor${color}${
-          currentPlayerHasStarted ? "" : " flashVibrate"
-        }`}
+        className={rollClassName}
         disabled={!itsMe}
       >
         <div>Roll</div>
@@ -50,7 +62,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
           moves.stop();
           onStop();
         }}
-        className={`btn btnAction bgcolor${color}`}
+        className={className}
         disabled={!itsMe}
       >
         Stop
@@ -63,7 +75,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
 class Possibilities extends React.Component<{
   moves: any;
   // We'll highlight the last selected option
-  lastPickedDiceSumOption: null | number[];
+  lastPickedDiceSumOption?: number[];
   diceSumOptions?: SumOption[];
   itsMe: boolean;
   onMouseEnter: (diceSplit: number, dicePairs: number[]) => void;
@@ -164,7 +176,9 @@ class Possibilities extends React.Component<{
             });
 
             return buttons.length > 0 ? (
-              <div className="possibilitiesRow">{buttons}</div>
+              <div className="possibilitiesRow" key={i}>
+                {buttons}
+              </div>
             ) : null;
           })}
       </div>
@@ -186,59 +200,80 @@ interface MoveButtonsProps {
   bustProb: number;
 }
 
-export default class MoveButtons extends React.Component<MoveButtonsProps> {
-  render() {
-    const {
-      moves,
-      onRoll,
-      onStop,
-      onMouseEnter,
-      onMouseLeave,
-      playerID,
-      ctx,
-      playerColor,
-      showProbs,
-      bustProb,
-    } = this.props;
-    const currentPlayer = ctx.currentPlayer;
-    const stage = ctx.activePlayers[currentPlayer];
-    const itsMe = playerID === currentPlayer;
-    const {
-      lastPickedDiceSumOption,
-      diceSumOptions,
-      currentPlayerHasStarted,
-    } = this.props.G;
-    if (itsMe && stage === "rolling") {
-      return (
-        <ActionButtons
-          {...{
-            moves,
-            itsMe,
-            color: playerColor,
-            currentPlayerHasStarted,
-            onRoll,
-            onStop,
-            showProbs,
-            bustProb,
-          }}
-        />
-      );
-    } else {
-      return (
-        <Possibilities
-          onMouseEnter={(diceSplit, dicePairs) =>
-            onMouseEnter(diceSplit, dicePairs)
-          }
-          onMouseLeave={() => onMouseLeave()}
-          {...{
-            moves,
-            itsMe,
-            color: playerColor,
-            lastPickedDiceSumOption,
-            diceSumOptions,
-          }}
-        />
-      );
+// export default class MoveButtons extends React.Component<MoveButtonsProps> {
+const MoveButtons = (props: MoveButtonsProps) => {
+  const {
+    moves,
+    onRoll,
+    onStop,
+    onMouseEnter,
+    onMouseLeave,
+    playerID,
+    ctx,
+    playerColor,
+    showProbs,
+    bustProb,
+  } = props;
+  const currentPlayer = ctx.currentPlayer;
+  const stage = ctx.activePlayers[currentPlayer];
+  const itsMe = playerID === currentPlayer;
+  const {
+    lastPickedDiceSumOption,
+    diceSumOptions,
+    currentPlayerHasStarted,
+  } = props.G;
+
+  const [justPickedNumbers, setJustPickedNumbers] = useState(false);
+
+  // After someone else picks an option, we make sure to show it for a short amount of
+  // time. We want to because when showProbs=='before', we want to see the Roll buttons
+  // AND the choices.
+  useEffect(() => {
+    // We need some last picked option.
+    if (lastPickedDiceSumOption == null) {
+      return;
     }
+
+    setJustPickedNumbers(true);
+    setTimeout(() => setJustPickedNumbers(false), 300);
+  }, [lastPickedDiceSumOption]);
+
+  const showPossibilities =
+    stage !== "rolling" ||
+    (justPickedNumbers && !itsMe && showProbs === "before");
+
+  if (showPossibilities) {
+    return (
+      <Possibilities
+        onMouseEnter={(diceSplit, dicePairs) =>
+          onMouseEnter(diceSplit, dicePairs)
+        }
+        onMouseLeave={() => onMouseLeave()}
+        {...{
+          moves,
+          itsMe,
+          color: playerColor,
+          lastPickedDiceSumOption,
+          diceSumOptions,
+        }}
+      />
+    );
+  } else {
+    return (
+      <ActionButtons
+        {...{
+          moves,
+          itsMe,
+          color: playerColor,
+          currentPlayerHasStarted,
+          onRoll,
+          onStop,
+          showProbs,
+          bustProb,
+        }}
+      />
+    );
   }
-}
+};
+
+export default MoveButtons;

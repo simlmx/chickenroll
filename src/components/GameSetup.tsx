@@ -475,7 +475,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         >
           {[
             ["before", "Before every roll"],
-            ["after", "At the of the turn"],
+            ["after", "At the end of the turn"],
             ["never", "Never"],
           ].map(([optionName, optionLabel]) => {
             return (

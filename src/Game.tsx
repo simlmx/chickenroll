@@ -44,7 +44,7 @@ export interface GameType {
   currentPositions: { [key: number]: number };
   checkpointPositions: { [key: string]: { [key: number]: number } };
   diceSumOptions?: SumOption[];
-  lastPickedDiceSumOption: null | number[];
+  lastPickedDiceSumOption?: number[];
   blockedSums: { [key: number]: string };
   info?: Info;
   scores: { [key: number]: number };
@@ -129,7 +129,7 @@ const turn = {
 
           const move: Move = { diceValues, playerID: ctx.currentPlayer };
 
-          G.lastPickedDiceSumOption = null;
+          G.lastPickedDiceSumOption = undefined;
           G.diceSumOptions = getSumOptions(
             G.diceValues,
             G.currentPositions,
@@ -156,7 +156,7 @@ const turn = {
           G.moveHistory.push(move);
         },
         stop: (G: GameType, ctx) => {
-          G.lastPickedDiceSumOption = null;
+          G.lastPickedDiceSumOption = undefined;
           G.diceSumOptions = undefined;
           // Save current positions as checkpoints.
           Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
@@ -281,17 +281,15 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // for (let i = 0; i < ctx.numPlayers; ++i) {
   // const id = i.toString();
   // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  // scores[id] = i % 2;
+  // scores[id] = (i % 2) + 1;
 
-  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
+  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4};
   // }
   // numVictories[0] = 1;
-  // numVictories[3] = 2;
   // numVictories[2] = 1;
   // numVictories[1] = 7;
   // checkpointPositions["0"][3] = 4;
   // checkpointPositions["2"][7] = 4;
-  // checkpointPositions["3"][7] = 5;
   // checkpointPositions["1"][7] = 2;
   // checkpointPositions["1"][8] = 2;
   // blockedSums[4] = "0";
@@ -309,7 +307,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     currentPositions: {},
     checkpointPositions,
     diceSumOptions: undefined,
-    lastPickedDiceSumOption: null,
+    lastPickedDiceSumOption: undefined,
     blockedSums,
     scores,
     passAndPlay,
@@ -514,6 +512,7 @@ const CantStop = {
             "numPlayers",
             "numVictories",
             "numColsToWin",
+            "showProbs",
           ];
 
           // Create an object like G but with only the fields to keep.
