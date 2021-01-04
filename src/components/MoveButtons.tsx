@@ -239,7 +239,8 @@ const MoveButtons = (props: MoveButtonsProps) => {
   }, [lastPickedDiceSumOption]);
 
   const showPossibilities =
-    stage !== "rolling" ||
+    stage === "moving" ||
+    (showProbs !== "before" && !itsMe) ||
     (justPickedNumbers && !itsMe && showProbs === "before");
 
   if (showPossibilities) {
