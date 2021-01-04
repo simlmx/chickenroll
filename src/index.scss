@@ -544,12 +544,11 @@ $diceSize: 3.4rem;
 }
 
 .btnAction {
+  width: 100%;
   margin: 0.1rem;
-  padding: 10px;
-
-  padding-right: 20px;
-  padding-left: 20px;
-  font-size: 20px;
+  padding: 10px 20px;
+  font-size: 21px;
+  text-transform: uppercase;
 
   display: flex;
   flex-direction: column;
@@ -565,6 +564,7 @@ $diceSize: 3.4rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .diceBoard {
@@ -1164,6 +1164,7 @@ $diceSize: 3.4rem;
 
 .dieHighlight {
   filter: brightness(1.1);
+  border: 1px solid black;
 }
 
 .highlight {
@@ -1474,6 +1475,7 @@ $height: $width * $mountainRatio;
     font-size: 1rem;
     padding: 0 0.5rem;
     display: inline-block;
+    width: auto;
   }
 
   @include cellSize(1.2rem, 3, 3);
@@ -1633,6 +1635,7 @@ $height: $width * $mountainRatio;
   .btnAction {
     font-size: 0.8rem;
     padding: 0 0.5rem;
+    width: auto;
   }
 
   .moveRow {
