@@ -484,10 +484,8 @@ p:last-child {
   }
 
   .diceContainer {
-    width: $buttonsHeight;
-    height: $buttonsHeight;
-    /* width: $diceSize * 2.5; */
-    /* height: $diceSize * 2.5; */
+    width: $diceSize * 2.5;
+    height: $diceSize * 2.5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -567,16 +565,6 @@ $diceSize: 3.4rem;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.possibilitiesWrap {
-  display: flex;
-  flex-direction: column;
-  justify-content: center; //space-between;
-  align-items: center;
-
-  height: $buttonsHeight;
-  width: $buttonsWidth;
 }
 
 .diceBoard {
@@ -1140,12 +1128,6 @@ $diceSize: 3.4rem;
   }
 }
 
-.playAgainWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .matchId {
   font-family: courier new;
   font-size: 12pt;
@@ -1195,15 +1177,13 @@ $diceSize: 3.4rem;
 }
 
 .actionButtons {
+  height: $buttonsHeight;
+  width: $buttonsWidth;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: $buttonsHeight;
-  width: $buttonsWidth;
-}
-
-.actionButtons,
-.possibilitiesWrap {
+  align-items: center;
 }
 
 .numVictoriesCol {
@@ -1433,8 +1413,8 @@ $height: $width * $mountainRatio;
   }
 }
 
-@media (min-aspect-ratio: 3/2) {
-  @include cellSize(80vh / 14);
+@media (min-aspect-ratio: 4/2) {
+  @include cellSize(95vh / 14);
 
   .diceButtons {
     flex-direction: row;

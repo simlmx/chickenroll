@@ -437,7 +437,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
 
   const buttons =
     props.ctx.phase === "gameover" ? (
-      <div className="playAgainWrap">
+      <div className="actionButtons">
         <button
           onClick={() => {
             moves.playAgain();

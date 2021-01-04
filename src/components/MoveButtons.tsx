@@ -91,7 +91,7 @@ class Possibilities extends React.Component<{
   render() {
     const last = this.props.lastPickedDiceSumOption;
     return (
-      <div className="possibilitiesWrap">
+      <div className="actionButtons">
         {this.props.diceSumOptions != null &&
           this.props.diceSumOptions.map((sumOption: SumOption, i: number) => {
             // We make sure we have an array of arrays of sum.
