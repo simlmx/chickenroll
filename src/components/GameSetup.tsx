@@ -393,7 +393,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
 
   const freeSpot = numFreeSpots > 0 && (
     <div className="gameSetupPlayer gameSetupPlayerFree">
-      Waiting for player to join
+      Waiting for players to join
     </div>
   );
 
