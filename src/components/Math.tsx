@@ -121,9 +121,7 @@ const Math = () => {
   const rows = (
     <>
       <div className="mathRow">{[2, 3, 4, 5].map((x) => makeNumber(x))}</div>
-      <div className="mathRow mathRowMiddle">
-        {[6, 7, 8].map((x) => makeNumber(x))}
-      </div>
+      <div className="mathRow">{[6, 7, 8].map((x) => makeNumber(x))}</div>
       <div className="mathRow">{[9, 10, 11, 12].map((x) => makeNumber(x))}</div>
     </>
   );

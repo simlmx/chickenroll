@@ -10,7 +10,7 @@ export const BustEmoji = () => {
 
 export const NoBustEmoji = () => {
   return (
-    <span role="img" aria-label="bust">
+    <span role="img" aria-label="no bust">
       👍
     </span>
   );
@@ -32,7 +32,8 @@ export const BustProb = (props: {
 
   let title;
   if (prob2text == null) {
-    title = `The probably of busting is ${prettyProb}`;
+    const not = bust ? "" : "not ";
+    title = `The probably of ${not}busting is ${prettyProb}%`;
   } else {
     title = prob2text(prob);
   }
