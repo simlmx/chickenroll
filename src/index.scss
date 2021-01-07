@@ -927,6 +927,12 @@ $diceSize: 3.4rem;
     align-items: center;
   }
 
+  .pencil > svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    vertical-align: bottom;
+  }
+
   .playerName {
     flex: 1;
     padding: 0;
@@ -934,6 +940,25 @@ $diceSize: 3.4rem;
     margin-left: 0.3rem;
     margin-right: 0.7rem;
     border: none;
+
+    display: flex;
+
+    .pencil {
+      margin-top: -0.4rem;
+      margin-left: 0.1rem;
+      display: flex;
+    }
+
+    .pencil > svg > path {
+      fill: $primary;
+    }
+  }
+
+  .colorWrap {
+    .pencil {
+      margin-right: 0.2rem;
+      margin-top: 0.2rem;
+    }
   }
 
   .playerNameInput,
@@ -960,6 +985,7 @@ $diceSize: 3.4rem;
 }
 
 .gameSetupColorButton {
+  padding: 0;
   min-width: 2rem;
   min-height: 2rem;
   max-width: 2rem;
@@ -970,20 +996,13 @@ $diceSize: 3.4rem;
   transition: none;
 
   display: flex;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-  padding-bottom: 0.6rem;
+  justify-content: flex-end;
+  align-items: flex-start;
 
-  /* color: black !important; */
   font-size: 0.6rem;
 
   // This is to ignore the effect bootstrap adds for disabled buttons.
   opacity: 1 !important;
-}
-
-.gameSetupColorButton > div {
-  transform: rotate(45deg);
 }
 
 .gameSetupColorButtonDisabled {
@@ -1351,7 +1370,7 @@ $height: $width * $mountainRatio;
 
 @if $debug {
   * {
-    border: 1px solid red;
+    border: 1px solid red !important;
   }
 }
 
@@ -1361,7 +1380,7 @@ $height: $width * $mountainRatio;
   @include cellSize(0.5 * 100vh / 14);
   @if $debug {
     * {
-      border: 1px solid orange;
+      border: 1px solid orange !important;
     }
   }
 }
@@ -1372,7 +1391,7 @@ $height: $width * $mountainRatio;
   @include cellSize($height);
   @if $debug {
     * {
-      border: 1px solid gold;
+      border: 1px solid gold !important;
     }
   }
 }
@@ -1399,7 +1418,7 @@ $height: $width * $mountainRatio;
   }
   @if $debug {
     * {
-      border: 1px solid orange;
+      border: 1px solid orange !important;
     }
   }
 }
@@ -1409,7 +1428,7 @@ $height: $width * $mountainRatio;
 
   @if $debug {
     * {
-      border: 1px solid green;
+      border: 1px solid green !important;
     }
   }
 }
@@ -1425,7 +1444,7 @@ $height: $width * $mountainRatio;
   }
   @if $debug {
     * {
-      border: 1px solid blue;
+      border: 1px solid blue !important;
     }
   }
 }
@@ -1438,7 +1457,7 @@ $height: $width * $mountainRatio;
   }
   @if $debug {
     * {
-      border: 1px solid purple;
+      border: 1px solid purple !important;
     }
   }
 }
@@ -1451,7 +1470,7 @@ $height: $width * $mountainRatio;
   @include cellSize(65vh / 14);
   @if $debug {
     * {
-      border: 1px solid pink;
+      border: 1px solid pink !important;
     }
   }
 }
