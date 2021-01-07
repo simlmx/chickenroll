@@ -13,9 +13,12 @@ import HowToPlay from "./components/HowToPlay";
 import About from "./components/About";
 import Math from "./components/Math";
 import localStorage from "./utils/localStorage";
+import { Helmet } from "react-helmet";
 // import { Debug } from 'boardgame.io/debug';
 //
 const TITLE = 'Can\'t Stop! - The classic "push your luck" dice game';
+const DESCRIPTION =
+  "Play with your friends for free, either online or on the same device. Can't Stop is a simple yet addictive board game. Our version is free and open source.";
 
 const PassAndPlayMatch = (props: { numPlayers: number }) => {
   // We use playerID=0 but we will let all the players play for everyone,
@@ -183,117 +186,152 @@ class App extends React.Component {
   render() {
     const lobbyClient = this.lobbyClient;
     return (
-      <BrowserRouter>
-        <Switch>
-          {/* Pass and play match */}
-          <Route
-            path="/:numPlayers([2345])"
-            render={(props) => {
-              const numPlayers = parseInt(props.match.params.numPlayers);
-              return (
-                <Page
-                  wrap={false}
-                  title={`Local Match ${numPlayers} Players | ${TITLE}`}
-                >
-                  <PassAndPlayMatch {...{ numPlayers }} />
-                </Page>
-              );
-            }}
-          />
+      <>
+        {/* Default helmet */}
 
-          {/* Create a match */}
-          <Route
-            path="/match"
-            exact={true}
-            render={() => {
-              return (
-                <Page wrap={false} title={"Creating Match | " + TITLE}>
-                  <DoAction
-                    action={async () => {
-                      const matchID = await this.createMatch();
-                      if (matchID != null) {
-                        window.location.replace(`${SERVER}/match/${matchID}`);
-                      }
-                    }}
+        <Helmet>
+          <title>{TITLE}</title>
+          <meta name="description" content={DESCRIPTION} />
+          <meta property="og:title" content={TITLE} />
+          <meta property="og:description" content={DESCRIPTION} />
+        </Helmet>
+        <BrowserRouter>
+          <Switch>
+            {/* Pass and play match */}
+            <Route
+              path="/:numPlayers([2345])"
+              render={(props) => {
+                const numPlayers = parseInt(props.match.params.numPlayers);
+                return (
+                  <Page
+                    wrap={false}
+                    title={`Local Match ${numPlayers} Players | ${TITLE}`}
+                    description={DESCRIPTION}
                   >
-                    {/* We need this <div> because our <Page> is not super happy with strings */}
-                    <div>Creating Match...</div>
-                  </DoAction>
-                </Page>
-              );
-            }}
-          />
+                    <PassAndPlayMatch {...{ numPlayers }} />
+                  </Page>
+                );
+              }}
+            />
 
-          {/* Regular match with match ID */}
-          <Route
-            path="/match/:matchID"
-            render={(props) => {
-              const { matchID } = props.match.params;
-              return (
-                <Page wrap={false} title={"Match | " + TITLE}>
-                  <Match {...{ matchID, lobbyClient }} />
-                </Page>
-              );
-            }}
-          />
+            {/* Create a match */}
+            <Route
+              path="/match"
+              exact={true}
+              render={() => {
+                return (
+                  <Page
+                    wrap={false}
+                    title={"Creating Match | " + TITLE}
+                    description={DESCRIPTION}
+                  >
+                    <DoAction
+                      action={async () => {
+                        const matchID = await this.createMatch();
+                        if (matchID != null) {
+                          window.location.replace(`${SERVER}/match/${matchID}`);
+                        }
+                      }}
+                    >
+                      {/* We need this <div> because our <Page> is not super happy with strings */}
+                      <div>Creating Match...</div>
+                    </DoAction>
+                  </Page>
+                );
+              }}
+            />
 
-          {/* How to play */}
-          <Route
-            path="/howtoplay"
-            render={(props) => {
-              return (
-                <Page path="/howtoplay" title={"How To Play | " + TITLE}>
-                  <HowToPlay />
-                </Page>
-              );
-            }}
-          />
+            {/* Regular match with match ID */}
+            <Route
+              path="/match/:matchID"
+              render={(props) => {
+                const { matchID } = props.match.params;
+                return (
+                  <Page
+                    wrap={false}
+                    title={"Match | " + TITLE}
+                    description={DESCRIPTION}
+                  >
+                    <Match {...{ matchID, lobbyClient }} />
+                  </Page>
+                );
+              }}
+            />
 
-          {/* About */}
-          <Route
-            path="/about"
-            render={(props) => {
-              return (
-                <Page path="/about" title={"About | " + TITLE}>
-                  <About />
-                </Page>
-              );
-            }}
-          />
+            {/* How to play */}
+            <Route
+              path="/howtoplay"
+              render={(props) => {
+                return (
+                  <Page
+                    path="/howtoplay"
+                    title={"How To Play | " + TITLE}
+                    description={"Rules of how to play Can't Stop."}
+                  >
+                    <HowToPlay />
+                  </Page>
+                );
+              }}
+            />
 
-          {/* Math */}
-          <Route
-            path="/math"
-            render={(props) => {
-              return (
-                <Page path="/math" title={"Math | " + TITLE}>
-                  <Math />
-                </Page>
-              );
-            }}
-          />
+            {/* About */}
+            <Route
+              path="/about"
+              render={(props) => {
+                return (
+                  <Page
+                    path="/about"
+                    title={"About | " + TITLE}
+                    description={
+                      "Learn more about our open source version of Can't Stop. Get in touch with us."
+                    }
+                  >
+                    <About />
+                  </Page>
+                );
+              }}
+            />
 
-          {/* Redirect to the home page for anything else.
+            {/* Math */}
+            <Route
+              path="/math"
+              render={(props) => {
+                return (
+                  <Page
+                    path="/math"
+                    title={"Math | " + TITLE}
+                    description={
+                      "Interactive probability table for the dice combinations in the board game Can't Stop. Get the probability of busting for any combination of available or blocked columns."
+                    }
+                  >
+                    <Math />
+                  </Page>
+                );
+              }}
+            />
+
+            {/* Redirect to the home page for anything else.
               This has to be *after* all the other routes.*/}
-          <Route
-            path="/:other"
-            render={(props) => {
-              window.location.replace(`${SERVER}`);
-            }}
-          />
-          {/* Home */}
-          <Route
-            path="/"
-            render={(props) => {
-              return (
-                <Page path="/" title={TITLE}>
-                  <Home />
-                </Page>
-              );
-            }}
-          ></Route>
-        </Switch>
-      </BrowserRouter>
+            <Route
+              path="/:other"
+              render={(props) => {
+                window.location.replace(`${SERVER}`);
+              }}
+            />
+            {/* Home */}
+            <Route
+              path="/"
+              render={(props) => {
+                return (
+                  <Page path="/" title={TITLE} description={DESCRIPTION}>
+                    <Home />
+                  </Page>
+                );
+              }}
+            ></Route>
+          </Switch>
+        </BrowserRouter>
+      </>
     );
   }
 }

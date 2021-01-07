@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Background } from "./Die";
+import { Helmet } from "react-helmet";
 
 interface HeaderProps {
   path: string;
@@ -132,6 +133,7 @@ interface PageProps {
   wrap?: boolean;
   // title for the html page
   title: string;
+  description: string;
 }
 
 /*
@@ -139,11 +141,16 @@ interface PageProps {
  */
 const Page = (props: PageProps): JSX.Element => {
   // Defaults to true
-  let { wrap, children, path, title } = props;
+  let { wrap, children, path, title, description } = props;
 
-  useEffect(() => {
-    document.title = title;
-  }, [title]);
+  const headers = (
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+    </Helmet>
+  );
 
   if (wrap == null) {
     wrap = true;
@@ -166,6 +173,7 @@ const Page = (props: PageProps): JSX.Element => {
   }
   return (
     <div className="backgroundWrap">
+      {headers}
       {content}
       <Background />
     </div>
