@@ -445,9 +445,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           }}
           className={`btn btnAction bgcolor${playerInfos[playerID].color}`}
         >
-          Play
-          <br />
-          Again!
+          Play again!
         </button>
       </div>
     ) : (
