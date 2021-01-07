@@ -82,15 +82,21 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
       const color = playerInfos[playerID].color;
       const points = scores[playerID];
       const numVictoriesPlayer = numVictories[playerID];
-      // 5 is the maximum number of points but you can finish with up to 8
-      const starColumns = Array(8)
+      // In theory we can finish with 2 more stars than required. For this reason we add
+      // 2 transparent stars at the end so that the layout doens't change when it
+      // happens.
+      const starColumns = Array(numColsToWin + 2)
         .fill(null)
         .map((_, i) => {
           const hasStar = points > i;
-          if (i >= numColsToWin && !hasStar) {
-            return null;
+          let className;
+          if (hasStar) {
+            className = `color${color}`;
+          } else if (i < numColsToWin) {
+            className = "emptyStar";
+          } else {
+            className = "transparent";
           }
-          const className = hasStar ? ` color${color}` : ` emptyStar`;
           return (
             <td className="starCol" key={i}>
               <div {...{ className }} key={playerID}>
