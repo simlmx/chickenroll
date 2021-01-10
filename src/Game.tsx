@@ -42,6 +42,7 @@ type GameMode = "pass-and-play" | "remote";
 export interface GameType {
   diceValues: number[];
   currentPositions: { [key: number]: number };
+  // player -> column -> position
   checkpointPositions: { [key: string]: { [key: number]: number } };
   diceSumOptions?: SumOption[];
   lastPickedDiceSumOption?: number[];
@@ -92,8 +93,10 @@ const updateBustProb = (G: GameType, endOfTurn: boolean): void => {
   if (endOfTurn) {
     G.endOfTurnBustProb = G.bustProb;
   }
+  console.log("prob");
   const allowedColumns = getAllowedColumns(G.currentPositions, G.blockedSums);
   G.bustProb = getOddsCalculator().oddsBust(allowedColumns);
+  console.log("done");
 };
 
 /*
@@ -278,22 +281,22 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   const blockedSums = {};
 
   // Those are for quick debugging.
-  // for (let i = 0; i < ctx.numPlayers; ++i) {
-  // const id = i.toString();
-  // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  // scores[id] = (i % 2) + 1;
+  for (let i = 0; i < ctx.numPlayers; ++i) {
+    const id = i.toString();
+    checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
+    scores[id] = (i % 2) + 1;
 
-  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4};
-  // }
-  // numVictories[0] = 1;
-  // numVictories[2] = 1;
-  // numVictories[1] = 7;
-  // checkpointPositions["0"][3] = 4;
-  // checkpointPositions["2"][7] = 4;
-  // checkpointPositions["1"][7] = 2;
-  // checkpointPositions["1"][8] = 2;
-  // blockedSums[4] = "0";
-  // blockedSums[5] = "2";
+    playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
+  }
+  numVictories[0] = 1;
+  numVictories[2] = 1;
+  numVictories[1] = 7;
+  checkpointPositions["0"][3] = 4;
+  checkpointPositions["2"][7] = 4;
+  checkpointPositions["1"][7] = 2;
+  checkpointPositions["1"][8] = 2;
+  blockedSums[4] = "0";
+  blockedSums[5] = "2";
 
   return {
     /*

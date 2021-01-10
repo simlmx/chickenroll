@@ -1,13 +1,30 @@
-import React from "react";
+import React, { Profiler } from "react";
 import ReactDOM from "react-dom";
 import "./index.scss";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
+const onRender = (
+  id,
+  phase,
+  actualDuration,
+  baseDuration,
+  startTime,
+  commitTime,
+  interations
+) => {
+  console.log(id);
+  console.log(phase);
+  console.log(actualDuration);
+  console.log(baseDuration);
+};
+
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Profiler id={"main"} onRender={() => {}}>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </Profiler>,
   document.getElementById("root")
 );
 
