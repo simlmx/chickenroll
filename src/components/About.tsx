@@ -6,11 +6,12 @@ const About = () => {
       <h1>About</h1>
       <br />
       <p>
+        <b>Chicken Roll</b> is an online alternative to the classic
+        push-your-luck dice game{" "}
         <a href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)">
           Can't Stop
-        </a>{" "}
-        is a classic "push your luck" dice game. We hope that you and your
-        friends enjoy our online version!
+        </a>
+        , with some added features. We hope that you and your friends enjoy it!
       </p>
       <h2>Code</h2>
       <p>
@@ -28,7 +29,7 @@ const About = () => {
       <h2>We want to hear from you! </h2>
       <p>
         Don't hesitate to contact us at{" "}
-        <a href="mailto:info@cantstop.fun"> info@cantstop.fun</a> with any{" "}
+        <a href="mailto:info@chickenroll.fun"> info@chickenroll.fun</a> with any{" "}
         <strong>comment</strong>, <strong>suggestion</strong>,{" "}
         <strong>feature request</strong>, <strong>bug</strong>,{" "}
         <strong>question</strong> or just to <strong>say hello</strong> 👋

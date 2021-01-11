@@ -279,11 +279,11 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
 
   // Those are for quick debugging.
   // for (let i = 0; i < ctx.numPlayers; ++i) {
-  // const id = i.toString();
-  // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  // scores[id] = (i % 2) + 1;
+    // const id = i.toString();
+    // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
+    // scores[id] = (i % 2) + 1;
 
-  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4};
+    // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
   // }
   // numVictories[0] = 1;
   // numVictories[2] = 1;

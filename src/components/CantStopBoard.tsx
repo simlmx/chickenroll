@@ -46,7 +46,7 @@ export class Info extends React.Component<{
         <BustProb
           prob={endOfTurnBustProb}
           prob2text={(prob) =>
-            `The probability of busting was ${(prob * 100).toFixed(1)}%`
+            `The probability of cracking was ${(prob * 100).toFixed(1)}%`
           }
         />
       </div>
@@ -80,7 +80,8 @@ export class Info extends React.Component<{
           <div>
             {itsYourTurnTag}
             <div>
-              {playerNameTag} <span className="badge badge-danger">busted</span>
+              {playerNameTag}{" "}
+              <span className="badge badge-danger">cracked</span>
             </div>
             {probMsg}
           </div>

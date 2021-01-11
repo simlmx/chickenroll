@@ -1,9 +1,9 @@
-# [Can't Stop!][csf]
+# [Chicken Roll][crf]
 
 
-Open source web app of the board game [Can't Stop][wiki].
+Open source web alternative to the classic board game [Can't Stop][wiki].
 
-Online at [`cantstop.fun`][csf].
+Online at [`chickenroll.fun`][crf].
 
 
 ## Supporting the project
@@ -14,12 +14,12 @@ Online at [`cantstop.fun`][csf].
 ## Feedback
 
 Comments, suggestions, feature requests, bugs, questions, etc.
-welcome at [info@cantstop.fun][email] or in the [issues section][issues].
+welcome at [info@chickenroll.fun][email] or in the [issues section][issues].
 
 
 
-[csf]: https://cantstop.fun
+[crf]: https://chickenroll.fun
 [wiki]: https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)
-[email]: mailto:info@cantstop.fun
+[email]: mailto:info@chickenroll.fun
 [bmc]: https://www.buymeacoffee.com/simlmx
 [issues]: https://github.com/simlmx/cantstop/issues

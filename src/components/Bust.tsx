@@ -2,15 +2,15 @@ import React from "react";
 
 export const BustEmoji = () => {
   return (
-    <span role="img" aria-label="bust">
-      💥
+    <span role="img" aria-label="crack">
+      🍳
     </span>
   );
 };
 
 export const NoBustEmoji = () => {
   return (
-    <span role="img" aria-label="no bust">
+    <span role="img" aria-label="not crack">
       👍
     </span>
   );
@@ -33,7 +33,7 @@ export const BustProb = (props: {
   let title;
   if (prob2text == null) {
     const not = bust ? "" : "not ";
-    title = `The probably of ${not}busting is ${prettyProb}%`;
+    title = `The probably of ${not}cracking is ${prettyProb}%`;
   } else {
     title = prob2text(prob);
   }

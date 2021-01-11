@@ -106,8 +106,7 @@ const Rules = (props) => {
           <div className="movesBox">
             <div className="movesLeft">
               <p>
-                Add a new <strong>black token</strong> at the bottom of a
-                column.
+                Add a new <strong>black egg</strong> at the bottom of a column.
               </p>
             </div>
             <div className="movesRight">
@@ -121,8 +120,7 @@ const Rules = (props) => {
           <div className="movesBox">
             <div className="movesLeft">
               <p>
-                Continue right above one of your <strong>colored tokens</strong>
-                .
+                Continue right above one of your <strong>colored eggs</strong>.
               </p>
             </div>
             <div className="movesRight">
@@ -135,7 +133,7 @@ const Rules = (props) => {
           <div className="movesBox">
             <div className="movesLeft">
               <p>
-                Move an already placed <strong>black token</strong> up one step.
+                Move an already placed <strong>black egg</strong> up one step.
               </p>
             </div>
             <div className="movesRight">
@@ -170,7 +168,7 @@ const Rules = (props) => {
 
   const bust = (
     <span className="bust badge badge-danger">
-      <strong>bust</strong>
+      <strong>crack</strong>
     </span>
   );
 
@@ -180,8 +178,12 @@ const Rules = (props) => {
       <p>
         You must climb the different columns faster than your opponents, by
         rolling the dice. You move up columns that correspond to the sums of
-        dice pairs. You can keep rolling to move faster but you might bust and
-        lose your progress. Will you be able to stop in time?
+        dice pairs. You can keep rolling to move faster but you might crack and
+        lose your progress. Will you keep rolling or will you be a chicken{" "}
+        <span role="img" aria-label="chicken">
+          🐓
+        </span>
+        ?
       </p>
       <div className="fullMountain">
         <Mountain {...mountainOptions} />
@@ -189,9 +191,9 @@ const Rules = (props) => {
       <h2>On your turn </h2>
       <p>
         You can either {actionBtn("Roll")} or {actionBtn("Stop")}. When rolling,
-        you try to make your <strong>black tokens</strong> ({runner}) progress.
+        you try to make your <strong>black eggs</strong> ({runner}) progress.
         When stopping, you end your turn but keep the progress you made this
-        turn using <strong>colored tokens</strong>{" "}
+        turn using <strong>colored eggs</strong>{" "}
         <span style={{ display: "inlineBlock" }}>({token})</span>. You can{" "}
         {actionBtn("Roll")} as many times as you like until you either{" "}
         {actionBtn("Stop")} or {bust}.{" "}
@@ -206,24 +208,24 @@ const Rules = (props) => {
         {dice[3]} or {dice[0]}
         {dice[3]}|{dice[1]}
         {dice[2]}). For each of those two pairs you choose, you can add or move
-        a <strong>black token</strong> up on the corresponding columns. You can
+        a <strong>black egg</strong> up on the corresponding columns. You can
         have up to three per turn.
       </p>
       {moveUpTable}
       <p>
         If you can't do any action for any pair, you {bust}. You lose the
-        progress made by the <strong>black tokens</strong> and your turn ends.
+        progress made by the <strong>black eggs</strong> and your turn ends.
       </p>
       <h3>Stop</h3>
       <p>
-        If you have a <strong>black token</strong> at the end of a column,
+        If you have a <strong>black egg</strong> at the end of a column,
         stopping will <strong>block</strong> it. From now on, no one can use
         that column. The first player to <strong>block</strong> three columns{" "}
         <strong>wins</strong>.
       </p>
       <p>
-        You change your <strong>black tokens</strong> into{" "}
-        <strong>colored tokens</strong> and end your turn.
+        You change your <strong>black eggs</strong> into{" "}
+        <strong>colored eggs</strong> and end your turn.
       </p>
     </>
   );

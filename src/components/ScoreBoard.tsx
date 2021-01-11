@@ -91,7 +91,9 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
           const hasStar = points > i;
           let className;
           if (hasStar) {
-            className = `color${color}`;
+            className = `eggColor${color}`;
+            // style['textShadow'] = ''
+            // style['color'] = 'transparent'
           } else if (i < numColsToWin) {
             className = "emptyStar";
           } else {
@@ -100,7 +102,9 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
           return (
             <td className="starCol" key={i}>
               <div {...{ className }} key={playerID}>
-                ★
+                <span role="img" aria-label="chicken">
+                  🐓
+                </span>
               </div>
             </td>
           );

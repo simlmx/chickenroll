@@ -73,8 +73,8 @@ const Footer = (props) => {
       <div className="footerIcon">
         <a
           className="atIcon"
-          href="mailto:info@cantstop.fun"
-          title="info@cantstop.fun"
+          href="mailto:info@chickenroll.fun"
+          title="info@chickenroll.fun"
         >
           @
         </a>

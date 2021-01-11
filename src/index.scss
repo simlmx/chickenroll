@@ -249,6 +249,11 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
   .dotColor#{$i - 1} {
     fill: white;
   }
+
+  .eggColor#{$i - 1} {
+    color: transparent;
+    text-shadow: 0 0 0 $color;
+  }
 }
 
 // For the pale colors, we adjust a few things, like make text black instead of white
@@ -352,6 +357,11 @@ nav {
 .homeTitle {
   font-weight: bold;
   text-align: center;
+}
+
+.homePageLink,
+.homePageLink:hover {
+  font-weight: normal;
 }
 
 h1 {
@@ -691,7 +701,7 @@ $diceSize: 3.4rem;
   box-shadow: 0 0 0.2rem -0.05rem black, 0.05rem 0.1rem 0.15rem 0 black;
   z-index: 50;
   border-width: 0px;
-  border-radius: 999px;
+  border-radius: 50% / 60% 60% 40% 40%;
 }
 
 .climberCurrent {
@@ -863,8 +873,11 @@ $diceSize: 3.4rem;
 }
 
 .emptyStar {
-  color: $bgcolor;
-  text-shadow: 0px 0px 1px black;
+  color: transparent;
+  text-shadow: 0 0 0 $bgcolor, 0 0 1px black;
+
+  /* color: $bgcolor; */
+  /* text-shadow: 0px 0px 1px black; */
 }
 
 .gameSetupWrap {
@@ -1276,11 +1289,11 @@ $mountainRatio: 0.67;
 @mixin cellSize($height, $numCols: 11, $numRows: 13) {
   $width: $height / $mountainRatio;
 
-  $neg-margin: $width * -0.13;
-  $climberSize: $width * 0.4;
+  $neg-margin: $width * -0.12;
+  $climberSize: $width * 0.36;
   $colNumWidth: $width * 0.5;
   $currentClimberSize: $climberSize;
-  $currentClimberBorder: $width * 1/20;
+  $currentClimberBorder: $width * 0.035;
   $mountainWidth: $width * $numCols;
   $blockedSize: $width * 0.35;
 
@@ -1291,14 +1304,14 @@ $mountainRatio: 0.67;
   }
 
   .climber {
-    height: $climberSize;
-    width: $climberSize;
+    height: $climberSize * 1.25;
+    width: $climberSize * 1;
     margin-right: $neg-margin;
     margin-left: $neg-margin;
   }
 
   .climberCurrent {
-    height: $currentClimberSize;
+    height: $currentClimberSize * 1.25;
     width: $currentClimberSize;
     border-width: $currentClimberBorder !important;
   }

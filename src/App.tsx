@@ -15,10 +15,12 @@ import Math from "./components/Math";
 import localStorage from "./utils/localStorage";
 import { Helmet } from "react-helmet";
 // import { Debug } from 'boardgame.io/debug';
-//
-const TITLE = 'Can\'t Stop! - The classic "push your luck" dice game';
+
+const TITLE =
+  "Chicken Roll - Online alternative to Can't Stop, the classic push-your-luck board game";
+
 const DESCRIPTION =
-  "Play with your friends for free, either online or on the same device. Can't Stop is a simple yet addictive board game. Our version is free and open source.";
+  "Play with your friends, either online or on the same device. Chicken Roll is free, open source and addictive!.";
 
 const PassAndPlayMatch = (props: { numPlayers: number }) => {
   // We use playerID=0 but we will let all the players play for everyone,
@@ -266,7 +268,7 @@ class App extends React.Component {
                   <Page
                     path="/howtoplay"
                     title={"How To Play | " + TITLE}
-                    description={"Rules of how to play Can't Stop."}
+                    description={"The rules of Chicken Roll."}
                   >
                     <HowToPlay />
                   </Page>
@@ -283,7 +285,7 @@ class App extends React.Component {
                     path="/about"
                     title={"About | " + TITLE}
                     description={
-                      "Learn more about our open source version of Can't Stop. Get in touch with us."
+                      "Learn more about our open source implementation of Chicken Roll. Get in touch with us."
                     }
                   >
                     <About />

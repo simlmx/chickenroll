@@ -167,15 +167,15 @@ const Math = () => {
   return (
     <div className="mathPage">
       <h1>
-        The Math Behind <i>Can't Stop</i>
+        The Math Behind <i>Chicken Roll</i>
       </h1>
       <br />
-      <h2>Probability of busting</h2>
+      <h2>Probability of cracking</h2>
       <p>Here you can interactively answer questions like:</p>
       <p>
         <i>
           {" "}
-          &nbsp;&nbsp;What are the odds of busting when climbing certain{" "}
+          &nbsp;&nbsp;What are the odds of cracking when climbing certain{" "}
           <span className="text-success">
             <b>columns</b>
           </span>
@@ -184,7 +184,7 @@ const Math = () => {
       </p>
       <p>
         <i>
-          &nbsp;&nbsp;What are the odds of busting on a first roll when some{" "}
+          &nbsp;&nbsp;What are the odds of cracking on a first roll when some{" "}
           <span className="text-danger">
             <b>columns</b>
           </span>{" "}

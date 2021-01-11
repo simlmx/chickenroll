@@ -73,7 +73,24 @@ const Home = (): JSX.Element => {
 
   return (
     <div className="homeContent">
-      <h1> Can't Stop! </h1>
+      <h1>
+        {" "}
+        Chicken Roll{" "}
+        <span role="img" aria-label="chicken">
+          🐓
+        </span>
+      </h1>
+      <p className="text-muted small text-center">
+        Online alternative to the classic board game{" "}
+        <i>
+          <a
+            href="https://en.wikipedia.org/wiki/Can%27t_Stop_(board_game)"
+            className="homePageLink text-muted"
+          >
+            Can't Stop
+          </a>
+        </i>
+      </p>
       <div>
         {diceBoard}
         <h2> Play remotely </h2>
