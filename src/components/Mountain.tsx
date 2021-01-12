@@ -71,9 +71,12 @@ export const ColNum = (props: {
 
   let wrapClassName = "colBg";
   let className = "";
+  let chickenClass = "";
+
   if (top) {
     className += " colFgTop";
     wrapClassName += " colBgTop";
+    chickenClass = "topChicken";
   } else {
     className += " colFgBottom";
     wrapClassName += " colBgBottom";
@@ -81,6 +84,7 @@ export const ColNum = (props: {
   if (blockedColor != null) {
     className += ` bgcolor${blockedColor}`;
     wrapClassName += ` bgcolor${blockedColor} bgcolor${blockedColor}alpha40`;
+    chickenClass += ` chickenColor${blockedColor}`;
   } else {
     className += " colFgNotBlocked";
     wrapClassName += " colBgNotBlocked";
@@ -92,6 +96,13 @@ export const ColNum = (props: {
 
   return (
     <div className={wrapClassName}>
+      {top && (
+        <div className={chickenClass}>
+          <span role="img" aria-label="chicken">
+            🐓
+          </span>
+        </div>
+      )}
       <div {...{ className }} key={0}>
         {colNum}
       </div>

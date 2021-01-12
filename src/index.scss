@@ -250,9 +250,14 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
     fill: white;
   }
 
-  .eggColor#{$i - 1} {
+  .scoreChicken#{$i - 1} {
     color: transparent;
-    text-shadow: 0 0 0 $color;
+    text-shadow: 0 0 0 $color, 0 0 0.05rem black;
+  }
+
+  .chickenColor#{$i - 1} {
+    color: transparent !important;
+    text-shadow: 0 0 0 $color, 0 0 0.05rem black !important;
   }
 }
 
@@ -1330,11 +1335,37 @@ $mountainRatio: 0.67;
     border: none;
   }
 
+  .colFgBottom {
+    width: $colNumWidth * 0.9;
+    height: $colNumWidth * 0.9 * 1.25;
+    border-radius: 50% / 60% 60% 40% 40%;
+    box-shadow: 0 0 0.1rem black;
+  }
+
   .colFgMiddle {
     border: none;
     width: $height / 10;
     height: $height / 10;
     border-radius: 999px;
+  }
+
+  .colBgTop {
+    position: relative;
+  }
+
+  .colFgTop {
+    background-color: transparent;
+    z-index: 5;
+  }
+
+  .topChicken {
+    border-radius: 100%;
+    color: transparent;
+    text-shadow: 0 0 0 white, 0 0 1px black;
+    position: absolute;
+    font-size: $width * 0.8;
+    z-index: 4;
+    top: -47%;
   }
 
   .twoDigits {
