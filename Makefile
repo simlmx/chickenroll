@@ -2,7 +2,15 @@
 
 # Start the database
 db:
-	docker run -it --rm --name cantstop-db -e POSTGRES_PASSWORD=postgres -p 5454:5432  postgres
+	docker run \
+		-it --rm \
+		--name cantstop-db \
+		-e POSTGRES_PASSWORD=postgres \
+		-p 5454:5432 \
+		postgres
+
+# Debugging options
+# --cpus 0.02 \
 
 # Build the web app
 build:

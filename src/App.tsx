@@ -15,6 +15,8 @@ import Math from "./components/Math";
 import localStorage from "./utils/localStorage";
 import { Helmet } from "react-helmet";
 // import { Debug } from 'boardgame.io/debug';
+// import logger from 'redux-logger';
+// import { applyMiddleware } from "redux";
 
 const TITLE =
   "Chicken Roll - Online alternative to Can't Stop, the classic push-your-luck board game";
@@ -34,6 +36,7 @@ const PassAndPlayMatch = (props: { numPlayers: number }) => {
     multiplayer: Local(),
     debug: false,
     // debug: true,
+    // enhancer: applyMiddleware(logger),
   });
 
   return <CantStopClient playerID="0" />;

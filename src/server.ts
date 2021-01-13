@@ -14,7 +14,11 @@ const serverOptions: any = {
 // Add the DB if we have environment variables defining it.
 // Otherwise we'll use the default backend.
 if (env.CANTSTOP_DB_URI) {
-  const db = new PostgresStore(env.CANTSTOP_DB_URI);
+  const db = new PostgresStore(env.CANTSTOP_DB_URI, {
+    // Without this option the ORM used by PostgresStore ends up printing all the moves
+    // in the database for every move.
+    logging: false,
+  });
   serverOptions.db = db;
 }
 

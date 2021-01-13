@@ -144,7 +144,6 @@ class Possibilities extends React.Component<{
                   key={j}
                   onClick={() => {
                     this.props.moves.pickSumOption(i, j);
-                    this.props.onMouseLeave();
                   }}
                   // Using mouse over and mouse out because the behaviour is
                   // nicer!

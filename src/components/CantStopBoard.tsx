@@ -329,9 +329,20 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     });
   }
 
-  // If we are in pass-and-play mode, then the playerID is always "0". The
-  // "currentPlayer" is what we mean.
-  const playerID = passAndPlay ? currentPlayer : props.playerID;
+  // We want to forget about mouseOverPossibility as soon as we are not in the moving
+  // stage. This prevents some flickering of the black eggs.
+  const stageIsMoving = ctx.activePlayers[currentPlayer] === "moving";
+  const realMouseOverPossibility = stageIsMoving
+    ? mouseOverPossibility
+    : undefined;
+
+  // We need to set back the mouseOverPossibility to undefined after we have clicked on
+  // a picked a choice. I think here might be the best place.
+  useEffect(() => {
+    if (!stageIsMoving) {
+      setMouseOverPossibility(undefined);
+    }
+  }, [stageIsMoving]);
 
   const mountain = useMemo(() => {
     return (
@@ -342,7 +353,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           blockedSums,
           currentPlayer,
           diceSumOptions,
-          mouseOverPossibility,
+          mouseOverPossibility: realMouseOverPossibility,
           playerInfos,
         }}
       />
@@ -353,7 +364,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     blockedSums,
     currentPlayer,
     diceSumOptions,
-    mouseOverPossibility,
+    realMouseOverPossibility,
     playerInfos,
   ]);
 
@@ -378,6 +389,10 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
       </>
     );
   }
+
+  // If we are in pass-and-play mode, then the playerID is always "0". The
+  // "currentPlayer" is what we mean.
+  const playerID = passAndPlay ? currentPlayer : props.playerID;
 
   if (phase === "setup") {
     return (
@@ -452,9 +467,9 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           showProbs,
           bustProb,
         }}
-        onMouseEnter={(diceSplit, dicePairs) =>
-          setMouseOverPossibility({ diceSplit, dicePairs })
-        }
+        onMouseEnter={(diceSplit, dicePairs) => {
+          setMouseOverPossibility({ diceSplit, dicePairs });
+        }}
         onMouseLeave={() => {
           setMouseOverPossibility(undefined);
         }}

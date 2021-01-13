@@ -1353,7 +1353,8 @@ $mountainRatio: 0.67;
     width: $colNumWidth * 0.9;
     height: $colNumWidth * 0.9 * 1.25;
     border-radius: 50% / 60% 60% 40% 40%;
-    box-shadow: 0 0 0.1rem black;
+    // This makes is similar to the chicken svg border.
+    border: 0.04rem solid rgba(black, 0.55);
   }
 
   .colFgMiddle {
@@ -1384,7 +1385,7 @@ $mountainRatio: 0.67;
 
   .topChicken > svg path {
     stroke: black;
-    stroke-width: 0.1rem;
+    stroke-width: 0.15rem;
     fill: white;
   }
 
@@ -1806,4 +1807,8 @@ $height: $width * $mountainRatio;
     height: 1rem;
     border-radius: 0.1rem;
   }
+}
+
+.historyBustEmoji {
+  margin-left: 0.1rem;
 }

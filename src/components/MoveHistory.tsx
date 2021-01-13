@@ -3,6 +3,7 @@ import { DiceBoard } from "./DiceBoard";
 import { DICE_INDICES } from "../math";
 import { PlayerID, PlayerInfo } from "../types";
 import { Move } from "../Game";
+import { BustEmoji } from "./Bust";
 
 const ActionBtn = (props: { text: string; color: number }) => (
   <button className={`btn btnAction bgcolor${props.color}`}>
@@ -85,8 +86,8 @@ const MoveHistory = (props: MoveHistoryProps) => {
             />
           );
           const bustEl = bust && (
-            <span role="img" aria-label="bust" title="Bust">
-              💥
+            <span className="historyBustEmoji">
+              <BustEmoji />
             </span>
           );
 
