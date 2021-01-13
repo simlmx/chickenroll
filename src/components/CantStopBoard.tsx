@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 import { DiceBoard } from "./DiceBoard";
 import { Mountain } from "./Mountain";
@@ -177,10 +177,6 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   const [modal, setModal] = useState<undefined | "history" | "rules">(
     undefined
   );
-  const [gameStartedWithoutYou, setGameStartedWithoutYou] = useState<
-    boolean | undefined
-  >(undefined);
-
   const soundPlayer = getSoundPlayer();
 
   const setPlayerVolume = (volume: number): void => {
@@ -243,17 +239,11 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     !props.G.passAndPlay &&
     props.ctx.currentPlayer === props.playerID;
 
-  useEffect(() => {
-    // This verifies if the game has already started without us.
-    // Once the game is started, `G.numPlayers` is set to the number of players that
-    // have joined. If our playerID is bigger than that, it means we are not part of
-    // those players.
-    if (parseInt(props.playerID) >= props.G.numPlayers) {
-      setGameStartedWithoutYou(true);
-    } else {
-      setGameStartedWithoutYou(false);
-    }
-  }, [props.playerID, props.G.numPlayers]);
+  // This verifies if the game has already started without us.
+  // Once the game is started, `G.numPlayers` is set to the number of players that
+  // have joined. If our playerID is bigger than that, it means we are not part of
+  // those players.
+  const gameStartedWithoutYou = parseInt(props.playerID) >= props.G.numPlayers;
 
   const infoCode = props.G.info?.code;
   const infoTs = props.G.info?.ts;
@@ -323,28 +313,52 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     return () => window.removeEventListener("keydown", escHandler);
   }, []);
 
+  // Highlight or not for each die.
+  let diceHighlight: boolean[] = Array(4).fill(false);
+  let diceSplit: number | undefined = undefined;
+  if (mouseOverPossibility != null) {
+    diceSplit = mouseOverPossibility.diceSplit;
+    const { dicePairs } = mouseOverPossibility;
+
+    const splitIndices: number[][] = DICE_INDICES[diceSplit];
+
+    dicePairs.forEach((pairIndex, i) => {
+      splitIndices[pairIndex].forEach((diceIndex) => {
+        diceHighlight[diceIndex] = true;
+      });
+    });
+  }
+
   // If we are in pass-and-play mode, then the playerID is always "0". The
   // "currentPlayer" is what we mean.
   const playerID = passAndPlay ? currentPlayer : props.playerID;
 
-  const inGameIcons = (
-    <InGameIcons
-      howToPlayOnClick={() => setModal(modal === "rules" ? undefined : "rules")}
-      volume={volume}
-      changeVolume={() => {
-        changeVolume();
-      }}
-      showVolume={!passAndPlay}
-      historyOnClick={() =>
-        setModal(modal === "history" ? undefined : "history")
-      }
-    />
-  );
+  const mountain = useMemo(() => {
+    return (
+      <Mountain
+        {...{
+          checkpointPositions,
+          currentPositions,
+          blockedSums,
+          currentPlayer,
+          diceSumOptions,
+          mouseOverPossibility,
+          playerInfos,
+        }}
+      />
+    );
+  }, [
+    checkpointPositions,
+    currentPositions,
+    blockedSums,
+    currentPlayer,
+    diceSumOptions,
+    mouseOverPossibility,
+    playerInfos,
+  ]);
 
   // If the game has already started we show a sorry message with a crying cat.
-  if (gameStartedWithoutYou == null) {
-    return <>"Loading..."</>;
-  } else if (gameStartedWithoutYou) {
+  if (gameStartedWithoutYou) {
     return (
       <>
         <InGameIcons />
@@ -381,36 +395,6 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
       />
     );
   }
-
-  // Highlight or not for each die.
-  let diceHighlight: boolean[] = Array(4).fill(false);
-  let diceSplit: number | undefined = undefined;
-  if (mouseOverPossibility != null) {
-    diceSplit = mouseOverPossibility.diceSplit;
-    const { dicePairs } = mouseOverPossibility;
-
-    const splitIndices: number[][] = DICE_INDICES[diceSplit];
-
-    dicePairs.forEach((pairIndex, i) => {
-      splitIndices[pairIndex].forEach((diceIndex) => {
-        diceHighlight[diceIndex] = true;
-      });
-    });
-  }
-
-  const mountain = (
-    <Mountain
-      {...{
-        checkpointPositions,
-        currentPositions,
-        blockedSums,
-        currentPlayer,
-        diceSumOptions,
-        mouseOverPossibility,
-        playerInfos,
-      }}
-    />
-  );
 
   const scoreBoard = (
     <ScoreBoard
@@ -457,8 +441,14 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           G,
           playerID,
           playerColor: playerInfos[playerID].color,
-          onRoll: () => setShowInfo(false),
-          onStop: () => setShowInfo(false),
+          onRoll: () => {
+            moves.rollDice();
+            setShowInfo(false);
+          },
+          onStop: () => {
+            moves.stop();
+            setShowInfo(false);
+          },
           showProbs,
           bustProb,
         }}
@@ -559,6 +549,20 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
         </div>
       </div>
     </div>
+  );
+
+  const inGameIcons = (
+    <InGameIcons
+      howToPlayOnClick={() => setModal(modal === "rules" ? undefined : "rules")}
+      volume={volume}
+      changeVolume={() => {
+        changeVolume();
+      }}
+      showVolume={!passAndPlay}
+      historyOnClick={() =>
+        setModal(modal === "history" ? undefined : "history")
+      }
+    />
   );
 
   // The onClick is necessary to disable the double-click zoom on ios.

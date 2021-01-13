@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { getNumStepsForSum } from "../math";
 import { PlayerID, SumOption, PlayerInfo } from "../types";
 import Chicken from "./Chicken";
@@ -111,7 +111,7 @@ export const ColNum = (props: {
 
 interface MountainProps {
   currentPositions: { [key: number]: number };
-  checkpointPositions: object;
+  checkpointPositions: { [key: string]: { [key: number]: number } };
   playerInfos: { [key: string]: PlayerInfo };
   blockedSums: { [key: number]: string };
   currentPlayer: PlayerID;
@@ -125,167 +125,240 @@ interface MountainProps {
   maxRow?: number;
 }
 
-export class Mountain extends React.Component<MountainProps> {
-  render() {
-    const {
-      mouseOverPossibility,
-      diceSumOptions,
-      checkpointPositions,
-      currentPlayer,
-      currentPositions,
-      playerInfos,
-      blockedSums,
-    } = this.props;
+interface MountainCell {
+  element?: JSX.Element;
+  climbers: JSX.Element[];
+  current?: JSX.Element;
+}
 
-    // First we need to copy the prop.
-    const updatedCurrentPositions = {};
-    Object.assign(updatedCurrentPositions, currentPositions);
+export const Mountain = (props: MountainProps) => {
+  const {
+    mouseOverPossibility,
+    diceSumOptions,
+    checkpointPositions,
+    currentPlayer,
+    currentPositions,
+    playerInfos,
+    blockedSums,
+  } = props;
 
-    let { minCol, maxCol, minRow, maxRow } = this.props;
-    minCol = minCol == null ? 2 : minCol;
-    maxCol = maxCol == null ? 12 : maxCol;
-    minRow = minRow == null ? 1 : minRow;
-    maxRow = maxRow == null ? 13 : maxRow;
+  // First we need to copy the prop.
+  const updatedCurrentPositions: typeof currentPositions = {};
+  Object.assign(updatedCurrentPositions, currentPositions);
 
-    // If we want to highlight, we'll compute where the new positions will be!
-    let highlightSums: number[] = [];
-    if (mouseOverPossibility != null && diceSumOptions != null) {
-      const { diceSplit, dicePairs } = mouseOverPossibility;
+  const minCol = props?.minCol || 2;
+  const maxCol = props?.maxCol || 12;
+  const minRow = props?.minRow || 1;
+  const maxRow = props?.maxRow || 13;
 
-      const diceSumOption = diceSumOptions[diceSplit];
-      highlightSums = dicePairs
-        .map((i) => diceSumOption.diceSums[i])
-        .filter((x) => x != null) as number[];
+  const numCols = maxCol - minCol + 1;
+  const numRows = maxRow - minRow + 1;
 
-      highlightSums.forEach((sum) => {
-        let checkpoint = checkpointPositions[currentPlayer][sum];
-        checkpoint = checkpoint == null ? 0 : checkpoint;
+  // Build a matrix of components for the parts of the mountain that don't change in a
+  // given turn. This is everything but the checkpoints. We memoize that part for faster
+  // re-render.
 
-        if (updatedCurrentPositions.hasOwnProperty(sum)) {
-          updatedCurrentPositions[sum] += 1;
-        } else {
-          updatedCurrentPositions[sum] = checkpoint + 1;
-        }
-      });
-    }
+  let elMatrix: MountainCell[][] = useMemo(() => {
+    const elMatrix: MountainCell[][] = Array(numRows)
+      .fill(undefined)
+      .map(() =>
+        Array(numCols)
+          .fill(undefined)
+          .map(() => {
+            return { climbers: [] };
+          })
+      );
 
-    let rows: JSX.Element[] = [];
-    for (let row = maxRow; row >= minRow; --row) {
-      let cols: any[] = [];
-      for (let col = minCol; col < maxCol + 1; ++col) {
-        let content: JSX.Element | string | (JSX.Element | string)[];
+    for (let j = 0; j < numCols; ++j) {
+      const col = j + minCol;
 
-        const totalNumSteps = getNumStepsForSum(col);
-        const currentIsThere = currentPositions[col] === row;
-        const currentWillBeHere = updatedCurrentPositions[col] === row;
-        const blockedBy = blockedSums[col];
+      const blockedBy = blockedSums[col];
 
-        let climbers: JSX.Element[] = [];
+      // Bottom of column.
+      elMatrix[0][j].element = (
+        <ColNum
+          colNum={col}
+          top={false}
+          blockedColor={playerInfos[blockedBy]?.color}
+        />
+      );
 
-        if (row === 1 || row === totalNumSteps) {
-          content = (
-            <ColNum
-              colNum={col}
-              blockedColor={playerInfos[blockedBy]?.color}
-              top={row !== 1}
-            />
-          );
-        } else if (row < totalNumSteps) {
-          content = (
-            <ClimberPlaceholder color={playerInfos[blockedBy]?.color} key={0} />
-          );
-        } else if ([13, 12, 11].includes(row) && col === 11) {
-          // We place the left climbers in the top left of the table.
-          const numClimbersLeft =
-            3 - Object.keys(updatedCurrentPositions).length;
-          content = (
-            <ClimberPlaceholder
-              key={0}
-              top={row === 13}
-              bottom={row === 11}
-              side={true}
-            />
-          );
-          if (row >= 14 - numClimbersLeft) {
-            climbers.push(
-              <Climber
-                key={-1}
-                current={true}
-                color={playerInfos[currentPlayer].color}
-              />
-            );
-          } else if (row >= 11 + Object.keys(currentPositions).length) {
-            climbers.push(
-              <Climber
-                key={-1}
-                current={true}
-                color={playerInfos[currentPlayer].color}
-                downlight={true}
-              />
-            );
-          }
-        } else {
-          content = <div className="colBg"></div>;
-        }
+      const topIndex = getNumStepsForSum(col) - 1;
 
-        content = <div className="colBgWrap">{content}</div>;
-
-        // It's not efficient to do this every time by... javascript :shrug:
-        Object.entries(checkpointPositions).forEach(([playerID, positions]) => {
-          Object.entries(positions).forEach(([diceSumStr, numSteps]) => {
-            const diceSum = parseInt(diceSumStr);
-            if (diceSum === col && numSteps === row) {
-              climbers.push(
-                <Climber color={playerInfos[playerID].color} key={playerID} />
-              );
-            }
-          });
-        });
-
-        if (currentIsThere) {
-          climbers.push(
-            <Climber
-              key={-1}
-              current={true}
-              color={playerInfos[currentPlayer].color}
-              downlight={highlightSums.includes(col)}
-            />
-          );
-        } else if (currentWillBeHere) {
-          climbers.push(
-            <Climber
-              key={-1}
-              current={true}
-              color={playerInfos[currentPlayer].color}
-              highlight={true}
-            />
-          );
-        }
-
-        if (climbers.length > 0) {
-          content = (
-            <>
-              {content}
-              <div className="climberGroup" key={1}>
-                {climbers}
-              </div>
-            </>
-          );
-        }
-
-        cols.push(
-          <div className="mountainCell" key={col}>
-            {content}
-          </div>
+      if (topIndex <= maxRow && topIndex >= minRow) {
+        // Top of column.
+        elMatrix[topIndex][j].element = (
+          <ColNum
+            colNum={col}
+            top={true}
+            blockedColor={playerInfos[blockedBy]?.color}
+          />
         );
       }
-      rows.push(
-        <div className="mountainRow" key={row}>
-          {cols}
-        </div>
-      );
+
+      // Everything between the bottom and the top of the column.
+      for (let i = 1; i < Math.min(topIndex, maxRow); ++i) {
+        elMatrix[i][j].element = (
+          <ClimberPlaceholder color={playerInfos[blockedBy]?.color} />
+        );
+      }
     }
 
-    return <div className="mountain">{rows}</div>;
+    // Add the checkpoint climbers.
+    Object.entries(checkpointPositions).forEach(([playerID, positions]) => {
+      Object.entries(positions).forEach(([diceSumStr, numSteps]) => {
+        const diceSum = parseInt(diceSumStr);
+        if (
+          diceSum < minCol ||
+          diceSum > maxCol ||
+          numSteps < minRow ||
+          numSteps > maxRow
+        ) {
+          return;
+        }
+        elMatrix[numSteps - minRow][diceSum - minCol].climbers.push(
+          <Climber color={playerInfos[playerID].color} key={playerID} />
+        );
+      });
+    });
+
+    return elMatrix;
+  }, [
+    checkpointPositions,
+    playerInfos,
+    blockedSums,
+    maxCol,
+    minCol,
+    maxRow,
+    minRow,
+    numCols,
+    numRows,
+  ]);
+
+  // Add the current tokens, i.e. what changes often.
+  //
+
+  // If we want to highlight, we'll compute where the new positions will be!
+  let highlightSums: number[] = [];
+  if (mouseOverPossibility != null && diceSumOptions != null) {
+    const { diceSplit, dicePairs } = mouseOverPossibility;
+
+    const diceSumOption = diceSumOptions[diceSplit];
+    highlightSums = dicePairs
+      .map((i) => diceSumOption.diceSums[i])
+      .filter((x) => x != null) as number[];
+
+    highlightSums.forEach((sum) => {
+      let checkpoint = checkpointPositions[currentPlayer][sum];
+      checkpoint = checkpoint == null ? 0 : checkpoint;
+
+      if (updatedCurrentPositions.hasOwnProperty(sum)) {
+        updatedCurrentPositions[sum] += 1;
+      } else {
+        updatedCurrentPositions[sum] = checkpoint + 1;
+      }
+    });
   }
-}
+
+  const currentElements: JSX.Element[][] = Array(numRows)
+    .fill(undefined)
+    .map(() => Array(numCols).fill(undefined));
+
+  // Left tokens in the top right.
+  // Only do those for full mountains.
+  if (numRows === 13 && numCols === 11) {
+    const numLeft = 3 - Object.keys(currentPositions).length;
+    const numLeftAfterUpdate = 3 - Object.keys(updatedCurrentPositions).length;
+    for (let i = 0; i < 3; ++i) {
+      const col = numCols - 1;
+      const row = numRows - 1 - i;
+
+      let el: JSX.Element;
+      if (numLeftAfterUpdate > i) {
+        el = (
+          <Climber
+            key={-1}
+            current={true}
+            color={playerInfos[currentPlayer].color}
+          />
+        );
+      } else if (numLeft > i) {
+        el = (
+          <Climber
+            key={-1}
+            current={true}
+            color={playerInfos[currentPlayer].color}
+            downlight={true}
+          />
+        );
+      } else {
+        el = <ClimberPlaceholder key={0} side={true} />;
+      }
+
+      currentElements[row][col] = el;
+    }
+
+    // Downlighted current climbers.
+    Object.entries(currentPositions).forEach(([colStr, step]) => {
+      if (updatedCurrentPositions[colStr] === step) {
+        return;
+      }
+      const col = parseInt(colStr);
+      currentElements[step - 1][col - 2] = (
+        <Climber
+          key={-1}
+          current={true}
+          color={playerInfos[currentPlayer].color}
+          downlight={true}
+        />
+      );
+    });
+  }
+
+  // Highlighted current climbers.
+  Object.entries(updatedCurrentPositions).forEach(([colStr, row]) => {
+    const col = parseInt(colStr);
+
+    if (col < minCol || col > maxCol || row < minRow || row > maxRow) {
+      return;
+    }
+
+    currentElements[row - minRow][col - minCol] = (
+      <Climber
+        key={-1}
+        current={true}
+        color={playerInfos[currentPlayer].color}
+        highlight={true}
+      />
+    );
+  });
+
+  // Draw the whole thing.
+  const content = elMatrix
+    .slice()
+    .reverse()
+    .map((row, i) => {
+      return (
+        <div className="mountainRow" key={i}>
+          {row.map((col, j) => {
+            let climbers = col.climbers;
+            if (currentElements[numRows - i - 1][j] != null) {
+              climbers = [...climbers, currentElements[numRows - i - 1][j]];
+            }
+            return (
+              <div className="mountainCell" key={j}>
+                <div className="colBgWrap" key={j}>
+                  {col.element}
+                  <div className="climberGroup" key={1}>
+                    {climbers}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    });
+
+  return <div className="mountain">{content}</div>;
+};

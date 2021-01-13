@@ -4,7 +4,6 @@ import { SumOption, DiceSum, PlayerID } from "../types";
 import { BustProb } from "./Bust";
 
 interface ActionButtonsProps {
-  moves: any;
   itsMe: boolean;
   color: number;
   currentPlayerHasStarted: boolean;
@@ -16,7 +15,6 @@ interface ActionButtonsProps {
 /* Roll / Stop buttons */
 const ActionButtons = (props: ActionButtonsProps) => {
   const {
-    moves,
     onRoll,
     color,
     itsMe,
@@ -44,7 +42,6 @@ const ActionButtons = (props: ActionButtonsProps) => {
     <div className="actionButtons">
       <button
         onClick={() => {
-          moves.rollDice();
           onRoll();
         }}
         className={rollClassName}
@@ -59,7 +56,6 @@ const ActionButtons = (props: ActionButtonsProps) => {
       </button>
       <button
         onClick={() => {
-          moves.stop();
           onStop();
         }}
         className={className}
@@ -263,7 +259,6 @@ const MoveButtons = (props: MoveButtonsProps) => {
     return (
       <ActionButtons
         {...{
-          moves,
           itsMe,
           color: playerColor,
           currentPlayerHasStarted,
