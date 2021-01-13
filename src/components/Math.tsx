@@ -25,8 +25,7 @@ interface NumberProps {
 const Number = (props: NumberProps) => {
   const { value, selected, onMouseDown } = props;
 
-  let className =
-    "colFgBottom colFgNotBlocked mathNumber user-select-none pointer";
+  let className = "mathNumber user-select-none pointer";
 
   className += selected ? " mathNumberAllowed" : " mathNumberForbidden";
 

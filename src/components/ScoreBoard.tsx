@@ -1,5 +1,6 @@
 import React from "react";
 import { PlayerID, PlayerInfo } from "../types";
+import Chicken from "./Chicken";
 
 const Trophy = (props: { value: number; color: number | "gold" }) => {
   const { color, value } = props;
@@ -89,22 +90,20 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
         .fill(null)
         .map((_, i) => {
           const hasStar = points > i;
-          let className;
+          let className = "scoreChicken";
           if (hasStar) {
-            className = `scoreChicken${color}`;
+            className += ` scoreChicken${color}`;
             // style['textShadow'] = ''
             // style['color'] = 'transparent'
           } else if (i < numColsToWin) {
-            className = "emptyStar";
+            className += " emptyChicken";
           } else {
-            className = "transparent";
+            className += " transparentChicken";
           }
           return (
             <td className="starCol" key={i}>
               <div {...{ className }} key={playerID}>
-                <span role="img" aria-label="chicken">
-                  🐓
-                </span>
+                <Chicken />
               </div>
             </td>
           );

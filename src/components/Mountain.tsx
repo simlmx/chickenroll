@@ -1,6 +1,7 @@
 import React from "react";
 import { getNumStepsForSum } from "../math";
 import { PlayerID, SumOption, PlayerInfo } from "../types";
+import Chicken from "./Chicken";
 
 export const Climber = (props: {
   color?: number;
@@ -98,9 +99,7 @@ export const ColNum = (props: {
     <div className={wrapClassName}>
       {top && (
         <div className={chickenClass}>
-          <span role="img" aria-label="chicken">
-            🐓
-          </span>
+          <Chicken />
         </div>
       )}
       <div {...{ className }} key={0}>

@@ -58,6 +58,8 @@ body {
   background-color: transparent;
   fill: transparent;
   user-select: none;
+  stroke: transparent !important;
+  stroke-width: 0;
 }
 
 .nav-item {
@@ -250,14 +252,12 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
     fill: white;
   }
 
-  .scoreChicken#{$i - 1} {
-    color: transparent;
-    text-shadow: 0 0 0 $color, 0 0 0.05rem black;
+  .scoreChicken#{$i - 1} > svg path {
+    fill: $color;
   }
 
-  .chickenColor#{$i - 1} {
-    color: transparent !important;
-    text-shadow: 0 0 0 $color, 0 0 0.05rem black !important;
+  .chickenColor#{$i - 1} > svg path {
+    fill: $color !important;
   }
 }
 
@@ -877,12 +877,26 @@ $diceSize: 3.4rem;
   flex-direction: column;
 }
 
-.emptyStar {
-  color: transparent;
-  text-shadow: 0 0 0 $bgcolor, 0 0 1px black;
+.scoreChicken {
+  display: flex;
+  padding: 0 0.03rem;
+  > svg {
+    width: 1.2rem;
+    height: 1.2rem;
 
-  /* color: $bgcolor; */
-  /* text-shadow: 0px 0px 1px black; */
+    path {
+      stroke: black;
+      stroke-width: 0.2rem;
+    }
+  }
+}
+.emptyChicken > svg path {
+  fill: transparent;
+}
+
+.transparentChicken > svg path {
+  fill: transparent;
+  stroke: transparent;
 }
 
 .gameSetupWrap {
@@ -1294,7 +1308,7 @@ $mountainRatio: 0.67;
 @mixin cellSize($height, $numCols: 11, $numRows: 13) {
   $width: $height / $mountainRatio;
 
-  $neg-margin: $width * -0.12;
+  $neg-margin: $width * -0.1;
   $climberSize: $width * 0.36;
   $colNumWidth: $width * 0.5;
   $currentClimberSize: $climberSize;
@@ -1359,17 +1373,28 @@ $mountainRatio: 0.67;
   }
 
   .topChicken {
-    border-radius: 100%;
     color: transparent;
-    text-shadow: 0 0 0 white, 0 0 1px black;
     position: absolute;
-    font-size: $width * 0.8;
+    height: $width * 0.8;
+    width: $width * 0.8;
     z-index: 4;
-    top: -47%;
+    left: -4%;
+    top: -20%;
+  }
+
+  .topChicken > svg path {
+    stroke: black;
+    stroke-width: 0.1rem;
+    fill: white;
   }
 
   .twoDigits {
     font-size: $width / 3.2;
+  }
+
+  .twoDigits.colFgTop {
+    position: absolute;
+    top: 8%;
   }
 
   .colBg {
@@ -1713,6 +1738,14 @@ $height: $width * $mountainRatio;
   margin: 0.4rem;
 
   border: 0.2rem solid black;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: white;
+  border-radius: 100%;
+  font-weight: bold;
 }
 
 .mathNumber2Digits {
