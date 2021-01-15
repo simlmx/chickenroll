@@ -16,7 +16,7 @@ const About = () => {
       <h2>Code</h2>
       <p>
         This project is open source. You can see the code on{" "}
-        <a href="https://github.com/simlmx/cantstop">github</a>.
+        <a href="https://github.com/simlmx/chickenroll">github</a>.
       </p>
       <h2>Support Us</h2>
       <p>

@@ -81,7 +81,7 @@ const Footer = (props) => {
       </div>
       <div className="footerIcon">
         <a
-          href="https://github.com/simlmx/cantstop"
+          href="https://github.com/simlmx/chickenroll"
           title="Github"
           target="_blank"
           rel="noopener noreferrer"

@@ -467,7 +467,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   const settings = (
     <div className="settingsWrap">
       <div className="form-group">
-        <label htmlFor="numColsToWin">Num of columns to win</label>
+        <label htmlFor="numColsToWin">Number of columns to win</label>
         <select
           className="custom-select custom-select-sm"
           id="numColsToWin"
@@ -489,7 +489,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         </select>
       </div>
       <div className="form-group mb-3">
-        <label htmlFor="showProbs">Show probability of busting</label>
+        <label htmlFor="showProbs">Show probability of cracking</label>
         <select
           className="custom-select custom-select-sm"
           id="showProbs"

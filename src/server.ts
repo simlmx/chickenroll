@@ -28,7 +28,7 @@ const PORT = env.PORT ? parseInt(env.PORT) : 8000;
 
 // Redirect to CANTSTOP_HOST if the environment variable is defined.
 // In prod we set this to 'CANTSTOP_HOST=chickenroll.fun' so that people with
-// the old herokuapp address get redirected there.
+// the herokuapp address get redirected there.
 const CANTSTOP_HOST = env.CANTSTOP_HOST || undefined;
 
 server.app.use(
