@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { PlayerID, PlayerInfo } from "../types";
+import { PlayerID, PlayerInfo, MountainShape } from "../types";
 import {
   SERVER,
   NUM_COLORS,
@@ -295,6 +295,42 @@ export const Player = (props: PlayerProps): JSX.Element => {
   );
 };
 
+interface SettingOptionProps {
+  name: string;
+  // (value) =>
+  onChange: (string) => void;
+  // [[value, label], ...]
+  currentValue: any;
+  values: [any, string][];
+  disabled: boolean;
+  // some html "id".
+  id: string;
+}
+
+const SettingOption = (props: SettingOptionProps) => {
+  const { name, onChange, currentValue, values, disabled, id } = props;
+  return (
+    <div className="form-group">
+      <label htmlFor={id}>{name}</label>
+      <select
+        className="custom-select custom-select-sm"
+        id={id}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        value={currentValue}
+      >
+        {values.map(([value, label]) => {
+          return (
+            <option value={value} key={value}>
+              {label}
+            </option>
+          );
+        })}
+      </select>
+    </div>
+  );
+};
+
 interface GameSetupProps {
   playerInfos: { [key: string]: PlayerInfo };
   playerID: PlayerID;
@@ -304,6 +340,7 @@ interface GameSetupProps {
   passAndPlay: boolean;
   numColsToWin: number | "auto";
   showProbs: ShowProbsType;
+  mountainShape: MountainShape;
 }
 
 const GameSetup = (props: GameSetupProps): JSX.Element => {
@@ -316,6 +353,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
     playerID,
     numColsToWin,
     showProbs,
+    mountainShape,
   } = props;
 
   // Using a state is how I made the auto-focus on the start button once everyone is
@@ -466,50 +504,42 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
 
   const settings = (
     <div className="settingsWrap">
-      <div className="form-group">
-        <label htmlFor="numColsToWin">Number of columns to win</label>
-        <select
-          className="custom-select custom-select-sm"
-          id="numColsToWin"
-          disabled={!imTheOwner}
-          onChange={(e) =>
-            moves.setNumColsToWin(
-              e.target.value === "auto" ? "auto" : parseInt(e.target.value)
-            )
-          }
-          value={numColsToWin}
-        >
-          {numColsToWinValues.map((value) => {
-            return (
-              <option value={value} key={value}>
-                {value === "auto" ? `Auto (${autoValue})` : value}
-              </option>
-            );
-          })}
-        </select>
-      </div>
-      <div className="form-group mb-3">
-        <label htmlFor="showProbs">Show probability of cracking</label>
-        <select
-          className="custom-select custom-select-sm"
-          id="showProbs"
-          disabled={!imTheOwner}
-          onChange={(e) => moves.setShowProbs(e.target.value)}
-          value={showProbs}
-        >
-          {[
-            ["before", "Before every roll"],
-            ["after", "At the end of the turn"],
-            ["never", "Never"],
-          ].map(([optionName, optionLabel]) => {
-            return (
-              <option value={optionName} key={optionName}>
-                {optionLabel}
-              </option>
-            );
-          })}
-        </select>
-      </div>
+      <SettingOption
+        id="numColsToWin"
+        name="Number of columns to win"
+        disabled={!imTheOwner}
+        onChange={(value) =>
+          moves.setNumColsToWin(value === "auto" ? "auto" : parseInt(value))
+        }
+        currentValue={numColsToWin}
+        values={numColsToWinValues.map((value) => [
+          value,
+          value === "auto" ? `Auto (${autoValue})` : value.toString(),
+        ])}
+      />
+      <SettingOption
+        id="showProbs"
+        name="Show probability of cracking"
+        disabled={!imTheOwner}
+        onChange={(value) => moves.setShowProbs(value)}
+        currentValue={showProbs}
+        values={[
+          ["before", "Before every roll"],
+          ["after", "At the end of the turn"],
+          ["never", "Never"],
+        ]}
+      />
+      <SettingOption
+        id="mountainShape"
+        name="Height of columns"
+        disabled={!imTheOwner}
+        onChange={(value) => moves.setMountainShape(value)}
+        currentValue={mountainShape}
+        values={[
+          ["tall", "Tall"],
+          ["classic", "Classic"],
+        ]}
+      />
     </div>
   );
 
@@ -519,6 +549,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
       {inviteHeader}
       <div className="container gameSetupContentWrapWrap">
         <div className="gameSetupContentWrap">
+          <h1>Lobby</h1>
           <div className="sectionName">Players</div>
           {activePlayers}
           {freeSpot}

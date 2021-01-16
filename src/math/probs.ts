@@ -1,5 +1,6 @@
 import { getNumStepsForSum } from "../math";
 import { NUM_COLORS } from "../constants";
+import { MountainShape } from "../types";
 
 type Dice2sums = { [key: string]: Set<number> };
 
@@ -63,7 +64,11 @@ export class OddsCalculator {
   }
 }
 
-export function getAllowedColumns(currentPositions, blockedSums) {
+export function getAllowedColumns(
+  currentPositions,
+  blockedSums,
+  mountainShape: MountainShape
+) {
   // We start with the blocked columns.
   const blockedSumsSet = new Set(
     Object.keys(blockedSums).map((x) => parseInt(x))
@@ -71,7 +76,7 @@ export function getAllowedColumns(currentPositions, blockedSums) {
   // To which we add the columns for which the current position is at the last step,
   // which makes them blocked too.
   Object.entries(currentPositions).forEach(([sum, step]) => {
-    if (step === getNumStepsForSum(parseInt(sum))) {
+    if (step === getNumStepsForSum(parseInt(sum), mountainShape)) {
       blockedSumsSet.add(parseInt(sum));
     }
   });

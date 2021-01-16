@@ -13,3 +13,5 @@ export type PlayerInfo = {
   color: number;
   ready: boolean;
 };
+
+export type MountainShape = "classic" | "tall";

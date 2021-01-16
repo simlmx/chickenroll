@@ -170,6 +170,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     numColsToWin,
     moveHistory,
     showProbs,
+    mountainShape,
   } = G;
   const { currentPlayer, phase, numPlayers, playOrder } = ctx;
 
@@ -355,6 +356,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           diceSumOptions,
           mouseOverPossibility: realMouseOverPossibility,
           playerInfos,
+          mountainShape,
         }}
       />
     );
@@ -366,6 +368,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     diceSumOptions,
     realMouseOverPossibility,
     playerInfos,
+    mountainShape,
   ]);
 
   // If the game has already started we show a sorry message with a crying cat.
@@ -406,6 +409,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           passAndPlay,
           numColsToWin,
           showProbs,
+          mountainShape,
         }}
       />
     );
@@ -592,7 +596,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
         <div className="bigHspace"></div>
         <div className="boardContent">
           <div className="bandBegin"></div>
-          <div className="mountainWrap">
+          <div className={`mountainWrap ${mountainShape}MountainWrap`}>
             {/* First column: the mountain. */}
             {mountain}
           </div>

@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { getNumStepsForSum } from "../math";
-import { PlayerID, SumOption, PlayerInfo } from "../types";
+import { PlayerID, SumOption, PlayerInfo, MountainShape } from "../types";
 import Chicken from "./Chicken";
+import { NUM_STEPS } from "../constants";
 
 export const Climber = (props: {
   color?: number;
@@ -117,6 +118,7 @@ interface MountainProps {
   currentPlayer: PlayerID;
   diceSumOptions?: SumOption[];
   mouseOverPossibility?: { diceSplit: number; dicePairs: number[] };
+  mountainShape: MountainShape;
   // Those options were introduced to be used in the How To Play seciton.
   // It's useful to show a subset of the Mountain.
   minCol?: number;
@@ -140,7 +142,10 @@ export const Mountain = (props: MountainProps) => {
     currentPositions,
     playerInfos,
     blockedSums,
+    mountainShape,
   } = props;
+
+  const maxSteps = NUM_STEPS[mountainShape][7];
 
   // First we need to copy the prop.
   const updatedCurrentPositions: typeof currentPositions = {};
@@ -149,7 +154,7 @@ export const Mountain = (props: MountainProps) => {
   const minCol = props?.minCol || 2;
   const maxCol = props?.maxCol || 12;
   const minRow = props?.minRow || 1;
-  const maxRow = props?.maxRow || 13;
+  const maxRow = props?.maxRow || maxSteps;
 
   const numCols = maxCol - minCol + 1;
   const numRows = maxRow - minRow + 1;
@@ -183,7 +188,7 @@ export const Mountain = (props: MountainProps) => {
         />
       );
 
-      const topIndex = getNumStepsForSum(col) - 1;
+      const topIndex = getNumStepsForSum(col, mountainShape) - 1;
 
       if (topIndex <= maxRow && topIndex >= minRow) {
         // Top of column.
@@ -233,6 +238,7 @@ export const Mountain = (props: MountainProps) => {
     minRow,
     numCols,
     numRows,
+    mountainShape,
   ]);
 
   // Add the current tokens, i.e. what changes often.
@@ -266,7 +272,7 @@ export const Mountain = (props: MountainProps) => {
 
   // Left tokens in the top right.
   // Only do those for full mountains.
-  if (numRows === 13 && numCols === 11) {
+  if (numRows === maxSteps && numCols === 11) {
     const numLeft = 3 - Object.keys(currentPositions).length;
     const numLeftAfterUpdate = 3 - Object.keys(updatedCurrentPositions).length;
     for (let i = 0; i < 3; ++i) {
@@ -360,5 +366,5 @@ export const Mountain = (props: MountainProps) => {
       );
     });
 
-  return <div className="mountain">{content}</div>;
+  return <div className={`mountain ${mountainShape}Mountain`}>{content}</div>;
 };

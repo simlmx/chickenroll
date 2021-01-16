@@ -139,7 +139,8 @@ describe("testGetSumOptions", () => {
           diceValues,
           climberPositions,
           checkpointPositions,
-          blockedSums
+          blockedSums,
+          "classic"
         )
       ).toEqual(expected);
     }

@@ -1,4 +1,5 @@
 @use "sass:color";
+@use "sass:math";
 
 /* $debug: true; */
 $debug: false;
@@ -296,13 +297,6 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
 
 @include setPaleColors(0);
 @include setPaleColors(3);
-
-@mixin cellDim($cell-height, $cell-width) {
-  min-height: $cell-height;
-  max-height: $cell-height;
-  min-width: $cell-width;
-  max-width: $cell-width;
-}
 
 .pageContentWrap {
   display: flex;
@@ -1318,10 +1312,9 @@ $mountainRatio: 0.67;
 
   .mountain {
     display: table;
-    height: $height * $numRows;
     width: $width * $numCols;
+    height: $height * $numRows;
   }
-
   .climber {
     height: $climberSize * 1.25;
     width: $climberSize * 1;
@@ -1433,9 +1426,18 @@ $mountainRatio: 0.67;
 
 // Default is really tall not wide
 // In that case we want the mountain to take the full width
-$width: 96vw / 11;
-$height: $width * $mountainRatio;
-@include cellSize($height);
+
+.classicMountainWrap {
+  $width: 96vw / 11;
+  $height: $width * $mountainRatio;
+  @include cellSize($height, 11, 13);
+}
+
+.tallMountainWrap {
+  $width: 96vw / 11;
+  $height: $width * $mountainRatio;
+  @include cellSize($height, 11, 16);
+}
 
 @if $debug {
   * {
@@ -1446,7 +1448,12 @@ $height: $width * $mountainRatio;
 // As we get closer to a square, we want to use some ratio of the height of the device
 // as the side of our mountain square
 @media (min-aspect-ratio: 3/5) {
-  @include cellSize(0.5 * 100vh / 14);
+  .classicMountainWrap {
+    @include cellSize(50vh / 14, 11, 13);
+  }
+  .tallMountainWrap {
+    @include cellSize(50vh / 17, 11, 16);
+  }
   @if $debug {
     * {
       border: 1px solid orange !important;
@@ -1455,17 +1462,20 @@ $height: $width * $mountainRatio;
 }
 
 @media (min-aspect-ratio: 1/1) {
-  $width: 60vw / 11;
+  $width: 50vw / 11;
   $height: $width * $mountainRatio;
-  @include cellSize($height);
+  .classicMountainWrap {
+    @include cellSize($height, 11, 13);
+  }
+  .tallMountainWrap {
+    @include cellSize($height, 11, 16);
+  }
   @if $debug {
     * {
       border: 1px solid gold !important;
     }
   }
-}
 
-@media (min-aspect-ratio: 1/1) {
   .rightWrap {
     flex-direction: column;
   }
@@ -1485,15 +1495,15 @@ $height: $width * $mountainRatio;
   .diceButtons {
     flex-direction: column;
   }
-  @if $debug {
-    * {
-      border: 1px solid orange !important;
-    }
-  }
 }
 
 @media (min-aspect-ratio: 4/3) {
-  @include cellSize(80vh / 14);
+  .classicMountainWrap {
+    @include cellSize(80vh / 14, 11, 13);
+  }
+  .tallMountainWrap {
+    @include cellSize(80vh / 17, 11, 16);
+  }
 
   @if $debug {
     * {
@@ -1503,7 +1513,12 @@ $height: $width * $mountainRatio;
 }
 
 @media (min-aspect-ratio: 4/2) {
-  @include cellSize(95vh / 14);
+  .classicMountainWrap {
+    @include cellSize(95vh / 14, 11, 13);
+  }
+  .tallMountainWrap {
+    @include cellSize(95vh / 17, 11, 16);
+  }
 
   .diceButtons {
     flex-direction: row;
@@ -1536,7 +1551,12 @@ $height: $width * $mountainRatio;
 // as big.
 
 @media (min-width: 1200px) and (min-height: 900px) and (min-aspect-ratio: 1/1) and (max-aspect-ratio: 7/3) {
-  @include cellSize(65vh / 14);
+  .classicMountainWrap {
+    @include cellSize(65vh / 14, 11, 13);
+  }
+  .tallMountainWrap {
+    @include cellSize(65vh / 17, 11, 16);
+  }
   @if $debug {
     * {
       border: 1px solid pink !important;

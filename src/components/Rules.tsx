@@ -1,6 +1,7 @@
 import React from "react";
 import { Die } from "./Die";
 import { Climber, Mountain } from "./Mountain";
+import { MountainShape } from "../types";
 
 const Rules = (props) => {
   const playerID = "0";
@@ -39,6 +40,7 @@ const Rules = (props) => {
     },
     blockedSums: {},
     currentPlayer: playerID,
+    mountainShape: "classic" as MountainShape,
   };
 
   const placeAtBottom = (

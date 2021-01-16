@@ -19,3 +19,6 @@ build:
 # Serve the web app. You need to run `make db` in a different window.
 serve: build
 	CANTSTOP_DB_URI=postgres://postgres:postgres@0.0.0.0:5454/postgres yarn serve
+
+test:
+	yarn test

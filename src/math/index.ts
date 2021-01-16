@@ -1,4 +1,5 @@
-import { DiceSum, SumOption } from "../types";
+import { DiceSum, SumOption, MountainShape } from "../types";
+import { NUM_STEPS } from "../constants";
 
 export const DICE_INDICES = [
   [
@@ -27,7 +28,8 @@ export function getSumOptions(
   diceValues: DiceSum[],
   currentPositions: { [key: string]: number },
   checkpointPositions: { [key: number]: number },
-  blockedSums: { [key: number]: string }
+  blockedSums: { [key: number]: string },
+  mountainShape: MountainShape
 ): SumOption[] {
   if (diceValues.length !== 4) {
     throw new Error("Should have 4 values");
@@ -44,7 +46,7 @@ export function getSumOptions(
 
   Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
     const diceSum = parseInt(diceSumStr);
-    const space = getNumStepsForSum(diceSum) - currentStep;
+    const space = getNumStepsForSum(diceSum, mountainShape) - currentStep;
 
     currentClimberSpace.set(diceSum, space);
 
@@ -91,7 +93,7 @@ export function getSumOptions(
             // play both. Otherwise we can only play one.
             if (
               checkpointPositions[diceSum] ===
-              getNumStepsForSum(diceSum) - 1
+              getNumStepsForSum(diceSum, mountainShape) - 1
             ) {
               return { diceSums: [diceSum, null] };
             } else {
@@ -149,6 +151,13 @@ export function getSumOptions(
  * Get the number of steps for a given dice sum
  * e.g. 2 -> 3, 3 -> 5, .., 7 -> 13, ..
  */
-export function getNumStepsForSum(sum: number): number {
-  return -2 * Math.abs(sum - 7) + 13;
+export function getNumStepsForSum(
+  sum: number,
+  mountainShape: MountainShape
+): number {
+  // Using the symetry.
+  if (sum >= 7) {
+    sum -= (sum - 7) * 2;
+  }
+  return NUM_STEPS[mountainShape][sum];
 }

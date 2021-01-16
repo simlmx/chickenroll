@@ -108,6 +108,8 @@ describe("getAllowedColumns", () => {
     [{ 2: 3, 12: 3 }, { 3: 1 }, [4, 5, 6, 7, 8, 9, 10, 11]],
     [{ 2: 2, 12: 3 }, { 3: 1 }, [2, 4, 5, 6, 7, 8, 9, 10, 11]],
   ]).it("case %s %s", (currentPositions, blockedSums, expected) => {
-    expect(getAllowedColumns(currentPositions, blockedSums)).toEqual(expected);
+    expect(getAllowedColumns(currentPositions, blockedSums, "classic")).toEqual(
+      expected
+    );
   });
 });

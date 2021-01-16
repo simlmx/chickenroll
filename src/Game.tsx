@@ -5,7 +5,7 @@ import {
 } from "./constants";
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, getNumStepsForSum } from "./math";
-import { SumOption, PlayerID, PlayerInfo } from "./types";
+import { SumOption, PlayerID, PlayerInfo, MountainShape } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 
@@ -69,6 +69,7 @@ export interface GameType {
   // Probability of busting at the end of the last turn. This is for the 'after' mode of
   // showing the probabilities.
   endOfTurnBustProb: number;
+  mountainShape: MountainShape;
 }
 
 /*
@@ -92,7 +93,11 @@ const updateBustProb = (G: GameType, endOfTurn: boolean): void => {
   if (endOfTurn) {
     G.endOfTurnBustProb = G.bustProb;
   }
-  const allowedColumns = getAllowedColumns(G.currentPositions, G.blockedSums);
+  const allowedColumns = getAllowedColumns(
+    G.currentPositions,
+    G.blockedSums,
+    G.mountainShape
+  );
   G.bustProb = getOddsCalculator().oddsBust(allowedColumns);
 };
 
@@ -134,7 +139,8 @@ const turn = {
             G.diceValues,
             G.currentPositions,
             G.checkpointPositions[ctx.currentPlayer],
-            G.blockedSums
+            G.blockedSums,
+            G.mountainShape
           );
           // Check if busted.
           const busted = G.diceSumOptions.every((sumOption: SumOption) => {
@@ -162,7 +168,7 @@ const turn = {
           Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
             const diceSum = parseInt(diceSumStr);
             G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
-            if (step === getNumStepsForSum(diceSum)) {
+            if (step === getNumStepsForSum(diceSum, G.mountainShape)) {
               G.blockedSums[diceSum] = ctx.currentPlayer;
               G.scores[ctx.currentPlayer] += 1;
               // Remove all the checkpoints for that one
@@ -325,6 +331,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     showProbs: "after",
     bustProb: 0,
     endOfTurnBustProb: 0,
+    mountainShape: "tall",
   };
 };
 
@@ -479,6 +486,16 @@ const CantStop = {
                 }
                 G.showProbs = showProbs;
               },
+              setMountainShape: (
+                G: GameType,
+                ctx,
+                mountainShape: MountainShape
+              ) => {
+                if (ctx.playerID !== "0") {
+                  return INVALID_MOVE;
+                }
+                G.mountainShape = mountainShape;
+              },
             },
           },
         },
@@ -513,6 +530,7 @@ const CantStop = {
             "numVictories",
             "numColsToWin",
             "showProbs",
+            "mountainShape",
           ];
 
           // Create an object like G but with only the fields to keep.
