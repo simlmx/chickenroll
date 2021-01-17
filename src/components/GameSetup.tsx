@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { PlayerID, PlayerInfo, MountainShape } from "../types";
+import { PlayerID, PlayerInfo, MountainShape, SameSpace } from "../types";
 import {
   SERVER,
   NUM_COLORS,
@@ -341,6 +341,7 @@ interface GameSetupProps {
   numColsToWin: number | "auto";
   showProbs: ShowProbsType;
   mountainShape: MountainShape;
+  sameSpace: SameSpace;
 }
 
 const GameSetup = (props: GameSetupProps): JSX.Element => {
@@ -354,6 +355,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
     numColsToWin,
     showProbs,
     mountainShape,
+    sameSpace,
   } = props;
 
   // Using a state is how I made the auto-focus on the start button once everyone is
@@ -538,6 +540,17 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         values={[
           ["tall", "Tall"],
           ["classic", "Classic"],
+        ]}
+      />
+      <SettingOption
+        id="sameSpace"
+        name="Player Interaction"
+        disabled={!imTheOwner}
+        onChange={(value) => moves.setSameSpace(value)}
+        currentValue={sameSpace}
+        values={[
+          ["share", "None"],
+          ["jump", "Jump Over"],
         ]}
       />
     </div>

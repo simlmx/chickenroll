@@ -138,9 +138,81 @@ describe("testGetSumOptions", () => {
         getSumOptions(
           diceValues,
           climberPositions,
+          { "0": checkpointPositions },
+          blockedSums,
+          "classic",
+          "share",
+          "0"
+        )
+      ).toEqual(expected);
+
+      // In jump mode it should be the same since we don't have opponents in these
+      // tests.
+      expect(
+        getSumOptions(
+          diceValues,
+          climberPositions,
+          { "0": checkpointPositions },
+          blockedSums,
+          "classic",
+          "jump",
+          "0"
+        )
+      ).toEqual(expected);
+    }
+  );
+});
+
+describe("testGetSumOptionsJump", () => {
+  each([
+    // Opponents on the other columns.
+    [
+      [3, 4, 3, 4],
+      { "7": 12 },
+      { "1": { "7": 10 } },
+      {},
+      [{ diceSums: [7, null] }, { diceSums: [6, 8] }, { diceSums: [7, null] }],
+    ],
+    // Opponents on the same column
+    [
+      [3, 4, 3, 4],
+      { "7": 11 },
+      { "1": { "7": 12 } },
+      {},
+      [{ diceSums: [7, null] }, { diceSums: [6, 8] }, { diceSums: [7, null] }],
+    ],
+    [
+      [3, 4, 3, 4],
+      { "7": 10 },
+      { "1": { "7": 12 }, "2": { "7": 11 } },
+      {},
+      [{ diceSums: [7, null] }, { diceSums: [6, 8] }, { diceSums: [7, null] }],
+    ],
+    [
+      [3, 4, 3, 4],
+      { "7": 9 },
+      { "1": { "7": 12 }, "2": { "7": 10 } },
+      {},
+      [{ diceSums: [7, 7] }, { diceSums: [6, 8] }, { diceSums: [7, 7] }],
+    ],
+  ]).it(
+    "case '%s %s %s %s'",
+    (
+      diceValues,
+      climberPositions,
+      checkpointPositions,
+      blockedSums,
+      expected
+    ) => {
+      expect(
+        getSumOptions(
+          diceValues,
+          climberPositions,
           checkpointPositions,
           blockedSums,
-          "classic"
+          "classic",
+          "jump",
+          "0"
         )
       ).toEqual(expected);
     }

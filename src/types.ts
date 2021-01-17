@@ -15,3 +15,8 @@ export type PlayerInfo = {
 };
 
 export type MountainShape = "classic" | "tall";
+
+// What to do when players occupy the same space.
+// share: tokens can share the same space
+// jump: tokens jump over opponents
+export type SameSpace = "share" | "jump";

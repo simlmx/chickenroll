@@ -1,8 +1,15 @@
 import React, { useMemo } from "react";
 import { getNumStepsForSum } from "../math";
-import { PlayerID, SumOption, PlayerInfo, MountainShape } from "../types";
+import {
+  PlayerID,
+  SumOption,
+  PlayerInfo,
+  MountainShape,
+  SameSpace,
+} from "../types";
 import Chicken from "./Chicken";
 import { NUM_STEPS } from "../constants";
+import { climbOneStep } from "../Game";
 
 export const Climber = (props: {
   color?: number;
@@ -119,6 +126,7 @@ interface MountainProps {
   diceSumOptions?: SumOption[];
   mouseOverPossibility?: { diceSplit: number; dicePairs: number[] };
   mountainShape: MountainShape;
+  sameSpace: SameSpace;
   // Those options were introduced to be used in the How To Play seciton.
   // It's useful to show a subset of the Mountain.
   minCol?: number;
@@ -143,6 +151,7 @@ export const Mountain = (props: MountainProps) => {
     playerInfos,
     blockedSums,
     mountainShape,
+    sameSpace,
   } = props;
 
   const maxSteps = NUM_STEPS[mountainShape][7];
@@ -255,14 +264,14 @@ export const Mountain = (props: MountainProps) => {
       .filter((x) => x != null) as number[];
 
     highlightSums.forEach((sum) => {
-      let checkpoint = checkpointPositions[currentPlayer][sum];
-      checkpoint = checkpoint == null ? 0 : checkpoint;
-
-      if (updatedCurrentPositions.hasOwnProperty(sum)) {
-        updatedCurrentPositions[sum] += 1;
-      } else {
-        updatedCurrentPositions[sum] = checkpoint + 1;
-      }
+      const newStep = climbOneStep(
+        updatedCurrentPositions,
+        checkpointPositions,
+        sum,
+        currentPlayer,
+        sameSpace
+      );
+      updatedCurrentPositions[sum] = newStep;
     });
   }
 

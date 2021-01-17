@@ -5,7 +5,13 @@ import {
 } from "./constants";
 import { Stage } from "boardgame.io/core";
 import { getSumOptions, getNumStepsForSum } from "./math";
-import { SumOption, PlayerID, PlayerInfo, MountainShape } from "./types";
+import {
+  SumOption,
+  PlayerID,
+  PlayerInfo,
+  MountainShape,
+  SameSpace,
+} from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 
@@ -70,6 +76,8 @@ export interface GameType {
   // showing the probabilities.
   endOfTurnBustProb: number;
   mountainShape: MountainShape;
+  // What happens when tokens occupy the same spot.
+  sameSpace: SameSpace;
 }
 
 /*
@@ -99,6 +107,61 @@ const updateBustProb = (G: GameType, endOfTurn: boolean): void => {
     G.mountainShape
   );
   G.bustProb = getOddsCalculator().oddsBust(allowedColumns);
+};
+
+/*
+ * When a player climbs a column of 1 step, this function determines where he will land.
+ * This is trivial in "share" mode but not in "jump" mode.
+ */
+export const climbOneStep = (
+  currentPositions: { [key: number]: number },
+  checkpointPositions: { [key: string]: { [key: number]: number } },
+  column: number,
+  playerID: PlayerID,
+  sameSpace: SameSpace
+): number => {
+  let newStep;
+
+  if (currentPositions.hasOwnProperty(column)) {
+    newStep = currentPositions[column] + 1;
+  } else {
+    const playerCheckpoint = checkpointPositions[playerID];
+    const checkpoint =
+      playerCheckpoint == null ? 0 : playerCheckpoint[column] || 0;
+    newStep = checkpoint + 1;
+  }
+
+  if (sameSpace === "share") {
+    return newStep;
+  } else if (sameSpace === "jump") {
+    let weJumped = true;
+
+    while (weJumped) {
+      // In jump mode we need to check if another player is at that spot.
+      const newStep2 = newStep;
+      weJumped = Object.entries(checkpointPositions).some(
+        ([otherPlayerID, playerCheckpointPositions]) => {
+          // Ignore the current player.
+          if (otherPlayerID === playerID) {
+            return false;
+          }
+          // If the step is the same, then we increment the current player's
+          // position.
+          const step = playerCheckpointPositions[column];
+          if (step != null && step === newStep2) {
+            return true;
+          }
+          return false;
+        }
+      );
+      if (weJumped) {
+        newStep++;
+      }
+    }
+    return newStep;
+  } else {
+    throw new Error("unexpected value for sameSpace");
+  }
 };
 
 /*
@@ -138,9 +201,11 @@ const turn = {
           G.diceSumOptions = getSumOptions(
             G.diceValues,
             G.currentPositions,
-            G.checkpointPositions[ctx.currentPlayer],
+            G.checkpointPositions,
             G.blockedSums,
-            G.mountainShape
+            G.mountainShape,
+            ctx.currentPlayer,
+            G.sameSpace
           );
           // Check if busted.
           const busted = G.diceSumOptions.every((sumOption: SumOption) => {
@@ -233,17 +298,17 @@ const turn = {
           }
           G.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
 
-          diceSums.forEach((s) => {
-            if (s == null) {
+          diceSums.forEach((col) => {
+            if (col == null) {
               return;
             }
-            if (G.currentPositions.hasOwnProperty(s)) {
-              G.currentPositions[s]++;
-            } else {
-              const checkpoint =
-                G.checkpointPositions[ctx.currentPlayer][s] || 0;
-              G.currentPositions[s] = checkpoint + 1;
-            }
+            G.currentPositions[col] = climbOneStep(
+              G.currentPositions,
+              G.checkpointPositions,
+              col,
+              ctx.currentPlayer,
+              G.sameSpace
+            );
           });
           updateBustProb(G, /* endOfTurn */ false);
           gotoStage(G, ctx, "rolling");
@@ -332,6 +397,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     bustProb: 0,
     endOfTurnBustProb: 0,
     mountainShape: "tall",
+    sameSpace: "share",
   };
 };
 
@@ -496,6 +562,12 @@ const CantStop = {
                 }
                 G.mountainShape = mountainShape;
               },
+              setSameSpace: (G: GameType, ctx, sameSpace: SameSpace) => {
+                if (ctx.playerID !== "0") {
+                  return INVALID_MOVE;
+                }
+                G.sameSpace = sameSpace;
+              },
             },
           },
         },
@@ -531,6 +603,7 @@ const CantStop = {
             "numColsToWin",
             "showProbs",
             "mountainShape",
+            "sameSpace",
           ];
 
           // Create an object like G but with only the fields to keep.

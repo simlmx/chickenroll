@@ -86,7 +86,6 @@ export function getAllowedColumns(
     // If not all the runners are there, allowed columns are everything but the blocked
     // columns.
 
-    // this is just [2, 3, ..., 12]
     all = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   } else {
     // If all the runners are available, then, we only have access to those

@@ -171,6 +171,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     moveHistory,
     showProbs,
     mountainShape,
+    sameSpace,
   } = G;
   const { currentPlayer, phase, numPlayers, playOrder } = ctx;
 
@@ -357,6 +358,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           mouseOverPossibility: realMouseOverPossibility,
           playerInfos,
           mountainShape,
+          sameSpace,
         }}
       />
     );
@@ -369,6 +371,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
     realMouseOverPossibility,
     playerInfos,
     mountainShape,
+    sameSpace,
   ]);
 
   // If the game has already started we show a sorry message with a crying cat.
@@ -410,6 +413,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           numColsToWin,
           showProbs,
           mountainShape,
+          sameSpace,
         }}
       />
     );

@@ -1,4 +1,10 @@
-import { DiceSum, SumOption, MountainShape } from "../types";
+import {
+  DiceSum,
+  SumOption,
+  MountainShape,
+  SameSpace,
+  PlayerID,
+} from "../types";
 import { NUM_STEPS } from "../constants";
 
 export const DICE_INDICES = [
@@ -27,9 +33,11 @@ export const DICE_INDICES = [
 export function getSumOptions(
   diceValues: DiceSum[],
   currentPositions: { [key: string]: number },
-  checkpointPositions: { [key: number]: number },
+  checkpointPositions: { [key: number]: { [key: number]: number } },
   blockedSums: { [key: number]: string },
-  mountainShape: MountainShape
+  mountainShape: MountainShape,
+  sameSpace: SameSpace,
+  playerID: PlayerID
 ): SumOption[] {
   if (diceValues.length !== 4) {
     throw new Error("Should have 4 values");
@@ -38,7 +46,7 @@ export function getSumOptions(
   const numClimbersLeft = 3 - Object.keys(currentPositions).length;
 
   // How many space left for each current climber.
-  let currentClimberSpace = new Map<DiceSum, number>();
+  let currentClimberSpaceLeft = new Map<DiceSum, number>();
 
   let updatedBlockedSums = new Set(
     Object.keys(blockedSums).map((x) => parseInt(x))
@@ -46,9 +54,25 @@ export function getSumOptions(
 
   Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
     const diceSum = parseInt(diceSumStr);
-    const space = getNumStepsForSum(diceSum, mountainShape) - currentStep;
+    let space = getNumStepsForSum(diceSum, mountainShape) - currentStep;
 
-    currentClimberSpace.set(diceSum, space);
+    // Now if we are in 'jump' mode, we need to subtract the number of other players in
+    // those spaces.
+    if (sameSpace === "jump") {
+      Object.values(checkpointPositions).forEach((playerCheckpoints) => {
+        const otherPlayerCurrentStep = playerCheckpoints[diceSumStr];
+        // If that other player is on the same column and more advanced than us, then it's
+        // a space we need to remove.
+        if (
+          otherPlayerCurrentStep != null &&
+          otherPlayerCurrentStep > currentStep
+        ) {
+          space--;
+        }
+      });
+    }
+
+    currentClimberSpaceLeft.set(diceSum, space);
 
     // If there is no space left for some climbers, then those columns are actually
     // blocked.
@@ -70,15 +94,15 @@ export function getSumOptions(
       );
 
       if (diceSums[0] === diceSums[1]) {
-        // If both of the sums are the same.
+        // Both of the sums are the same.
         const diceSum = diceSums[0];
+        // If the column is blocked, there are no options.
         if (updatedBlockedSums.has(diceSum)) {
-          // If the column is blocked, there are no options.
           return { diceSums: [null, null] };
         }
-        if (currentClimberSpace.has(diceSum)) {
+        if (currentClimberSpaceLeft.has(diceSum)) {
           // Are we already climbing that "sum"?
-          if (currentClimberSpace.get(diceSum) === 1) {
+          if (currentClimberSpaceLeft.get(diceSum) === 1) {
             // If the columns has one space left, we can choose the sum only once.
             return { diceSums: [diceSum, null] };
           } else {
@@ -91,9 +115,12 @@ export function getSumOptions(
           if (numClimbersLeft > 0) {
             // But we need 2 spaces if we already have a checkpoint there to be able to
             // play both. Otherwise we can only play one.
+            //
+            const ourCheckpointPositions = checkpointPositions[playerID];
             if (
-              checkpointPositions[diceSum] ===
-              getNumStepsForSum(diceSum, mountainShape) - 1
+              ourCheckpointPositions != null &&
+              ourCheckpointPositions[diceSum] ===
+                getNumStepsForSum(diceSum, mountainShape) - 1
             ) {
               return { diceSums: [diceSum, null] };
             } else {
