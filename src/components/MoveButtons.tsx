@@ -185,7 +185,7 @@ interface MoveButtonsProps {
   ctx: any;
   moves: any;
   G: GameType;
-  playerID: PlayerID;
+  playerID: PlayerID | null;
   playerColor: number;
   onMouseEnter: (diceSplit: number, dicePairs: number[]) => void;
   onMouseLeave: () => void;

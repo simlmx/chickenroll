@@ -94,7 +94,7 @@ const gotoStage = (G: GameType, ctx, newStage: string): void => {
   const activePlayers = G.passAndPlay
     ? { all: newStage }
     : { currentPlayer: newStage, others: Stage.NULL };
-  ctx.events.setActivePlayers(activePlayers);
+  ctx?.events?.setActivePlayers?.(activePlayers);
 };
 
 const updateBustProb = (G: GameType, endOfTurn: boolean): void => {

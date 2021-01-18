@@ -333,7 +333,7 @@ const SettingOption = (props: SettingOptionProps) => {
 
 interface GameSetupProps {
   playerInfos: { [key: string]: PlayerInfo };
-  playerID: PlayerID;
+  playerID: PlayerID | null;
   moves: any;
   maxNumPlayers: number;
   matchID: string;
@@ -365,6 +365,9 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
   const [showQr, setShowQr] = useState(false);
 
   useEffect(() => {
+    if (playerID == null) {
+      return;
+    }
     // If it's the first time we join that game, we tell the game. It's going to assign
     // us a default name and color.
 

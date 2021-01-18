@@ -1,5 +1,5 @@
 {
-  "name": "cantstop",
+  "name": "chickenroll",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,7 +10,7 @@
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.0",
     "bgio-postgres": "^1.0.8",
-    "boardgame.io": "^0.41.1",
+    "boardgame.io": "^0.43.1",
     "esm": "^3.2.25",
     "koa-sslify": "^4.0.3",
     "koa-static": "^5.0.0",

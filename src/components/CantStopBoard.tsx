@@ -16,7 +16,9 @@ import localStorage from "../utils/localStorage";
 import { isIOS } from "../utils/platform";
 import { BustProb } from "./Bust";
 
-export class Info extends React.Component<{
+import { BoardProps } from "boardgame.io/react";
+
+interface InfoProps {
   info?: { code: string; playerID?: PlayerID };
   endOfTurnBustProb?: number;
   onClick: () => void;
@@ -25,7 +27,9 @@ export class Info extends React.Component<{
   playerID: PlayerID;
   // When it's your turn, we add it to the Info.
   itsYourTurn: boolean;
-}> {
+}
+
+export class Info extends React.Component<InfoProps> {
   renderContent(): JSX.Element | undefined {
     const { info, playerInfos, itsYourTurn, endOfTurnBustProb } = this.props;
 
@@ -129,27 +133,7 @@ export class Info extends React.Component<{
   }
 }
 
-interface CantStopBoardProps {
-  G: GameType;
-  playerID: PlayerID;
-  matchID: string;
-  ctx: any;
-  moves: any;
-  log: any;
-  isActive: boolean;
-  isConnected: boolean;
-  plugins: any;
-  _undo: any;
-  _redo: any;
-  _stateID: any;
-  events: any;
-  reset: any;
-  undo: any;
-  redo: any;
-  isMultiplayer: boolean;
-}
-
-export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
+export const CantStopBoard = (props: BoardProps<GameType>) => {
   const [mouseOverPossibility, setMouseOverPossibility] = useState<
     { diceSplit: number; dicePairs: number[] } | undefined
   >(undefined);
@@ -245,7 +229,8 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
   // Once the game is started, `G.numPlayers` is set to the number of players that
   // have joined. If our playerID is bigger than that, it means we are not part of
   // those players.
-  const gameStartedWithoutYou = parseInt(props.playerID) >= props.G.numPlayers;
+  const gameStartedWithoutYou =
+    props.playerID && parseInt(props.playerID) >= props.G.numPlayers;
 
   const infoCode = props.G.info?.code;
   const infoTs = props.G.info?.ts;
@@ -333,7 +318,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
 
   // We want to forget about mouseOverPossibility as soon as we are not in the moving
   // stage. This prevents some flickering of the black eggs.
-  const stageIsMoving = ctx.activePlayers[currentPlayer] === "moving";
+  const stageIsMoving = ctx?.activePlayers?.[currentPlayer] === "moving";
   const realMouseOverPossibility = stageIsMoving
     ? mouseOverPossibility
     : undefined;
@@ -451,7 +436,9 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
             moves.playAgain();
             setShowInfo(false);
           }}
-          className={`btn btnAction bgcolor${playerInfos[playerID].color}`}
+          className={`btn btnAction ${
+            playerID == null ? "" : `bgcolor${playerInfos[playerID].color}`
+          }`}
         >
           Play again!
         </button>
@@ -463,7 +450,10 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
           ctx,
           G,
           playerID,
-          playerColor: playerInfos[playerID].color,
+          // Use this player's color if there is a player otherwise use the current
+          // player's color.
+          playerColor:
+            playerInfos[playerID == null ? currentPlayer : playerID].color,
           onRoll: () => {
             moves.rollDice();
             setShowInfo(false);
@@ -494,7 +484,7 @@ export const CantStopBoard = (props: CantStopBoardProps): JSX.Element => {
         playerInfos,
         // For pass and play we ignore the playerID.
         // This means we never right "You" but always "player name".
-        playerID: passAndPlay ? -1 : playerID,
+        playerID: passAndPlay || playerID == null ? "-1" : playerID,
         itsYourTurn,
       }}
     />
