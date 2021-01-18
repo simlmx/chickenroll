@@ -138,7 +138,7 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
     { diceSplit: number; dicePairs: number[] } | undefined
   >(undefined);
 
-  const { moves, matchID, ctx, G } = props;
+  const { moves, matchID, ctx, G, matchData } = props;
   const {
     checkpointPositions,
     currentPositions,
@@ -399,6 +399,7 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
           showProbs,
           mountainShape,
           sameSpace,
+          matchData,
         }}
       />
     );
@@ -413,6 +414,7 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
         playOrder,
         numVictories,
         numColsToWin,
+        matchData,
       }}
     />
   );

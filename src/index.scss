@@ -931,6 +931,36 @@ $diceSize: 3.4rem;
   align-self: center;
 }
 
+.playerDisconnected {
+  color: $danger;
+  font-style: italic;
+}
+
+.disconnected {
+  width: 1.2em;
+  height: 1.2rem;
+  border-radius: 0.2rem;
+  border: 0.1rem solid $danger;
+  margin-left: 1rem;
+
+  align-self: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba($danger, 0.1);
+
+  > svg {
+    width: 0.8rem;
+    height: 0.8rem;
+    padding: 0.05rem;
+  }
+  path {
+    fill: $danger;
+  }
+}
+
 .gameSetupPlayer {
   height: 2.8rem;
   width: 100%;

@@ -11,29 +11,8 @@ import InGameIcons from "./InGameIcons";
 import getSoundPlayer from "../audio";
 import localStorage from "../utils/localStorage";
 import { ShowProbsType } from "../Game";
-
-// Inspired from: https://github.com/tailwindlabs/heroicons/blob/master/src/solid/pencil.svg
-const Pencil = (props: { color?: number }) => {
-  const { color } = props;
-  let pathClassName = "";
-  if (color != null) {
-    pathClassName = `dotColor${color}`;
-  }
-  return (
-    <div className="pencil">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          className={pathClassName}
-          d="M13.5858 3.58579C14.3668 2.80474 15.6332 2.80474 16.4142 3.58579C17.1953 4.36683 17.1953 5.63316 16.4142 6.41421L15.6213 7.20711L12.7929 4.37868L13.5858 3.58579Z"
-        />
-        <path
-          d="M11.3787 5.79289L3 14.1716V17H5.82842L14.2071 8.62132L11.3787 5.79289Z"
-          className={pathClassName}
-        />
-      </svg>
-    </div>
-  );
-};
+import { FilteredMetadata } from "boardgame.io";
+import { Pencil } from "./icons";
 
 // We need this to close the popup when we click outside.
 // https://stackoverflow.com/a/42234988
@@ -140,6 +119,7 @@ interface PlayerProps {
   playerID: PlayerID;
   colorAvailabilityMap: boolean[];
   passAndPlay: boolean;
+  isConnected: boolean;
 }
 
 export const Player = (props: PlayerProps): JSX.Element => {
@@ -150,6 +130,7 @@ export const Player = (props: PlayerProps): JSX.Element => {
     playerID,
     colorAvailabilityMap,
     passAndPlay,
+    isConnected,
   } = props;
 
   const { name, color, ready } = playerInfo;
@@ -235,12 +216,16 @@ export const Player = (props: PlayerProps): JSX.Element => {
       </OutsideAlerter>
     );
   } else {
+    const opts: any = {
+      className: "playerName",
+    };
+    if (!isConnected) {
+      opts.className += " playerDisconnected";
+      opts.title = "Player has disconnected";
+    }
     nameElement = (
-      <div
-        className="playerName"
-        onClick={(e) => !currentReady && setEditingName(true)}
-      >
-        {name || "..."}
+      <div {...opts} onClick={(e) => !currentReady && setEditingName(true)}>
+        {name}
         {!currentReady && itsMe && <Pencil />}
       </div>
     );
@@ -342,6 +327,7 @@ interface GameSetupProps {
   showProbs: ShowProbsType;
   mountainShape: MountainShape;
   sameSpace: SameSpace;
+  matchData?: FilteredMetadata; //{ id?: number; name?: string; isConnected?: boolean }[];
 }
 
 const GameSetup = (props: GameSetupProps): JSX.Element => {
@@ -356,6 +342,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
     showProbs,
     mountainShape,
     sameSpace,
+    matchData,
   } = props;
 
   // Using a state is how I made the auto-focus on the start button once everyone is
@@ -453,6 +440,9 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
           key={currentPlayerID}
           colorAvailabilityMap={colorAvailabilityMap}
           passAndPlay={passAndPlay}
+          isConnected={
+            matchData == null || matchData[currentPlayerID].isConnected
+          }
         />
       );
     }

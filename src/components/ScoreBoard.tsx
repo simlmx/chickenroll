@@ -1,6 +1,7 @@
 import React from "react";
 import { PlayerID, PlayerInfo } from "../types";
 import Chicken from "./Chicken";
+import { FilteredMetadata } from "boardgame.io";
 
 const Trophy = (props: { value: number; color: number | "gold" }) => {
   const { color, value } = props;
@@ -59,6 +60,7 @@ interface ScoreBoardProps {
   currentPlayer: PlayerID;
   playOrder: PlayerID[];
   numColsToWin: number | "auto";
+  matchData?: FilteredMetadata;
 }
 
 export class ScoreBoard extends React.Component<ScoreBoardProps> {
@@ -70,6 +72,7 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
       currentPlayer,
       numVictories,
       numColsToWin,
+      matchData,
     } = this.props;
 
     if (numColsToWin === "auto") {
@@ -83,6 +86,8 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
       const color = playerInfos[playerID].color;
       const points = scores[playerID];
       const numVictoriesPlayer = numVictories[playerID];
+      const isConnected = matchData == null || matchData[playerID].isConnected;
+
       // In theory we can finish with 2 more stars than required. For this reason we add
       // 2 transparent stars at the end so that the layout doens't change when it
       // happens.
@@ -108,9 +113,13 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
             </td>
           );
         });
-      let className = `scoreBoardPlayerName bgcolor${color}`;
+      let opts: any = { className: `scoreBoardPlayerName bgcolor${color}` };
       if (playerID === currentPlayer) {
-        className += " scoreBoardPlayerNameCurrent littleFlash";
+        opts.className += " scoreBoardPlayerNameCurrent littleFlash";
+      }
+      if (!isConnected) {
+        opts.className += " playerDisconnected";
+        opts.title = "Player has disconnected";
       }
       return (
         <tr key={playerID}>
@@ -121,7 +130,7 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
             />
           </td>
           <td>
-            <div {...{ className }}>{name}</div>
+            <div {...opts}>{name}</div>
           </td>
           {starColumns}
         </tr>
