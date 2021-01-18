@@ -523,15 +523,14 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         ])}
       />
       <SettingOption
-        id="showProbs"
-        name="Show probability of cracking"
+        id="sameSpace"
+        name="Player Interaction"
         disabled={!imTheOwner}
-        onChange={(value) => moves.setShowProbs(value)}
-        currentValue={showProbs}
+        onChange={(value) => moves.setSameSpace(value)}
+        currentValue={sameSpace}
         values={[
-          ["before", "Before every roll"],
-          ["after", "At the end of the turn"],
-          ["never", "Never"],
+          ["share", "None"],
+          ["jump", "Jump Over"],
         ]}
       />
       <SettingOption
@@ -546,14 +545,15 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         ]}
       />
       <SettingOption
-        id="sameSpace"
-        name="Player Interaction"
+        id="showProbs"
+        name="Show probability of cracking"
         disabled={!imTheOwner}
-        onChange={(value) => moves.setSameSpace(value)}
-        currentValue={sameSpace}
+        onChange={(value) => moves.setShowProbs(value)}
+        currentValue={showProbs}
         values={[
-          ["share", "None"],
-          ["jump", "Jump Over"],
+          ["before", "Before every roll"],
+          ["after", "At the end of the turn"],
+          ["never", "Never"],
         ]}
       />
     </div>
