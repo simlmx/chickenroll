@@ -125,6 +125,66 @@ describe("testGetSumOptions", () => {
       { 6: 0, 8: 0 },
       [{ diceSums: [null, null] }, { diceSums: [7, 7] }, { diceSums: [7, 7] }],
     ],
+    [
+      [3, 3, 3, 3],
+      {},
+      { "6": 10 },
+      {},
+      [
+        { diceSums: [6, null] },
+        { diceSums: [6, null] },
+        { diceSums: [6, null] },
+      ],
+    ],
+    // A bunch of cases for double-12.
+    // [ ] [ ] [ ]
+    [
+      [6, 6, 6, 6],
+      {},
+      {},
+      {},
+      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
+    ],
+    // [x] [ ] [ ]
+    [
+      [6, 6, 6, 6],
+      { "12": 1 },
+      {},
+      {},
+      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
+    ],
+    // [ ] [x] [ ]
+    [
+      [6, 6, 6, 6],
+      { "12": 2 },
+      {},
+      {},
+      [
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+      ],
+    ],
+    // [X] [ ] [ ]
+    [
+      [6, 6, 6, 6],
+      {},
+      { "12": 1 },
+      {},
+      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
+    ],
+    // [ ] [X] [ ]
+    [
+      [6, 6, 6, 6],
+      {},
+      { "12": 2 },
+      {},
+      [
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+      ],
+    ],
   ]).it(
     "case '%s %s %s %s'",
     (
@@ -195,8 +255,121 @@ describe("testGetSumOptionsJump", () => {
       {},
       [{ diceSums: [7, 7] }, { diceSums: [6, 8] }, { diceSums: [7, 7] }],
     ],
+    [
+      [3, 3, 3, 3],
+      {},
+      { "0": { "6": 10 } },
+      {},
+      [
+        { diceSums: [6, null] },
+        { diceSums: [6, null] },
+        { diceSums: [6, null] },
+      ],
+    ],
+    // A bunch of cases for double-12.
+    // [x] [o] []
+    [
+      [6, 6, 6, 6],
+      { "12": 1 },
+      { "1": { "12": 2 } },
+      {},
+      [
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+      ],
+    ],
+    // [X] [o] []
+    [
+      [6, 6, 6, 6],
+      {},
+      { "0": { "12": 1 }, "1": { "12": 2 } },
+      {},
+      [
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+      ],
+    ],
+    // [o] [ ] []
+    [
+      [6, 6, 6, 6],
+      {},
+      { "1": { "12": 1 } },
+      {},
+      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
+    ],
+    // [ ] [o] []
+    [
+      [6, 6, 6, 6],
+      {},
+      { "1": { "12": 2 } },
+      {},
+      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
+    ],
+    // [o] [o] []
+    [
+      [6, 6, 6, 6],
+      {},
+      { "1": { "12": 2 }, "2": { "12": 1 } },
+      {},
+      [
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+      ],
+    ],
+    // [o] [x] []
+    [
+      [6, 6, 6, 6],
+      {},
+      { "1": { "12": 2 }, "2": { "12": 1 } },
+      {},
+      [
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+        { diceSums: [12, null] },
+      ],
+    ],
+
+    // Double with [x] [o] [ ] [o] [ ]
+    [
+      [5, 6, 5, 6],
+      { "11": 1 },
+      { "2": { "11": 2 }, "3": { "11": 4 } },
+      {},
+      [{ diceSums: [11, 11] }, { diceSums: [10, 12] }, { diceSums: [11, 11] }],
+    ],
+
+    // Double with [x] [o] [o] [ ] [o] [o] [ ]
+    [
+      [4, 5, 4, 5],
+      { "9": 1 },
+      { "2": { "9": 2 }, "3": { "9": 3 }, "4": { "9": 5 }, "5": { "9": 6 } },
+      {},
+      [{ diceSums: [9, 9] }, { diceSums: [8, 10] }, { diceSums: [9, 9] }],
+    ],
+
+    // Double with [x] [o] [o] [o] [o] [o] [ ]
+    [
+      [4, 6, 4, 6],
+      { "10": 1 },
+      {
+        "2": { "10": 2 },
+        "3": { "10": 3 },
+        "6": { "10": 4 },
+        "4": { "10": 5 },
+        "5": { "10": 6 },
+      },
+      {},
+      [
+        { diceSums: [10, null] },
+        { diceSums: [8, 12] },
+        { diceSums: [10, null] },
+      ],
+    ],
   ]).it(
-    "case '%s %s %s %s'",
+    "case '%s %s %s %s %s'",
     (
       diceValues,
       climberPositions,

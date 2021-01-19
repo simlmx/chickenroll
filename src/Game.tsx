@@ -204,8 +204,8 @@ const turn = {
             G.checkpointPositions,
             G.blockedSums,
             G.mountainShape,
-            ctx.currentPlayer,
-            G.sameSpace
+            G.sameSpace,
+            ctx.currentPlayer
           );
           // Check if busted.
           const busted = G.diceSumOptions.every((sumOption: SumOption) => {

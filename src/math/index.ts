@@ -23,6 +23,44 @@ export const DICE_INDICES = [
 ];
 
 /*
+ * Given the state of the game, how many spaces are left for player `playerID` on column
+ * `column`?
+ *
+ * This is basically the number of step left minus the number of people in the way, IF
+ * in jump mode.
+ */
+const getSpaceLeft = (
+  currentPositions: { [key: string]: number },
+  checkpointPositions: { [key: number]: { [key: number]: number } },
+  mountainShape: MountainShape,
+  sameSpace: SameSpace,
+  column: number,
+  playerID: PlayerID
+) => {
+  const startStep =
+    currentPositions[column] || checkpointPositions[playerID]?.[column] || 0;
+
+  let space = getNumStepsForSum(column, mountainShape) - startStep;
+
+  // Now if we are in 'jump' mode, we need to subtract the number of other players in
+  // those spaces.
+  if (sameSpace === "jump") {
+    Object.values(checkpointPositions).forEach((playerCheckpoints) => {
+      const otherPlayerCurrentStep = playerCheckpoints[column.toString()];
+      // If that other player is on the same column and more advanced than us, then it's
+      // a space we need to remove.
+      if (
+        otherPlayerCurrentStep != null &&
+        otherPlayerCurrentStep > startStep
+      ) {
+        space--;
+      }
+    });
+  }
+  return space;
+};
+
+/*
  * Return something like
  * [[[8, 10]], [[9]], [[3], [7]]]
  * Which means you can either choose
@@ -30,7 +68,7 @@ export const DICE_INDICES = [
  * - 9
  * - 3 or 7
  */
-export function getSumOptions(
+export const getSumOptions = (
   diceValues: DiceSum[],
   currentPositions: { [key: string]: number },
   checkpointPositions: { [key: number]: { [key: number]: number } },
@@ -38,7 +76,7 @@ export function getSumOptions(
   mountainShape: MountainShape,
   sameSpace: SameSpace,
   playerID: PlayerID
-): SumOption[] {
+): SumOption[] => {
   if (diceValues.length !== 4) {
     throw new Error("Should have 4 values");
   }
@@ -54,23 +92,14 @@ export function getSumOptions(
 
   Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
     const diceSum = parseInt(diceSumStr);
-    let space = getNumStepsForSum(diceSum, mountainShape) - currentStep;
-
-    // Now if we are in 'jump' mode, we need to subtract the number of other players in
-    // those spaces.
-    if (sameSpace === "jump") {
-      Object.values(checkpointPositions).forEach((playerCheckpoints) => {
-        const otherPlayerCurrentStep = playerCheckpoints[diceSumStr];
-        // If that other player is on the same column and more advanced than us, then it's
-        // a space we need to remove.
-        if (
-          otherPlayerCurrentStep != null &&
-          otherPlayerCurrentStep > currentStep
-        ) {
-          space--;
-        }
-      });
-    }
+    const space = getSpaceLeft(
+      currentPositions,
+      checkpointPositions,
+      mountainShape,
+      sameSpace,
+      diceSum,
+      playerID
+    );
 
     currentClimberSpaceLeft.set(diceSum, space);
 
@@ -116,11 +145,15 @@ export function getSumOptions(
             // But we need 2 spaces if we already have a checkpoint there to be able to
             // play both. Otherwise we can only play one.
             //
-            const ourCheckpointPositions = checkpointPositions[playerID];
             if (
-              ourCheckpointPositions != null &&
-              ourCheckpointPositions[diceSum] ===
-                getNumStepsForSum(diceSum, mountainShape) - 1
+              getSpaceLeft(
+                currentPositions,
+                checkpointPositions,
+                mountainShape,
+                sameSpace,
+                diceSum,
+                playerID
+              ) === 1
             ) {
               return { diceSums: [diceSum, null] };
             } else {
@@ -172,7 +205,7 @@ export function getSumOptions(
   );
 
   return allDiceSums;
-}
+};
 
 /*
  * Get the number of steps for a given dice sum
