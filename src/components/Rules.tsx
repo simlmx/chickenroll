@@ -2,6 +2,7 @@ import React from "react";
 import { Die } from "./Die";
 import { Climber, Mountain } from "./Mountain";
 import { MountainShape, SameSpace } from "../types";
+import { makeSumOption } from "../math";
 
 const Rules = (props) => {
   const playerID = "0";
@@ -81,8 +82,8 @@ const Rules = (props) => {
           maxCol: 10,
           maxRow: 3,
           // Ok now this is ugly
-          mouseOverPossibility: { diceSplit: 0, dicePairs: [0] },
-          diceSumOptions: [{ diceSums: [9, null] }],
+          mouseOverPossibility: { buttonRow: 0, buttonColumn: 0 },
+          diceSumOptions: [makeSumOption([9, 0], [true, false])],
         }}
       />
     </div>

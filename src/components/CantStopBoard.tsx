@@ -6,7 +6,6 @@ import { ScoreBoard } from "./ScoreBoard";
 import GameSetup from "./GameSetup";
 import MoveButtons from "./MoveButtons";
 import MoveHistory from "./MoveHistory";
-import { DICE_INDICES } from "../math";
 import { GameType } from "../Game";
 import { PlayerID, PlayerInfo } from "../types";
 import InGameIcons from "./InGameIcons";
@@ -135,7 +134,7 @@ export class Info extends React.Component<InfoProps> {
 
 export const CantStopBoard = (props: BoardProps<GameType>) => {
   const [mouseOverPossibility, setMouseOverPossibility] = useState<
-    { diceSplit: number; dicePairs: number[] } | undefined
+    { buttonRow: number; buttonColumn: number } | undefined
   >(undefined);
 
   const { moves, matchID, ctx, G, matchData } = props;
@@ -300,22 +299,6 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
     return () => window.removeEventListener("keydown", escHandler);
   }, []);
 
-  // Highlight or not for each die.
-  let diceHighlight: boolean[] = Array(4).fill(false);
-  let diceSplit: number | undefined = undefined;
-  if (mouseOverPossibility != null) {
-    diceSplit = mouseOverPossibility.diceSplit;
-    const { dicePairs } = mouseOverPossibility;
-
-    const splitIndices: number[][] = DICE_INDICES[diceSplit];
-
-    dicePairs.forEach((pairIndex, i) => {
-      splitIndices[pairIndex].forEach((diceIndex) => {
-        diceHighlight[diceIndex] = true;
-      });
-    });
-  }
-
   // We want to forget about mouseOverPossibility as soon as we are not in the moving
   // stage. This prevents some flickering of the black eggs.
   const stageIsMoving = ctx?.activePlayers?.[currentPlayer] === "moving";
@@ -424,8 +407,6 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
       {...{
         diceValues,
         color: playerInfos[currentPlayer].color,
-        diceHighlight,
-        diceSplit,
       }}
     />
   );
@@ -467,8 +448,8 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
           showProbs,
           bustProb,
         }}
-        onMouseEnter={(diceSplit, dicePairs) => {
-          setMouseOverPossibility({ diceSplit, dicePairs });
+        onMouseEnter={(buttonRow, buttonColumn) => {
+          setMouseOverPossibility({ buttonRow, buttonColumn });
         }}
         onMouseLeave={() => {
           setMouseOverPossibility(undefined);

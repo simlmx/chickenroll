@@ -569,6 +569,10 @@ $diceSize: 3.4rem;
 }
 
 .possibilitiesRow {
+  flex: 1;
+  margin-top: 2px;
+  margin-bottom: 2px;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1207,35 +1211,6 @@ $diceSize: 3.4rem;
   font-size: 12pt;
 }
 
-.dieSplit0 {
-  margin-left: 1px;
-  margin-right: 1px;
-}
-
-.dieSplit1 {
-  margin-top: 1px;
-  margin-bottom: 1px;
-}
-
-.dieSplit20 {
-  transform: translate(0.05rem, 0.05rem);
-  margin: 0;
-}
-
-.dieSplit21 {
-  transform: translate(0.3rem, -0.3rem);
-  margin: 0;
-}
-
-.dieSplit22 {
-  margin: 0;
-  transform: translate(-0.3rem, 0.3rem);
-}
-.dieSplit23 {
-  margin: 0;
-  transform: translate(-0.05rem, -0.05rem);
-}
-
 .dieHighlight {
   filter: brightness(1.1);
   border: 1px solid black;
@@ -1861,4 +1836,70 @@ $mountainRatio: 0.67;
 
 .historyBustEmoji {
   margin-left: 0.1rem;
+}
+
+.btnPossibilities {
+  margin: 2px !important;
+  flex: 1;
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.diceSplit {
+  position: absolute;
+  top: 0.5px;
+  left: 0.5px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.diceSplitRow {
+  display: flex;
+}
+
+.diceSplitDie {
+  margin: 0.4px;
+  border-radius: 1.5px;
+  height: 6px;
+  width: 6px;
+  border: 1px solid black;
+}
+
+.diceSplitWhite {
+  background-color: white;
+}
+
+.diceSplitBlack {
+  background-color: black;
+}
+
+.diceSplitPale {
+  background-color: transparent;
+  border-color: rgba(black, 0.5);
+}
+
+.notMeDisabled {
+  background-color: #d1d1d1 !important;
+  color: #646464 !important;
+  border: none !important;
+}
+
+// This is what we use for buttons when it's not our turn.
+.btn-secondary.notMe:hover {
+  filter: none !important;
+}
+
+.possNumber {
+  flex: 1;
+}
+
+.possNumberSeparator {
+  height: 60%;
+  width: 0;
+  border-right: solid 1px rgba(black, 0.2);
+  border-left: solid 1px rgba(white, 0.3);
 }

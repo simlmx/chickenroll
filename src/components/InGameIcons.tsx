@@ -1,5 +1,6 @@
 import React from "react";
 import { DieLogo } from "./Die";
+import getSoundPlayer from "../audio";
 
 /*
  * volume: 0 (mute), 1, 2, 3 (max)
@@ -50,6 +51,8 @@ const InGameIcons = (props: InGameIconsProps) => {
     showVolume = false;
   }
 
+  const soundPlayer = getSoundPlayer();
+
   return (
     <div className="homeLinkWrap">
       <div className="inGameIcon homeLinkIcon">
@@ -98,7 +101,10 @@ const InGameIcons = (props: InGameIconsProps) => {
       {showVolume && (
         <div
           className="inGameIcon"
-          onClick={() => changeVolume && changeVolume()}
+          onClick={() => {
+            soundPlayer.init();
+            changeVolume && changeVolume();
+          }}
         >
           <div className="soundIconWrap pointer">
             <SoundIcon volume={volume || 0} />

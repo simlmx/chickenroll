@@ -4,14 +4,13 @@ import {
   PLAYER_NAME_MAX_LEN,
 } from "./constants";
 import { Stage } from "boardgame.io/core";
-import { getSumOptions, getNumStepsForSum } from "./math";
 import {
+  getSumOptions,
+  getNumStepsForSum,
   SumOption,
-  PlayerID,
-  PlayerInfo,
-  MountainShape,
-  SameSpace,
-} from "./types";
+  isSumOptionSplit,
+} from "./math";
+import { PlayerID, PlayerInfo, MountainShape, SameSpace } from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 
@@ -78,6 +77,10 @@ export interface GameType {
   mountainShape: MountainShape;
   // What happens when tokens occupy the same spot.
   sameSpace: SameSpace;
+  // Id of the previous player;
+  previousPlayer?: PlayerID;
+  // How did the last player finish;
+  lastOutcome: "stop" | "bust";
 }
 
 /*
@@ -164,6 +167,12 @@ export const climbOneStep = (
   }
 };
 
+const endTurn = (G: GameType, ctx, outcome: "bust" | "stop"): void => {
+  G.previousPlayer = ctx.currentPlayer;
+  G.lastOutcome = outcome;
+  ctx.events.endTurn();
+};
+
 /*
  * Definition of the main phase.
  */
@@ -182,6 +191,7 @@ const turn = {
       let playOrder = Array(G.numPlayers)
         .fill(null)
         .map((_, i) => i.toString());
+      // TODO move 1 back for the 2nd game and more.
       playOrder = ctx.random.Shuffle(playOrder);
       return playOrder;
     },
@@ -208,16 +218,16 @@ const turn = {
             ctx.currentPlayer
           );
           // Check if busted.
-          const busted = G.diceSumOptions.every((sumOption: SumOption) => {
-            return sumOption.diceSums.every((x) => x == null);
-          });
+          const busted = G.diceSumOptions.every((sumOption: SumOption) =>
+            sumOption.enabled.every((x) => !x)
+          );
           if (busted) {
             G.info = {
               code: "bust",
               playerID: ctx.currentPlayer,
               ts: new Date().getTime(),
             };
-            ctx.events.endTurn();
+            endTurn(G, ctx, "bust");
             move.bust = true;
           } else {
             G.currentPlayerHasStarted = true;
@@ -260,7 +270,7 @@ const turn = {
               playerID: ctx.currentPlayer,
               ts: new Date().getTime(),
             };
-            ctx.events.endTurn();
+            endTurn(G, ctx, "stop");
           }
         },
       },
@@ -286,22 +296,19 @@ const turn = {
             throw new Error("assert false");
           }
           const sumOption = G.diceSumOptions[diceSplitIndex];
-          let { diceSums } = sumOption;
+          let { diceSums, enabled } = sumOption;
 
-          if (sumOption?.split) {
+          if (isSumOptionSplit(sumOption)) {
             diceSums = [diceSums[choiceIndex]];
             move.diceUsed = [choiceIndex];
           } else {
             move.diceUsed = diceSums
-              .map((s, i) => (s == null ? null : i))
+              .map((s, i) => (enabled[i] ? i : null))
               .filter((x) => x != null) as number[];
           }
           G.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
 
-          diceSums.forEach((col) => {
-            if (col == null) {
-              return;
-            }
+          diceSums.forEach((col, i) => {
             G.currentPositions[col] = climbOneStep(
               G.currentPositions,
               G.checkpointPositions,
@@ -398,6 +405,7 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     endOfTurnBustProb: 0,
     mountainShape: "tall",
     sameSpace: "share",
+    lastOutcome: "stop",
   };
 };
 

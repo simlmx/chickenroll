@@ -1,10 +1,4 @@
-import {
-  DiceSum,
-  SumOption,
-  MountainShape,
-  SameSpace,
-  PlayerID,
-} from "../types";
+import { DiceSum, MountainShape, SameSpace, PlayerID } from "../types";
 import { NUM_STEPS } from "../constants";
 
 export const DICE_INDICES = [
@@ -21,6 +15,37 @@ export const DICE_INDICES = [
     [1, 2],
   ],
 ];
+
+export type SumOption = {
+  // The 2 numbers
+  diceSums: number[];
+  // In a non-split case this contains only one element.
+  enabled: boolean[];
+  forceSplit: boolean;
+};
+
+/*
+ * Convenient function to create a SumOption object
+ */
+export const makeSumOption = (
+  diceSums: number[],
+  enabled?: boolean[],
+  forceSplit?: boolean
+): SumOption => {
+  forceSplit = forceSplit == null ? false : true;
+  enabled = enabled == null ? [true, true] : enabled;
+  return {
+    diceSums,
+    enabled,
+    forceSplit,
+  };
+};
+
+// We split if we can only select one of the two options.
+// Force split is for when we can select both options but not at the same time.
+export const isSumOptionSplit = (sumOption: SumOption): boolean => {
+  return sumOption?.forceSplit || sumOption.enabled[0] !== sumOption.enabled[1];
+};
 
 /*
  * Given the state of the game, how many spaces are left for player `playerID` on column
@@ -61,12 +86,8 @@ const getSpaceLeft = (
 };
 
 /*
- * Return something like
- * [[[8, 10]], [[9]], [[3], [7]]]
- * Which means you can either choose
- * - 8 and 10
- * - 9
- * - 3 or 7
+ * Compute the 3 options the current player has given the state of the game and the dice
+ * he rolled.
  */
 export const getSumOptions = (
   diceValues: DiceSum[],
@@ -127,17 +148,17 @@ export const getSumOptions = (
         const diceSum = diceSums[0];
         // If the column is blocked, there are no options.
         if (updatedBlockedSums.has(diceSum)) {
-          return { diceSums: [null, null] };
+          return makeSumOption(diceSums, [false, false]);
         }
         if (currentClimberSpaceLeft.has(diceSum)) {
           // Are we already climbing that "sum"?
           if (currentClimberSpaceLeft.get(diceSum) === 1) {
             // If the columns has one space left, we can choose the sum only once.
-            return { diceSums: [diceSum, null] };
+            return makeSumOption(diceSums, [true, false]);
           } else {
             // Otherwise the column is not blocked and we have more than 1 space: we can
             // use both sums.
-            return { diceSums: [diceSum, diceSum] };
+            return makeSumOption(diceSums);
           }
         } else {
           // We are not climbing it. We can play it if we have a climber left.
@@ -155,21 +176,20 @@ export const getSumOptions = (
                 playerID
               ) === 1
             ) {
-              return { diceSums: [diceSum, null] };
+              return makeSumOption(diceSums, [true, false]);
             } else {
-              return { diceSums: [diceSum, diceSum] };
+              return makeSumOption(diceSums);
             }
           } else {
-            return { diceSums: [null, null] };
+            return makeSumOption(diceSums, [false, false]);
           }
         }
       } else {
         // Both sums are different.
         let climbingAtLeastOne = false;
-        let numNonNull = 0;
 
-        // Change the unavailable dice sums to `null`.
-        const newDiceSums = diceSums.map((diceSum: DiceSum): DiceSum | null => {
+        // Are they enabled?
+        const enabled = diceSums.map((diceSum: DiceSum): boolean => {
           const alreadyClimbingIt = currentPositions.hasOwnProperty(diceSum);
 
           if (alreadyClimbingIt) {
@@ -177,29 +197,27 @@ export const getSumOptions = (
             climbingAtLeastOne = true;
           }
 
-          if (
-            updatedBlockedSums.has(diceSum) ||
-            (numClimbersLeft === 0 && !alreadyClimbingIt)
-          ) {
-            // It could be blocked or we could not be climbing it and have no climbers
-            // left.
-            return null;
-          } else {
-            numNonNull += 1;
-            return diceSum;
-          }
+          const isBlocked = updatedBlockedSums.has(diceSum);
+
+          // We can use that number if the column is not blocked and if we have some
+          // climbers left or if we are already climbing it.
+          return !isBlocked && (numClimbersLeft > 0 || alreadyClimbingIt);
         });
 
         // Now the only tricky case left is if we are allowed for both sums, *but not
         // at the same time*.
         // This happens when we have only one climber left, and if the two sums are new
         // sums that we are not already climbing.
+        const forceSplit =
+          numClimbersLeft === 1 &&
+          !climbingAtLeastOne &&
+          enabled.every((x) => x);
 
-        const sumOption: SumOption = { diceSums: newDiceSums };
-        if (numClimbersLeft === 1 && !climbingAtLeastOne && numNonNull === 2) {
-          sumOption.split = true;
-        }
-        return sumOption;
+        return {
+          diceSums,
+          enabled,
+          forceSplit,
+        };
       }
     }
   );

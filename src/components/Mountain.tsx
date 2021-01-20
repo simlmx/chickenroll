@@ -1,12 +1,6 @@
 import React, { useMemo } from "react";
-import { getNumStepsForSum } from "../math";
-import {
-  PlayerID,
-  SumOption,
-  PlayerInfo,
-  MountainShape,
-  SameSpace,
-} from "../types";
+import { getNumStepsForSum, isSumOptionSplit, SumOption } from "../math";
+import { PlayerID, PlayerInfo, MountainShape, SameSpace } from "../types";
 import Chicken from "./Chicken";
 import { NUM_STEPS } from "../constants";
 import { climbOneStep } from "../Game";
@@ -124,7 +118,7 @@ interface MountainProps {
   blockedSums: { [key: number]: string };
   currentPlayer: PlayerID;
   diceSumOptions?: SumOption[];
-  mouseOverPossibility?: { diceSplit: number; dicePairs: number[] };
+  mouseOverPossibility?: { buttonRow: number; buttonColumn: number };
   mountainShape: MountainShape;
   sameSpace: SameSpace;
   // Those options were introduced to be used in the How To Play seciton.
@@ -254,14 +248,17 @@ export const Mountain = (props: MountainProps) => {
   //
 
   // If we want to highlight, we'll compute where the new positions will be!
-  let highlightSums: number[] = [];
   if (mouseOverPossibility != null && diceSumOptions != null) {
-    const { diceSplit, dicePairs } = mouseOverPossibility;
+    const { buttonRow, buttonColumn } = mouseOverPossibility;
 
-    const diceSumOption = diceSumOptions[diceSplit];
-    highlightSums = dicePairs
-      .map((i) => diceSumOption.diceSums[i])
-      .filter((x) => x != null) as number[];
+    const sumOption = diceSumOptions[buttonRow];
+
+    let highlightSums;
+    if (isSumOptionSplit(sumOption)) {
+      highlightSums = [sumOption.diceSums[buttonColumn]];
+    } else {
+      highlightSums = sumOption.diceSums;
+    }
 
     highlightSums.forEach((sum) => {
       const newStep = climbOneStep(
