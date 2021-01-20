@@ -81,8 +81,8 @@ const Rules = (props) => {
           maxCol: 10,
           maxRow: 3,
           // Ok now this is ugly
-          mouseOverPossibility: { diceSplit: 0, dicePairs: [0] },
-          diceSumOptions: [{ diceSums: [9, null] }],
+          mouseOverPossibility: { buttonRow: 0, buttonColumn: 0 },
+          diceSumOptions: [{ diceSums: [9, 0], enabled: [true, false] }],
         }}
       />
     </div>

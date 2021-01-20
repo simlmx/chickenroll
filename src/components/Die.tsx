@@ -77,18 +77,12 @@ interface DieProps {
   color?: number;
   value: number;
   highlight?: boolean;
-  // 0: horizontal split
-  // 1: vertical split
-  // 20: diagonal split die 0
-  // ...
-  // 23: diagonal split die 3
-  split?: string;
   onClick?: () => void;
 }
 
 export class Die extends React.Component<DieProps> {
   render() {
-    const { color, value, highlight, split, onClick } = this.props;
+    const { color, value, highlight, onClick } = this.props;
 
     let className = "die";
     if (color != null) {
@@ -97,10 +91,6 @@ export class Die extends React.Component<DieProps> {
     if (highlight) {
       className += " dieHighlight";
     }
-    if (split != null) {
-      className += ` dieSplit${split}`;
-    }
-
     const opts = { className };
 
     if (onClick) {

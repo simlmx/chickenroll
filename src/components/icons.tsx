@@ -1,4 +1,5 @@
 import React from "react";
+import { DICE_INDICES } from "../math";
 
 // From: https://github.com/tailwindlabs/heroicons/blob/master/src/solid/pencil.svg
 export const Pencil = (props: { color?: number }) => {
@@ -41,6 +42,49 @@ export const Disconnected = (props: { title?: string }) => {
           fill="#626262"
         />
       </svg>
+    </div>
+  );
+};
+
+interface DiceSplitProps {
+  // Which split (0=horizontal, 1=vertical, 2=diagonal)
+  split: number;
+  // For each pair, should they be highlighted
+  pairHighlight: boolean[];
+}
+
+/*
+ * Little icons to represent the dice splits
+ */
+export const DiceSplit = (props: DiceSplitProps) => {
+  const { split, pairHighlight } = props;
+
+  const colorClassNames = ["diceSplitWhite", "diceSplitBlack"];
+
+  const classNames = Array(4).fill("diceSplitDie");
+
+  const diceIndices = DICE_INDICES[split];
+
+  diceIndices.forEach((group, groupIndex) => {
+    const palePair = !pairHighlight[groupIndex];
+    group.forEach((dieIndex) => {
+      classNames[dieIndex] += " " + colorClassNames[groupIndex];
+      if (palePair) {
+        classNames[dieIndex] += " diceSplitPale";
+      }
+    });
+  });
+
+  return (
+    <div className="diceSplit">
+      <div className="diceSplitRow">
+        <div className={classNames[0]}></div>
+        <div className={classNames[1]}></div>
+      </div>
+      <div className="diceSplitRow">
+        <div className={classNames[2]}></div>
+        <div className={classNames[3]}></div>
+      </div>
     </div>
   );
 };

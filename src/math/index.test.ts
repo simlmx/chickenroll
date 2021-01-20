@@ -1,53 +1,56 @@
-import { getSumOptions } from "../math";
+import { getSumOptions, SumOption, makeSumOption } from "../math";
 import each from "jest-each";
+
+/*
+ * Convenient function to create a SumOption object
+ */
+const so = (
+  d0,
+  d1,
+  enabled0?: boolean,
+  enabled1?: boolean,
+  forceSplit?: boolean
+): SumOption => {
+  const sumOptions = [d0, d1];
+  const enabled = [
+    enabled0 == null ? true : enabled0,
+    enabled1 == null ? true : enabled1,
+  ];
+
+  return makeSumOption(sumOptions, enabled, forceSplit);
+};
 
 describe("testGetSumOptions", () => {
   each([
-    [
-      [1, 1, 2, 2],
-      {},
-      {},
-      {},
-      [{ diceSums: [2, 4] }, { diceSums: [3, 3] }, { diceSums: [3, 3] }],
-    ],
-    [
-      [1, 2, 3, 4],
-      {},
-      {},
-      {},
-      [{ diceSums: [3, 7] }, { diceSums: [4, 6] }, { diceSums: [5, 5] }],
-    ],
+    [[1, 1, 2, 2], {}, {}, {}, [so(2, 4), so(3, 3), so(3, 3)]],
+    [[1, 2, 3, 4], {}, {}, {}, [so(3, 7), so(4, 6), so(5, 5)]],
     [
       [1, 2, 3, 4],
       {},
       {},
       { 5: 0 },
-      [{ diceSums: [3, 7] }, { diceSums: [4, 6] }, { diceSums: [null, null] }],
+      [so(3, 7), so(4, 6), so(5, 5, false, false)],
     ],
     [
       [1, 2, 3, 4],
       { 5: 7 },
       {},
       { 6: 0 },
-      [{ diceSums: [3, 7] }, { diceSums: [4, null] }, { diceSums: [5, 5] }],
+      [so(3, 7), so(4, 6, true, false), so(5, 5)],
     ],
     [
       [1, 2, 3, 4],
       { 5: 6 },
       {},
       { 6: 0 },
-      [{ diceSums: [3, 7] }, { diceSums: [4, null] }, { diceSums: [5, 5] }],
+      [so(3, 7), so(4, 6, true, false), so(5, 5)],
     ],
     [
       [1, 2, 3, 4],
       { 4: 1, 12: 1 },
       {},
       { 6: 0 },
-      [
-        { diceSums: [3, 7], split: true },
-        { diceSums: [4, null] },
-        { diceSums: [5, 5] },
-      ],
+      [so(3, 7, true, true, true), so(4, 6, true, false), so(5, 5)],
     ],
     [
       [1, 2, 3, 4],
@@ -58,9 +61,9 @@ describe("testGetSumOptions", () => {
       // blocked
       { 6: 0 },
       [
-        { diceSums: [3, 7], split: true },
-        { diceSums: [4, null] },
-        { diceSums: [5, null] },
+        so(3, 7, true, true, true),
+        so(4, 6, true, false),
+        so(5, 5, true, false),
       ],
     ],
     [
@@ -68,11 +71,7 @@ describe("testGetSumOptions", () => {
       { 4: 1, 12: 1 },
       { 5: 7 },
       { 6: 0 },
-      [
-        { diceSums: [3, 7], split: true },
-        { diceSums: [4, null] },
-        { diceSums: [5, 5] },
-      ],
+      [so(3, 7, true, true, true), so(4, 6, true, false), so(5, 5)],
     ],
     // All climbers on the board, almost done with diceSum=7
     [
@@ -80,11 +79,7 @@ describe("testGetSumOptions", () => {
       { 7: 11, 2: 1, 3: 1 },
       { 1: 2, 3: 4 },
       {},
-      [
-        { diceSums: [3, 7] },
-        { diceSums: [null, null] },
-        { diceSums: [null, null] },
-      ],
+      [so(3, 7), so(4, 6, false, false), so(5, 5, false, false)],
     ],
     [
       [1, 2, 3, 4],
@@ -93,11 +88,7 @@ describe("testGetSumOptions", () => {
       // checkpoints
       { 1: 2, 3: 3 },
       {},
-      [
-        { diceSums: [3, 7] },
-        { diceSums: [null, null] },
-        { diceSums: [null, null] },
-      ],
+      [so(3, 7), so(4, 6, false, false), so(5, 5, false, false)],
     ],
     [
       [5, 3, 3, 5],
@@ -105,7 +96,7 @@ describe("testGetSumOptions", () => {
       { 7: 1, 12: 1 },
       { 3: 3 },
       { 10: 0 },
-      [{ diceSums: [8, 8] }, { diceSums: [8, 8] }, { diceSums: [null, 6] }],
+      [so(8, 8), so(8, 8), so(10, 6, false, true)],
     ],
     [
       [4, 6, 5, 5],
@@ -113,9 +104,9 @@ describe("testGetSumOptions", () => {
       {},
       { 10: 0, 9: 0, 11: 0 },
       [
-        { diceSums: [null, null] },
-        { diceSums: [null, null] },
-        { diceSums: [null, null] },
+        so(10, 10, false, false),
+        so(9, 11, false, false),
+        so(9, 11, false, false),
       ],
     ],
     [
@@ -123,36 +114,20 @@ describe("testGetSumOptions", () => {
       { 2: 1, 3: 1 },
       {},
       { 6: 0, 8: 0 },
-      [{ diceSums: [null, null] }, { diceSums: [7, 7] }, { diceSums: [7, 7] }],
+      [so(6, 8, false, false), so(7, 7), so(7, 7)],
     ],
     [
       [3, 3, 3, 3],
       {},
       { "6": 10 },
       {},
-      [
-        { diceSums: [6, null] },
-        { diceSums: [6, null] },
-        { diceSums: [6, null] },
-      ],
+      [so(6, 6, true, false), so(6, 6, true, false), so(6, 6, true, false)],
     ],
     // A bunch of cases for double-12.
     // [ ] [ ] [ ]
-    [
-      [6, 6, 6, 6],
-      {},
-      {},
-      {},
-      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
-    ],
+    [[6, 6, 6, 6], {}, {}, {}, [so(12, 12), so(12, 12), so(12, 12)]],
     // [x] [ ] [ ]
-    [
-      [6, 6, 6, 6],
-      { "12": 1 },
-      {},
-      {},
-      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
-    ],
+    [[6, 6, 6, 6], { "12": 1 }, {}, {}, [so(12, 12), so(12, 12), so(12, 12)]],
     // [ ] [x] [ ]
     [
       [6, 6, 6, 6],
@@ -160,19 +135,13 @@ describe("testGetSumOptions", () => {
       {},
       {},
       [
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
+        so(12, 12, true, false),
+        so(12, 12, true, false),
+        so(12, 12, true, false),
       ],
     ],
     // [X] [ ] [ ]
-    [
-      [6, 6, 6, 6],
-      {},
-      { "12": 1 },
-      {},
-      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
-    ],
+    [[6, 6, 6, 6], {}, { "12": 1 }, {}, [so(12, 12), so(12, 12), so(12, 12)]],
     // [ ] [X] [ ]
     [
       [6, 6, 6, 6],
@@ -180,9 +149,9 @@ describe("testGetSumOptions", () => {
       { "12": 2 },
       {},
       [
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
+        so(12, 12, true, false),
+        so(12, 12, true, false),
+        so(12, 12, true, false),
       ],
     ],
   ]).it(
@@ -231,7 +200,7 @@ describe("testGetSumOptionsJump", () => {
       { "7": 12 },
       { "1": { "7": 10 } },
       {},
-      [{ diceSums: [7, null] }, { diceSums: [6, 8] }, { diceSums: [7, null] }],
+      [so(7, 7, true, false), so(6, 8), so(7, 7, true, false)],
     ],
     // Opponents on the same column
     [
@@ -239,32 +208,28 @@ describe("testGetSumOptionsJump", () => {
       { "7": 11 },
       { "1": { "7": 12 } },
       {},
-      [{ diceSums: [7, null] }, { diceSums: [6, 8] }, { diceSums: [7, null] }],
+      [so(7, 7, true, false), so(6, 8), so(7, 7, true, false)],
     ],
     [
       [3, 4, 3, 4],
       { "7": 10 },
       { "1": { "7": 12 }, "2": { "7": 11 } },
       {},
-      [{ diceSums: [7, null] }, { diceSums: [6, 8] }, { diceSums: [7, null] }],
+      [so(7, 7, true, false), so(6, 8), so(7, 7, true, false)],
     ],
     [
       [3, 4, 3, 4],
       { "7": 9 },
       { "1": { "7": 12 }, "2": { "7": 10 } },
       {},
-      [{ diceSums: [7, 7] }, { diceSums: [6, 8] }, { diceSums: [7, 7] }],
+      [so(7, 7), so(6, 8), so(7, 7)],
     ],
     [
       [3, 3, 3, 3],
       {},
       { "0": { "6": 10 } },
       {},
-      [
-        { diceSums: [6, null] },
-        { diceSums: [6, null] },
-        { diceSums: [6, null] },
-      ],
+      [so(6, 6, true, false), so(6, 6, true, false), so(6, 6, true, false)],
     ],
     // A bunch of cases for double-12.
     // [x] [o] []
@@ -274,9 +239,9 @@ describe("testGetSumOptionsJump", () => {
       { "1": { "12": 2 } },
       {},
       [
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
+        so(12, 12, true, false),
+        so(12, 12, true, false),
+        so(12, 12, true, false),
       ],
     ],
     // [X] [o] []
@@ -286,9 +251,9 @@ describe("testGetSumOptionsJump", () => {
       { "0": { "12": 1 }, "1": { "12": 2 } },
       {},
       [
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
+        so(12, 12, true, false),
+        so(12, 12, true, false),
+        so(12, 12, true, false),
       ],
     ],
     // [o] [ ] []
@@ -297,7 +262,7 @@ describe("testGetSumOptionsJump", () => {
       {},
       { "1": { "12": 1 } },
       {},
-      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
+      [so(12, 12), so(12, 12), so(12, 12)],
     ],
     // [ ] [o] []
     [
@@ -305,7 +270,7 @@ describe("testGetSumOptionsJump", () => {
       {},
       { "1": { "12": 2 } },
       {},
-      [{ diceSums: [12, 12] }, { diceSums: [12, 12] }, { diceSums: [12, 12] }],
+      [so(12, 12), so(12, 12), so(12, 12)],
     ],
     // [o] [o] []
     [
@@ -314,9 +279,9 @@ describe("testGetSumOptionsJump", () => {
       { "1": { "12": 2 }, "2": { "12": 1 } },
       {},
       [
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
+        so(12, 12, true, false),
+        so(12, 12, true, false),
+        so(12, 12, true, false),
       ],
     ],
     // [o] [x] []
@@ -326,9 +291,9 @@ describe("testGetSumOptionsJump", () => {
       { "1": { "12": 2 }, "2": { "12": 1 } },
       {},
       [
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
-        { diceSums: [12, null] },
+        so(12, 12, true, false),
+        so(12, 12, true, false),
+        so(12, 12, true, false),
       ],
     ],
 
@@ -338,7 +303,7 @@ describe("testGetSumOptionsJump", () => {
       { "11": 1 },
       { "2": { "11": 2 }, "3": { "11": 4 } },
       {},
-      [{ diceSums: [11, 11] }, { diceSums: [10, 12] }, { diceSums: [11, 11] }],
+      [so(11, 11), so(10, 12), so(11, 11)],
     ],
 
     // Double with [x] [o] [o] [ ] [o] [o] [ ]
@@ -347,7 +312,7 @@ describe("testGetSumOptionsJump", () => {
       { "9": 1 },
       { "2": { "9": 2 }, "3": { "9": 3 }, "4": { "9": 5 }, "5": { "9": 6 } },
       {},
-      [{ diceSums: [9, 9] }, { diceSums: [8, 10] }, { diceSums: [9, 9] }],
+      [so(9, 9), so(8, 10), so(9, 9)],
     ],
 
     // Double with [x] [o] [o] [o] [o] [o] [ ]
@@ -362,11 +327,7 @@ describe("testGetSumOptionsJump", () => {
         "5": { "10": 6 },
       },
       {},
-      [
-        { diceSums: [10, null] },
-        { diceSums: [8, 12] },
-        { diceSums: [10, null] },
-      ],
+      [so(10, 10, true, false), so(8, 12), so(10, 10, true, false)],
     ],
   ]).it(
     "case '%s %s %s %s %s'",
