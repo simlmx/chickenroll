@@ -118,7 +118,7 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
         opts.className += " scoreBoardPlayerNameCurrent littleFlash";
       }
       if (!isConnected) {
-        opts.className += " playerDisconnected";
+        opts.className += " playerDisconnected scorePlayerDisconnected";
         opts.title = "Player has disconnected";
       }
       return (

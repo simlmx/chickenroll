@@ -12,6 +12,7 @@ $black: #191516;
 $lightgrey: lightgrey;
 $darkgrey: #252422;
 $bgcolor: #f7f6f2;
+$secondary: #6c757d;
 $danger: #d70c0c;
 $success: #0c8f29;
 
@@ -27,9 +28,11 @@ html h4 {
 }
 
 $theme-colors: (
+  // We use "secondary" for disabled things like buttons and disconnected players.
+  "secondary": $secondary,
   "primary": $primary,
   "danger": $danger,
-  "success": $success,
+  "success": $success
 );
 
 $buttonsWidth: 150px;
@@ -940,6 +943,11 @@ $diceSize: 3.4rem;
 .playerDisconnected {
   color: $danger;
   font-style: italic;
+}
+
+.scorePlayerDisconnected {
+  // Same as for disabled secondary buttons, which we used for disabled buttons
+  background-color: rgba($secondary, 0.65);
 }
 
 .disconnected {
