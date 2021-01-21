@@ -915,6 +915,8 @@ $diceSize: 3.4rem;
 }
 
 .gameSetupContentWrap {
+  // Mimicking the padding of .pageContent
+  padding: 1rem 0;
   max-width: 18rem;
   flex: 1;
   display: flex;
