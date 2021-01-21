@@ -6,6 +6,33 @@ import { BustProb } from "./Bust";
 import { DiceSplit } from "./icons";
 import getSoundPlayer from "../audio";
 
+/*
+ * Given if it's us playing (itsMe) and if the button should be enabled, we return the
+ * class names of the action uttons.
+ */
+const getButtonClassNames = (
+  itsMe: boolean,
+  enabled: boolean,
+  color: number
+): string => {
+  let className = "btn btnAction";
+
+  if (!itsMe) {
+    className += " notMe";
+  }
+
+  if (itsMe && enabled) {
+    className += ` bgcolor${color}`;
+  } else if (!itsMe || !enabled) {
+    className += " btn-secondary";
+  }
+  if (!itsMe && !enabled) {
+    className += " notMeDisabled";
+  }
+
+  return className;
+};
+
 interface ActionButtonsProps {
   itsMe: boolean;
   color: number;
@@ -27,17 +54,17 @@ const ActionButtons = (props: ActionButtonsProps) => {
     bustProb,
   } = props;
 
+  // This provents showing the Stop button for a fraction of a second after having
+  // rolled... I think.
+  const [canStop, setCanStop] = useState(currentPlayerHasStarted);
+  useEffect(() => {
+    setCanStop(currentPlayerHasStarted);
+  }, [currentPlayerHasStarted]);
+
   const soundPlayer = getSoundPlayer();
 
-  let className = "btn btnAction";
-
-  if (itsMe) {
-    className += ` bgcolor${color}`;
-  } else {
-    className += " btn-secondary";
-  }
-
-  let rollClassName = className;
+  let rollClassName = getButtonClassNames(itsMe, true, color);
+  const stopClassName = getButtonClassNames(itsMe, canStop, color);
 
   if (!currentPlayerHasStarted && itsMe) {
     rollClassName += " flashVibrate";
@@ -64,8 +91,8 @@ const ActionButtons = (props: ActionButtonsProps) => {
         onClick={() => {
           onStop();
         }}
-        className={className}
-        disabled={!itsMe}
+        className={stopClassName}
+        disabled={!itsMe || !canStop}
       >
         Stop
       </button>
@@ -131,28 +158,17 @@ class Possibilities extends React.Component<{
                 lastPickedDiceSumOption[0] === i &&
                 lastPickedDiceSumOption[1] === j;
 
-              let className = "btn btnAction btnPossibilities";
+              let className = "btnPossibilities ";
 
-              let buttonType: string;
-              // If we were the previous and the current player has not started, then
-              // those are our possibilities that we are seeing, so that's the same as
-              // if we were the current player.
-              if (itsMe || (imThePrevious && !currentPlayerHasStarted)) {
-                if (enabled) {
-                  buttonType = ` bgcolor${color}`;
-                } else {
-                  buttonType = " btn-secondary";
-                }
-              } else {
-                buttonType = " btn-secondary notMe";
-                if (wasSelected) {
-                  buttonType += " lastChoiceOtherPlayer";
-                } else if (!enabled) {
-                  buttonType += " notMeDisabled";
-                }
+              className += getButtonClassNames(
+                itsMe || (imThePrevious && !currentPlayerHasStarted),
+                enabled,
+                color
+              );
+
+              if (wasSelected) {
+                className += " lastChoiceOtherPlayer";
               }
-
-              className += buttonType;
 
               let pairHighlight = [false, false];
               if (justOneButton) {
