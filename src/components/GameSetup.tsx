@@ -520,7 +520,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         currentValue={sameSpace}
         values={[
           ["share", "None"],
-          ["jump", "Jump Over"],
+          ["jump", "Jump over other players"],
         ]}
       />
       <SettingOption
@@ -530,8 +530,8 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
         onChange={(value) => moves.setMountainShape(value)}
         currentValue={mountainShape}
         values={[
-          ["tall", "Tall"],
-          ["classic", "Classic"],
+          ["tall", "Default"],
+          ["classic", "Classic (shorter)"],
         ]}
       />
       <SettingOption
