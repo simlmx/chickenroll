@@ -10,6 +10,8 @@ export const Climber = (props: {
   current?: boolean;
   highlight?: boolean;
   downlight?: boolean;
+  side?: boolean;
+  transparent?: boolean;
 }) => {
   let className = "climber";
   if (!props.current) {
@@ -21,6 +23,14 @@ export const Climber = (props: {
     className += " highlight";
   } else if (props.downlight) {
     className += " downlight";
+  }
+
+  if (props.side) {
+    className += " climberSide";
+  }
+
+  if (props.transparent) {
+    className += " transparent";
   }
   return <span {...{ className }}></span>;
 };
@@ -279,37 +289,6 @@ export const Mountain = (props: MountainProps) => {
   // Left tokens in the top right.
   // Only do those for full mountains.
   if (numRows === maxSteps && numCols === 11) {
-    const numLeft = 3 - Object.keys(currentPositions).length;
-    const numLeftAfterUpdate = 3 - Object.keys(updatedCurrentPositions).length;
-    for (let i = 0; i < 3; ++i) {
-      const col = numCols - 1;
-      const row = numRows - 1 - i;
-
-      let el: JSX.Element;
-      if (numLeftAfterUpdate > i) {
-        el = (
-          <Climber
-            key={-1}
-            current={true}
-            color={playerInfos[currentPlayer].color}
-          />
-        );
-      } else if (numLeft > i) {
-        el = (
-          <Climber
-            key={-1}
-            current={true}
-            color={playerInfos[currentPlayer].color}
-            downlight={true}
-          />
-        );
-      } else {
-        el = <ClimberPlaceholder key={0} side={true} />;
-      }
-
-      currentElements[row][col] = el;
-    }
-
     // Downlighted current climbers.
     Object.entries(currentPositions).forEach(([colStr, step]) => {
       if (updatedCurrentPositions[colStr] === step) {
@@ -373,4 +352,34 @@ export const Mountain = (props: MountainProps) => {
     });
 
   return <div className={`mountain ${mountainShape}Mountain`}>{content}</div>;
+};
+
+export const EggsLeft = (props: {
+  n: number;
+  nDownlight: number;
+  color: number;
+}) => {
+  const { n, color, nDownlight } = props;
+  const eggs = Array(3)
+    .fill(false)
+    .map((_, i) => {
+      return i < n ? (
+        <Climber
+          color={color}
+          current={true}
+          side={true}
+          key={i}
+          downlight={n - i <= nDownlight}
+        />
+      ) : (
+        <Climber
+          color={color}
+          current={true}
+          side={true}
+          key={i}
+          transparent={true}
+        />
+      );
+    });
+  return <div className="eggsLeftWrap">{eggs}</div>;
 };

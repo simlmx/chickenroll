@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 import { DiceBoard } from "./DiceBoard";
-import { Mountain } from "./Mountain";
+import { Mountain, EggsLeft, Climber } from "./Mountain";
 import { ScoreBoard } from "./ScoreBoard";
 import GameSetup from "./GameSetup";
 import MoveButtons from "./MoveButtons";
@@ -14,6 +14,7 @@ import getSoundPlayer from "../audio";
 import localStorage from "../utils/localStorage";
 import { isIOS } from "../utils/platform";
 import { BustProb } from "./Bust";
+import { isSumOptionSplit } from "../math";
 
 import { BoardProps } from "boardgame.io/react";
 
@@ -402,11 +403,13 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
     />
   );
 
+  const currentPlayerColor = playerInfos[currentPlayer].color;
+
   const diceBoard = (
     <DiceBoard
       {...{
         diceValues,
-        color: playerInfos[currentPlayer].color,
+        color: currentPlayerColor,
       }}
     />
   );
@@ -561,6 +564,44 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
     />
   );
 
+  // How many eggs would move from the side to the mountain for the mouse-over option.
+  let mouseOverNumEggsMoveIn = 0;
+  if (realMouseOverPossibility != null && diceSumOptions != null) {
+    const { buttonRow, buttonColumn } = realMouseOverPossibility;
+
+    const sumOption = diceSumOptions[buttonRow];
+
+    let sums;
+
+    if (isSumOptionSplit(sumOption)) {
+      sums = [sumOption.diceSums[buttonColumn]];
+    } else {
+      sums = sumOption.diceSums;
+    }
+
+    sums.forEach((sum) => {
+      if (currentPositions[sum] == null) {
+        mouseOverNumEggsMoveIn++;
+      }
+    });
+  }
+
+  const eggsLeft = (
+    <EggsLeft
+      n={3 - Object.keys(currentPositions).length}
+      color={currentPlayerColor}
+      nDownlight={mouseOverNumEggsMoveIn}
+    />
+  );
+
+  // This is a hack to make sure the dice are centered even though we have eggs next to
+  // it.
+  const invisibleEggs = (
+    <div className="eggsLeftWrap">
+      <Climber current={true} side={true} transparent={true} />
+    </div>
+  );
+
   // The onClick is necessary to disable the double-click zoom on ios.
   // See stackoverflow.com/a/54753520/1067132
   return (
@@ -569,11 +610,11 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
       {modal === "rules" && rulesModal}
       {modal === "history" && historyModal}
       {inGameIcons}
-      <div className="megaWrap">
+      <div className={`megaWrap ${mountainShape}MountainWrap`}>
         <div className="bigHspace"></div>
         <div className="boardContent">
           <div className="bandBegin"></div>
-          <div className={`mountainWrap ${mountainShape}MountainWrap`}>
+          <div className="mountainWrap">
             {/* First column: the mountain. */}
             {mountain}
           </div>
@@ -584,8 +625,12 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
             {/* Section with Dice and Buttons */}
             <div className="diceButtons">
               <div className="diceButtonsBefore"></div>
-              {/* Dice */}
-              {diceBoard}
+              <div className="eggsAndDice">
+                {eggsLeft}
+                {diceBoard}
+                {invisibleEggs}
+              </div>
+              <div className="diceButtonsMiddle"></div>
               <div className="diceButtonsMiddle"></div>
               {/* Buttons */}
               <div className="buttonsWrap">{buttons}</div>
