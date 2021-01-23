@@ -15,6 +15,7 @@ import localStorage from "../utils/localStorage";
 import { isIOS } from "../utils/platform";
 import { BustProb } from "./Bust";
 import { isSumOptionSplit } from "../math";
+import Chat from "./Chat";
 
 import { BoardProps } from "boardgame.io/react";
 
@@ -156,6 +157,7 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
     showProbs,
     mountainShape,
     sameSpace,
+    messages,
   } = G;
   const { currentPlayer, phase, numPlayers, playOrder } = ctx;
 
@@ -302,18 +304,18 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
 
   // We want to forget about mouseOverPossibility as soon as we are not in the moving
   // stage. This prevents some flickering of the black eggs.
-  const stageIsMoving = ctx?.activePlayers?.[currentPlayer] === "moving";
-  const realMouseOverPossibility = stageIsMoving
+  const playerIsMoving = G.currentPlayerPhase === "moving";
+  const realMouseOverPossibility = playerIsMoving
     ? mouseOverPossibility
     : undefined;
 
   // We need to set back the mouseOverPossibility to undefined after we have clicked on
   // a picked a choice. I think here might be the best place.
   useEffect(() => {
-    if (!stageIsMoving) {
+    if (!playerIsMoving) {
       setMouseOverPossibility(undefined);
     }
-  }, [stageIsMoving]);
+  }, [playerIsMoving]);
 
   const mountain = useMemo(() => {
     return (
@@ -602,6 +604,15 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
     </div>
   );
 
+  const chat = !passAndPlay && (
+    <Chat
+      messages={messages}
+      sendMessage={(text) => moves.sendMessage(text)}
+      playerID={playerID}
+      playerInfos={playerInfos}
+    />
+  );
+
   // The onClick is necessary to disable the double-click zoom on ios.
   // See stackoverflow.com/a/54753520/1067132
   return (
@@ -614,6 +625,8 @@ export const CantStopBoard = (props: BoardProps<GameType>) => {
         <div className="bigHspace"></div>
         <div className="boardContent">
           <div className="bandBegin"></div>
+          <div className="leftWrap">{chat}</div>
+          <div className="bandMiddle"></div>
           <div className="mountainWrap">
             {/* First column: the mountain. */}
             {mountain}

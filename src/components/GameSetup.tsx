@@ -366,7 +366,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
       if (playerColor != null) {
         playerColorInt = parseInt(playerColor);
       }
-      moves.join(playerName, playerColorInt);
+      moves.joinMatch(playerName, playerColorInt);
     }
     setAllReady(Object.values(playerInfos).every((info) => info.ready));
   }, [playerInfos, moves, playerID]);

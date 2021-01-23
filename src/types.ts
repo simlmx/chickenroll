@@ -13,3 +13,10 @@ export type MountainShape = "classic" | "tall";
 // share: tokens can share the same space
 // jump: tokens jump over opponents
 export type SameSpace = "share" | "jump";
+
+// Chat message.
+export type Message = {
+  playerID: PlayerID;
+  text: string;
+  ts: number;
+};

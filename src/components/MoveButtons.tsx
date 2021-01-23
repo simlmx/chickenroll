@@ -255,7 +255,6 @@ const MoveButtons = (props: MoveButtonsProps) => {
     bustProb,
   } = props;
   const currentPlayer = ctx.currentPlayer;
-  const stage = ctx.activePlayers[currentPlayer];
   const itsMe = playerID === currentPlayer;
   const {
     lastPickedDiceSumOption,
@@ -263,22 +262,23 @@ const MoveButtons = (props: MoveButtonsProps) => {
     currentPlayerHasStarted,
     previousPlayer,
     lastOutcome,
+    currentPlayerPhase,
   } = props.G;
+
+  const playerIsMoving = currentPlayerPhase === "moving";
 
   const imThePrevious = playerID === previousPlayer;
 
   // There are two possibilities: either we show the Roll/Stop buttons, or we show the
   // Possibilities.
-  const [showPossibilities, setShowPossibilities] = useState(
-    stage === "moving"
-  );
+  const [showPossibilities, setShowPossibilities] = useState(playerIsMoving);
 
   // Decide if we show the Roll/Stop buttons or the Possibility buttons. We do it in a
   // `useEffect` because of the timeouts.
   useEffect(() => {
     // If I'm playing, I want to see the real thing!
     if (itsMe) {
-      setShowPossibilities(stage === "moving");
+      setShowPossibilities(playerIsMoving);
       return;
     }
 
@@ -307,7 +307,7 @@ const MoveButtons = (props: MoveButtonsProps) => {
     // rolling button (because it contains a probability).
     // The solution is to keep showing the possibilities a few milliseconds
     // after the player has chosen them. Then we'll show the rolling buttons.
-    if (stage === "rolling" && currentPlayerHasStarted) {
+    if (!playerIsMoving && currentPlayerHasStarted) {
       setShowPossibilities(true);
 
       const timeout = setTimeout(() => {
@@ -318,8 +318,8 @@ const MoveButtons = (props: MoveButtonsProps) => {
         clearTimeout(timeout);
       };
     }
-    setShowPossibilities(stage === "moving");
-  }, [stage, itsMe, showProbs, currentPlayerHasStarted, lastOutcome]);
+    setShowPossibilities(playerIsMoving);
+  }, [playerIsMoving, itsMe, showProbs, currentPlayerHasStarted, lastOutcome]);
 
   if (showPossibilities) {
     return (

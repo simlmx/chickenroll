@@ -2,15 +2,22 @@ import {
   NUM_COLORS,
   AUTO_NUM_COLS_TO_WIN,
   PLAYER_NAME_MAX_LEN,
+  MAX_MESSAGES,
 } from "./constants";
-import { Stage } from "boardgame.io/core";
+// import { Stage } from "boardgame.io/core";
 import {
   getSumOptions,
   getNumStepsForSum,
   SumOption,
   isSumOptionSplit,
 } from "./math";
-import { PlayerID, PlayerInfo, MountainShape, SameSpace } from "./types";
+import {
+  PlayerID,
+  PlayerInfo,
+  MountainShape,
+  SameSpace,
+  Message,
+} from "./types";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 
@@ -79,6 +86,10 @@ export interface GameType {
   previousPlayer?: PlayerID;
   // How did the last player finish;
   lastOutcome: "stop" | "bust";
+  // We'll keep a rotation of N message;
+  messages: Message[];
+  // Is the current player rolling or moving tokens?
+  currentPlayerPhase: "rolling" | "moving";
 }
 
 /*
@@ -91,12 +102,12 @@ const getLastMove = (G: GameType): Move => {
 /*
  * Go to a given stage but taking into account the passAndPlay mode.
  */
-const gotoStage = (G: GameType, ctx, newStage: string): void => {
+/* const gotoStage = (G: GameType, ctx, newStage: string): void => {
   const activePlayers = G.passAndPlay
     ? { all: newStage }
     : { currentPlayer: newStage, others: Stage.NULL };
   ctx?.events?.setActivePlayers?.(activePlayers);
-};
+};*/
 
 const updateBustProb = (G: GameType, endOfTurn: boolean): void => {
   if (endOfTurn) {
@@ -172,155 +183,361 @@ const endTurn = (G: GameType, ctx, outcome: "bust" | "stop"): void => {
 };
 
 /*
- * Definition of the main phase.
+ * Move to send a chat message.
  */
-const turn = {
-  onBegin: (G: GameType, ctx) => {
+const sendMessage = {
+  // This move is not really a move so we change a few flags.
+  ignoreStaleStateID: true,
+  noLimit: true,
+  move: (G: GameType, ctx, text: string) => {
+    G.messages.push({
+      playerID: ctx.playerID,
+      text,
+      ts: new Date().getTime(),
+    });
+
+    if (G.messages.length > MAX_MESSAGES) {
+      G.messages.shift();
+    }
+  },
+};
+
+/*
+ * Check if the person making the move is the current player.
+ */
+const moveByCurrentPlayer = (G: GameType, ctx) => {
+  return G.passAndPlay || ctx.currentPlayer === ctx.playerID;
+};
+
+/*
+ *
+ * All the moves
+ *
+ *
+ */
+
+/*
+ * Roll the dice
+ */
+const rollDice = (G: GameType, ctx) => {
+  if (!moveByCurrentPlayer(G, ctx)) {
+    return INVALID_MOVE;
+  }
+  if (G.currentPlayerPhase !== "rolling") {
+    return INVALID_MOVE;
+  }
+
+  // After a roll we remove how the last player finished.
+  const diceValues = ctx.random.Die(6, 4);
+
+  G.diceValues = diceValues;
+
+  const move: Move = { diceValues, playerID: ctx.currentPlayer };
+
+  G.lastPickedDiceSumOption = undefined;
+  G.diceSumOptions = getSumOptions(
+    G.diceValues,
+    G.currentPositions,
+    G.checkpointPositions,
+    G.blockedSums,
+    G.mountainShape,
+    G.sameSpace,
+    ctx.currentPlayer
+  );
+  // Check if busted.
+  const busted = G.diceSumOptions.every((sumOption: SumOption) =>
+    sumOption.enabled.every((x) => !x)
+  );
+  if (busted) {
+    G.info = {
+      code: "bust",
+      playerID: ctx.currentPlayer,
+      ts: new Date().getTime(),
+    };
+    endTurn(G, ctx, "bust");
+    move.bust = true;
+  } else {
+    G.currentPlayerHasStarted = true;
+    G.currentPlayerPhase = "moving";
+  }
+
+  G.moveHistory.push(move);
+};
+
+/*
+ * Stop
+ */
+// FIXME rename moveByCurrentPlayer it's confusing with 'moving'
+const stop = (G: GameType, ctx) => {
+  if (!moveByCurrentPlayer(G, ctx)) {
+    return INVALID_MOVE;
+  }
+
+  if (G.currentPlayerPhase !== "rolling") {
+    return INVALID_MOVE;
+  }
+
+  G.lastPickedDiceSumOption = undefined;
+  G.diceSumOptions = undefined;
+  // Save current positions as checkpoints.
+  Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
+    const diceSum = parseInt(diceSumStr);
+    G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
+    if (step === getNumStepsForSum(diceSum, G.mountainShape)) {
+      G.blockedSums[diceSum] = ctx.currentPlayer;
+      G.scores[ctx.currentPlayer] += 1;
+      // Remove all the checkpoints for that one
+      for (let i = 0; i < ctx.numPlayers; ++i) {
+        delete G.checkpointPositions[i][diceSum];
+      }
+    }
+  });
+
+  // Check if we should end the game,
+  if (G.scores[ctx.currentPlayer] >= G.numColsToWin) {
+    // Clean the board a bit.
     G.currentPositions = {};
-    gotoStage(G, ctx, "rolling");
-    G.currentPlayerHasStarted = false;
-    updateBustProb(G, /* endOfTurn */ true);
+    G.info = {
+      code: "win",
+      playerID: ctx.currentPlayer,
+      ts: new Date().getTime(),
+    };
+    G.numVictories[ctx.currentPlayer] += 1;
+    ctx.events.endPhase();
+  } else {
+    G.info = {
+      code: "stop",
+      playerID: ctx.currentPlayer,
+      ts: new Date().getTime(),
+    };
+    endTurn(G, ctx, "stop");
+  }
+};
+
+/*
+ * Pick one of the sums in option.
+ * diceSplitIndex: One of the possible dice splits
+ * choiceIndex: 0 or 1, for "split' dice ([3] [5]) it means either the first or
+ * second one. For non split dice (e.g. [3 - 5]) it should always be 0.
+ */
+const pickSumOption = (
+  G: GameType,
+  ctx,
+  diceSplitIndex: number,
+  choiceIndex: number
+) => {
+  if (!moveByCurrentPlayer(G, ctx)) {
+    return INVALID_MOVE;
+  }
+
+  if (G.currentPlayerPhase !== "moving") {
+    return INVALID_MOVE;
+  }
+
+  const move = getLastMove(G);
+  move.diceSplitIndex = diceSplitIndex;
+  // Should not happen but makes typescript happy.
+  if (G.diceSumOptions == null) {
+    throw new Error("assert false");
+  }
+  const sumOption = G.diceSumOptions[diceSplitIndex];
+  let { diceSums, enabled } = sumOption;
+
+  if (isSumOptionSplit(sumOption)) {
+    diceSums = [diceSums[choiceIndex]];
+    move.diceUsed = [choiceIndex];
+  } else {
+    move.diceUsed = diceSums
+      .map((s, i) => (enabled[i] ? i : null))
+      .filter((x) => x != null) as number[];
+  }
+  G.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
+
+  diceSums.forEach((col, i) => {
+    G.currentPositions[col] = climbOneStep(
+      G.currentPositions,
+      G.checkpointPositions,
+      col,
+      ctx.currentPlayer,
+      G.sameSpace
+    );
+  });
+  updateBustProb(G, /* endOfTurn */ false);
+  G.currentPlayerPhase = "rolling";
+};
+
+const setName = {
+  ignoreStaleStateID: true,
+  noLimit: true,
+  move: (G: GameType, ctx, name: string, playerID: PlayerID = "0") => {
+    // Nothing happens if the name is empty.
+    // This way we make sure a player without a name is not ready.
+    if (!name) {
+      return;
+    }
+
+    playerID = G.passAndPlay ? playerID : ctx.playerID;
+
+    G.playerInfos[playerID].name = name.substring(0, PLAYER_NAME_MAX_LEN);
   },
-  order: {
-    first: (G: GameType, ctx) => 0,
-    next: (G: GameType, ctx) => (ctx.playOrderPos + 1) % G.numPlayers,
-    playOrder: (G: GameType, ctx) => {
-      // Take the actual number of players, and randomize amongst them.
-      let playOrder = Array(G.numPlayers)
-        .fill(null)
-        .map((_, i) => i.toString());
-      // TODO move 1 back for the 2nd game and more.
-      playOrder = ctx.random.Shuffle(playOrder);
-      return playOrder;
-    },
+};
+
+const setColor = (
+  G: GameType,
+  ctx,
+  color: number,
+  playerID: PlayerID = "0"
+) => {
+  playerID = G.passAndPlay ? playerID : ctx.playerID;
+
+  // If we are not actually changing the color we can ignore this.
+  // This happens when we click on the same color we already have.
+  if (G.playerInfos[playerID].color === color) {
+    return;
+  }
+
+  // It's an invalid move if someone else already has that color.
+  if (Object.values(G.playerInfos).some((info) => info.color === color)) {
+    return INVALID_MOVE;
+  }
+  G.playerInfos[playerID].color = color;
+};
+
+const setReady = {
+  ignoreStaleStateID: true,
+  noLimit: true,
+  move: (G: GameType, ctx, playerID: PlayerID, ready: boolean) => {
+    if (G.passAndPlay) {
+      return INVALID_MOVE;
+    }
+    G.playerInfos[playerID].ready = ready;
   },
-  stages: {
-    rolling: {
-      moves: {
-        rollDice: (G: GameType, ctx) => {
-          // After a roll we remove how the last player finished.
-          const diceValues = ctx.random.Die(6, 4);
+};
 
-          G.diceValues = diceValues;
+const startMatch = (G: GameType, ctx) => {
+  if (ctx.playerID !== "0") {
+    return INVALID_MOVE;
+  }
 
-          const move: Move = { diceValues, playerID: ctx.currentPlayer };
+  // If some players are not ready, we can't start the game. Not ready is
+  // the same as writing down your name, at least for now.
+  if (Object.values(G.playerInfos).some((info) => !info.name)) {
+    return INVALID_MOVE;
+  }
 
-          G.lastPickedDiceSumOption = undefined;
-          G.diceSumOptions = getSumOptions(
-            G.diceValues,
-            G.currentPositions,
-            G.checkpointPositions,
-            G.blockedSums,
-            G.mountainShape,
-            G.sameSpace,
-            ctx.currentPlayer
-          );
-          // Check if busted.
-          const busted = G.diceSumOptions.every((sumOption: SumOption) =>
-            sumOption.enabled.every((x) => !x)
-          );
-          if (busted) {
-            G.info = {
-              code: "bust",
-              playerID: ctx.currentPlayer,
-              ts: new Date().getTime(),
-            };
-            endTurn(G, ctx, "bust");
-            move.bust = true;
-          } else {
-            G.currentPlayerHasStarted = true;
-            gotoStage(G, ctx, "moving");
-          }
+  // Set the number of players
+  G.numPlayers = G.passAndPlay
+    ? ctx.numPlayers
+    : Object.keys(G.playerInfos).length;
 
-          G.moveHistory.push(move);
-        },
-        stop: (G: GameType, ctx) => {
-          G.lastPickedDiceSumOption = undefined;
-          G.diceSumOptions = undefined;
-          // Save current positions as checkpoints.
-          Object.entries(G.currentPositions).forEach(([diceSumStr, step]) => {
-            const diceSum = parseInt(diceSumStr);
-            G.checkpointPositions[ctx.currentPlayer][diceSum] = step;
-            if (step === getNumStepsForSum(diceSum, G.mountainShape)) {
-              G.blockedSums[diceSum] = ctx.currentPlayer;
-              G.scores[ctx.currentPlayer] += 1;
-              // Remove all the checkpoints for that one
-              for (let i = 0; i < ctx.numPlayers; ++i) {
-                delete G.checkpointPositions[i][diceSum];
-              }
-            }
-          });
+  // Convert 'auto' number of columns to win to a number
+  if (G.numColsToWin === "auto") {
+    G.numColsToWin = AUTO_NUM_COLS_TO_WIN.get(G.numPlayers) || 3;
+  }
 
-          // Check if we should end the game,
-          if (G.scores[ctx.currentPlayer] >= G.numColsToWin) {
-            // Clean the board a bit.
-            G.currentPositions = {};
-            G.info = {
-              code: "win",
-              playerID: ctx.currentPlayer,
-              ts: new Date().getTime(),
-            };
-            G.numVictories[ctx.currentPlayer] += 1;
-            ctx.events.endPhase();
-          } else {
-            G.info = {
-              code: "stop",
-              playerID: ctx.currentPlayer,
-              ts: new Date().getTime(),
-            };
-            endTurn(G, ctx, "stop");
-          }
-        },
-      },
-    },
-    moving: {
-      moves: {
-        /*
-         * Pick one of the sums in option.
-         * diceSplitIndex: One of the possible dice splits
-         * choiceIndex: 0 or 1, for "split' dice ([3] [5]) it means either the first or
-         * second one. For non split dice (e.g. [3 - 5]) it should always be 0.
-         */
-        pickSumOption: (
-          G: GameType,
-          ctx,
-          diceSplitIndex: number,
-          choiceIndex: number
-        ) => {
-          const move = getLastMove(G);
-          move.diceSplitIndex = diceSplitIndex;
-          // Should not happen but makes typescript happy.
-          if (G.diceSumOptions == null) {
-            throw new Error("assert false");
-          }
-          const sumOption = G.diceSumOptions[diceSplitIndex];
-          let { diceSums, enabled } = sumOption;
+  ctx.events.endPhase();
+};
 
-          if (isSumOptionSplit(sumOption)) {
-            diceSums = [diceSums[choiceIndex]];
-            move.diceUsed = [choiceIndex];
-          } else {
-            move.diceUsed = diceSums
-              .map((s, i) => (enabled[i] ? i : null))
-              .filter((x) => x != null) as number[];
-          }
-          G.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
+const joinMatch = (
+  G: GameType,
+  ctx,
+  playerName: string | undefined,
+  playerColor: number | undefined
+) => {
+  if (G.passAndPlay) {
+    return INVALID_MOVE;
+  }
+  // If we have already joined, we ignore this.
+  if (G.playerInfos.hasOwnProperty(ctx.playerID)) {
+    return;
+  }
+  // Find the next available color.
+  const availableColors = Array(NUM_COLORS).fill(true);
 
-          diceSums.forEach((col, i) => {
-            G.currentPositions[col] = climbOneStep(
-              G.currentPositions,
-              G.checkpointPositions,
-              col,
-              ctx.currentPlayer,
-              G.sameSpace
-            );
-          });
-          updateBustProb(G, /* endOfTurn */ false);
-          gotoStage(G, ctx, "rolling");
-        },
-      },
-    },
-  },
+  Object.values(G.playerInfos).forEach(
+    (playerInfo) => (availableColors[playerInfo.color] = false)
+  );
+
+  // We shouldn't need this fallback because there as more colors than
+  // players.
+  let newColor = 0;
+
+  if (playerColor != null && availableColors[playerColor]) {
+    // If we supplied a prefered color and if it's available, we use that.
+    newColor = playerColor;
+  } else {
+    // Otherwise we take the next available color.
+    availableColors.some((available, color) => {
+      if (available) {
+        newColor = color;
+        return true;
+      }
+      return false;
+    });
+  }
+
+  if (!playerName) {
+    playerName = `Player ${parseInt(ctx.playerID) + 1}`;
+  }
+
+  G.playerInfos[ctx.playerID] = {
+    name: playerName,
+    color: newColor,
+    ready: false,
+  };
+};
+
+const setNumColsToWin = (G: GameType, ctx, numColsToWin: number | "auto") => {
+  if (ctx.playerID !== "0") {
+    return INVALID_MOVE;
+  }
+  G.numColsToWin = numColsToWin;
+};
+
+const setShowProbs = (G: GameType, ctx, showProbs: ShowProbsType) => {
+  if (ctx.playerID !== "0") {
+    return INVALID_MOVE;
+  }
+  G.showProbs = showProbs;
+};
+
+const setMountainShape = (G: GameType, ctx, mountainShape: MountainShape) => {
+  if (ctx.playerID !== "0") {
+    return INVALID_MOVE;
+  }
+  G.mountainShape = mountainShape;
+};
+
+const setSameSpace = (G: GameType, ctx, sameSpace: SameSpace) => {
+  if (ctx.playerID !== "0") {
+    return INVALID_MOVE;
+  }
+  G.sameSpace = sameSpace;
+};
+
+/* Reset the game to initial state */
+const playAgain = (G, ctx) => {
+  // We need to keep some of the fields that were entered during the game, in the "setup"
+  // phase.
+  const keepFields = [
+    "playerInfos",
+    "numPlayers",
+    "numVictories",
+    "numColsToWin",
+    "showProbs",
+    "mountainShape",
+    "sameSpace",
+    "messages",
+  ];
+
+  // Create an object like G but with only the fields to keep.
+  const GKeep = Object.keys(G)
+    .filter((key) => keepFields.indexOf(key) >= 0)
+    .reduce((G2, key) => Object.assign(G2, { [key]: G[key] }), {});
+
+  Object.assign(G, setup(ctx, G.setupData), GKeep);
+
+  ctx.events.setPhase("main");
 };
 
 const setup = (ctx, setupData: SetupDataType): GameType => {
@@ -352,14 +569,15 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   }
 
   const blockedSums = {};
+  const messages: Message[] = [];
 
   // Those are for quick debugging.
   // for (let i = 0; i < ctx.numPlayers; ++i) {
-  // const id = i.toString();
-  // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  // scores[id] = (i % 2) + 1;
+  //   const id = i.toString();
+  //   checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
+  //   scores[id] = (i % 2) + 1;
 
-  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
+  //   playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
   // }
   // numVictories[0] = 1;
   // numVictories[2] = 1;
@@ -370,6 +588,14 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // checkpointPositions["1"][8] = 2;
   // blockedSums[4] = "0";
   // blockedSums[5] = "2";
+
+  // for (let i = 0; i < 10; ++i) {
+  // messages.push({
+  // playerID: (i % 3).toString(),
+  // text: "asdf aosidjf osidjf soidj fsoidj faosidjf asoidfj",
+  // ts: new Date().getTime(),
+  // });
+  // }
 
   return {
     /*
@@ -404,40 +630,26 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
     mountainShape: "tall",
     sameSpace: "share",
     lastOutcome: "stop",
+    messages: messages,
+    currentPlayerPhase: "rolling",
   };
 };
 
-const setName = (G: GameType, ctx, name: string, playerID: PlayerID = "0") => {
-  // Nothing happens if the name is empty.
-  // This way we make sure a player without a name is not ready.
-  if (!name) {
-    return;
-  }
-
-  playerID = G.passAndPlay ? playerID : ctx.playerID;
-
-  G.playerInfos[playerID].name = name.substring(0, PLAYER_NAME_MAX_LEN);
-};
-
-const setColor = (
-  G: GameType,
-  ctx,
-  color: number,
-  playerID: PlayerID = "0"
-) => {
-  playerID = G.passAndPlay ? playerID : ctx.playerID;
-
-  // If we are not actually changing the color we can ignore this.
-  // This happens when we click on the same color we already have.
-  if (G.playerInfos[playerID].color === color) {
-    return;
-  }
-
-  // It's an invalid move if someone else already has that color.
-  if (Object.values(G.playerInfos).some((info) => info.color === color)) {
-    return INVALID_MOVE;
-  }
-  G.playerInfos[playerID].color = color;
+/*
+ * Set order of players.
+ */
+const mainOrder = {
+  first: (G: GameType, ctx) => 0,
+  next: (G: GameType, ctx) => (ctx.playOrderPos + 1) % G.numPlayers,
+  playOrder: (G: GameType, ctx) => {
+    // Take the actual number of players, and randomize amongst them.
+    let playOrder = Array(G.numPlayers)
+      .fill(null)
+      .map((_, i) => i.toString());
+    // TODO move 1 back for the 2nd game and more.
+    playOrder = ctx.random.Shuffle(playOrder);
+    return playOrder;
+  },
 };
 
 const CantStop = {
@@ -458,122 +670,16 @@ const CantStop = {
           setup: {
             moves: {
               // Join a new game with potentially a prefered name and color.
-              join: (
-                G: GameType,
-                ctx,
-                playerName: string | undefined,
-                playerColor: number | undefined
-              ) => {
-                if (G.passAndPlay) {
-                  return INVALID_MOVE;
-                }
-                // If we have already joined, we ignore this.
-                if (G.playerInfos.hasOwnProperty(ctx.playerID)) {
-                  return;
-                }
-                // Find the next available color.
-                const availableColors = Array(NUM_COLORS).fill(true);
-
-                Object.values(G.playerInfos).forEach(
-                  (playerInfo) => (availableColors[playerInfo.color] = false)
-                );
-
-                // We shouldn't need this fallback because there as more colors than
-                // players.
-                let newColor = 0;
-
-                if (playerColor != null && availableColors[playerColor]) {
-                  // If we supplied a prefered color and if it's available, we use that.
-                  newColor = playerColor;
-                } else {
-                  // Otherwise we take the next available color.
-                  availableColors.some((available, color) => {
-                    if (available) {
-                      newColor = color;
-                      return true;
-                    }
-                    return false;
-                  });
-                }
-
-                if (!playerName) {
-                  playerName = `Player ${parseInt(ctx.playerID) + 1}`;
-                }
-
-                G.playerInfos[ctx.playerID] = {
-                  name: playerName,
-                  color: newColor,
-                  ready: false,
-                };
-              },
+              joinMatch,
               setName,
               setColor,
-              setReady: (
-                G: GameType,
-                ctx,
-                playerID: PlayerID,
-                ready: boolean
-              ) => {
-                if (G.passAndPlay) {
-                  return INVALID_MOVE;
-                }
-                G.playerInfos[playerID].ready = ready;
-              },
-              startMatch: (G: GameType, ctx) => {
-                if (ctx.playerID !== "0") {
-                  return INVALID_MOVE;
-                }
-
-                // If some players are not ready, we can't start the game. Not ready is
-                // the same as writing down your name, at least for now.
-                if (Object.values(G.playerInfos).some((info) => !info.name)) {
-                  return INVALID_MOVE;
-                }
-
-                // Set the number of players
-                G.numPlayers = G.passAndPlay
-                  ? ctx.numPlayers
-                  : Object.keys(G.playerInfos).length;
-
-                // Convert 'auto' number of columns to win to a number
-                if (G.numColsToWin === "auto") {
-                  G.numColsToWin = AUTO_NUM_COLS_TO_WIN.get(G.numPlayers) || 3;
-                }
-
-                ctx.events.endPhase();
-              },
-              setNumColsToWin: (
-                G: GameType,
-                ctx,
-                numColsToWin: number | "auto"
-              ) => {
-                if (ctx.playerID !== "0") {
-                  return INVALID_MOVE;
-                }
-                G.numColsToWin = numColsToWin;
-              },
-              setShowProbs: (G: GameType, ctx, showProbs: ShowProbsType) => {
-                if (ctx.playerID !== "0") {
-                  return INVALID_MOVE;
-                }
-                G.showProbs = showProbs;
-              },
-              setMountainShape: (
-                G: GameType,
-                ctx,
-                mountainShape: MountainShape
-              ) => {
-                if (ctx.playerID !== "0") {
-                  return INVALID_MOVE;
-                }
-                G.mountainShape = mountainShape;
-              },
-              setSameSpace: (G: GameType, ctx, sameSpace: SameSpace) => {
-                if (ctx.playerID !== "0") {
-                  return INVALID_MOVE;
-                }
-                G.sameSpace = sameSpace;
-              },
+              setReady,
+              startMatch,
+              setNumColsToWin,
+              setShowProbs,
+              setMountainShape,
+              setSameSpace,
+              // TODO send messages in the lobby.
             },
           },
         },
@@ -581,7 +687,25 @@ const CantStop = {
     },
     // Main phase where we actually play the game.
     main: {
-      turn,
+      turn: {
+        onBegin: (G: GameType, ctx) => {
+          G.currentPositions = {};
+          G.currentPlayerPhase = "rolling";
+          G.currentPlayerHasStarted = false;
+          updateBustProb(G, /* endOfTurn */ true);
+          ctx.events.setActivePlayers({ all: "main" });
+        },
+        order: mainOrder,
+        stages: {
+          main: {},
+        },
+      },
+      moves: {
+        rollDice,
+        stop,
+        pickSumOption,
+        sendMessage,
+      },
       next: "gameover",
     },
     gameover: {
@@ -598,29 +722,8 @@ const CantStop = {
         },
       },
       moves: {
-        /* Reset the game to initial state */
-        playAgain: (G, ctx) => {
-          // We need to keep some of the fields that were entered during the game, in the "setup"
-          // phase.
-          const keepFields = [
-            "playerInfos",
-            "numPlayers",
-            "numVictories",
-            "numColsToWin",
-            "showProbs",
-            "mountainShape",
-            "sameSpace",
-          ];
-
-          // Create an object like G but with only the fields to keep.
-          const GKeep = Object.keys(G)
-            .filter((key) => keepFields.indexOf(key) >= 0)
-            .reduce((G2, key) => Object.assign(G2, { [key]: G[key] }), {});
-
-          Object.assign(G, setup(ctx, G.setupData), GKeep);
-
-          ctx.events.setPhase("main");
-        },
+        playAgain,
+        sendMessage,
       },
       stages: {
         gameover: {},

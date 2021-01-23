@@ -47,3 +47,6 @@ export const NUM_STEPS = {
     7: 16,
   },
 };
+
+// Maximum number of messages to show simultaneously.
+export const MAX_MESSAGES = 20;

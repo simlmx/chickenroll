@@ -15,6 +15,7 @@
     "koa-compress": "^5.0.1",
     "koa-sslify": "^4.0.3",
     "koa-static": "^5.0.0",
+    "lodash": "^4.17.20",
     "node-persist": "^3.1.0",
     "qrcode.react": "^1.0.0",
     "react": "^16.14.0",
