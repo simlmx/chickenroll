@@ -63,7 +63,7 @@ describe("testGetSumOptions", () => {
       [
         so(3, 7, true, true, true),
         so(4, 6, true, false),
-        so(5, 5, true, false),
+        so(5, 5, true, true, true),
       ],
     ],
     [
@@ -121,7 +121,11 @@ describe("testGetSumOptions", () => {
       {},
       { "6": 10 },
       {},
-      [so(6, 6, true, false), so(6, 6, true, false), so(6, 6, true, false)],
+      [
+        so(6, 6, true, true, true),
+        so(6, 6, true, true, true),
+        so(6, 6, true, true, true),
+      ],
     ],
     // A bunch of cases for double-12.
     // [ ] [ ] [ ]
@@ -135,9 +139,9 @@ describe("testGetSumOptions", () => {
       {},
       {},
       [
-        so(12, 12, true, false),
-        so(12, 12, true, false),
-        so(12, 12, true, false),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
       ],
     ],
     // [X] [ ] [ ]
@@ -149,9 +153,9 @@ describe("testGetSumOptions", () => {
       { "12": 2 },
       {},
       [
-        so(12, 12, true, false),
-        so(12, 12, true, false),
-        so(12, 12, true, false),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
       ],
     ],
   ]).it(
@@ -200,7 +204,7 @@ describe("testGetSumOptionsJump", () => {
       { "7": 12 },
       { "1": { "7": 10 } },
       {},
-      [so(7, 7, true, false), so(6, 8), so(7, 7, true, false)],
+      [so(7, 7, true, true, true), so(6, 8), so(7, 7, true, true, true)],
     ],
     // Opponents on the same column
     [
@@ -208,14 +212,14 @@ describe("testGetSumOptionsJump", () => {
       { "7": 11 },
       { "1": { "7": 12 } },
       {},
-      [so(7, 7, true, false), so(6, 8), so(7, 7, true, false)],
+      [so(7, 7, true, true, true), so(6, 8), so(7, 7, true, true, true)],
     ],
     [
       [3, 4, 3, 4],
       { "7": 10 },
       { "1": { "7": 12 }, "2": { "7": 11 } },
       {},
-      [so(7, 7, true, false), so(6, 8), so(7, 7, true, false)],
+      [so(7, 7, true, true, true), so(6, 8), so(7, 7, true, true, true)],
     ],
     [
       [3, 4, 3, 4],
@@ -229,7 +233,11 @@ describe("testGetSumOptionsJump", () => {
       {},
       { "0": { "6": 10 } },
       {},
-      [so(6, 6, true, false), so(6, 6, true, false), so(6, 6, true, false)],
+      [
+        so(6, 6, true, true, true),
+        so(6, 6, true, true, true),
+        so(6, 6, true, true, true),
+      ],
     ],
     // A bunch of cases for double-12.
     // [x] [o] []
@@ -239,9 +247,9 @@ describe("testGetSumOptionsJump", () => {
       { "1": { "12": 2 } },
       {},
       [
-        so(12, 12, true, false),
-        so(12, 12, true, false),
-        so(12, 12, true, false),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
       ],
     ],
     // [X] [o] []
@@ -251,9 +259,9 @@ describe("testGetSumOptionsJump", () => {
       { "0": { "12": 1 }, "1": { "12": 2 } },
       {},
       [
-        so(12, 12, true, false),
-        so(12, 12, true, false),
-        so(12, 12, true, false),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
       ],
     ],
     // [o] [ ] []
@@ -279,9 +287,9 @@ describe("testGetSumOptionsJump", () => {
       { "1": { "12": 2 }, "2": { "12": 1 } },
       {},
       [
-        so(12, 12, true, false),
-        so(12, 12, true, false),
-        so(12, 12, true, false),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
       ],
     ],
     // [o] [x] []
@@ -291,9 +299,9 @@ describe("testGetSumOptionsJump", () => {
       { "1": { "12": 2 }, "2": { "12": 1 } },
       {},
       [
-        so(12, 12, true, false),
-        so(12, 12, true, false),
-        so(12, 12, true, false),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
+        so(12, 12, true, true, true),
       ],
     ],
 
@@ -327,7 +335,7 @@ describe("testGetSumOptionsJump", () => {
         "5": { "10": 6 },
       },
       {},
-      [so(10, 10, true, false), so(8, 12), so(10, 10, true, false)],
+      [so(10, 10, true, true, true), so(8, 12), so(10, 10, true, true, true)],
     ],
   ]).it(
     "case '%s %s %s %s %s'",

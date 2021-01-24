@@ -154,18 +154,17 @@ export const getSumOptions = (
           // Are we already climbing that "sum"?
           if (currentClimberSpaceLeft.get(diceSum) === 1) {
             // If the columns has one space left, we can choose the sum only once.
-            return makeSumOption(diceSums, [true, false]);
+            return makeSumOption(diceSums, [true, true], /*forceSplit*/ true);
           } else {
             // Otherwise the column is not blocked and we have more than 1 space: we can
             // use both sums.
             return makeSumOption(diceSums);
           }
         } else {
-          // We are not climbing it. We can play it if we have a climber left.
+          // We are not climbing the column. We can play it if we have a climber left.
           if (numClimbersLeft > 0) {
-            // But we need 2 spaces if we already have a checkpoint there to be able to
-            // play both. Otherwise we can only play one.
-            //
+            // Depending on the number of spaces left we can either play only one or
+            // both numbers.
             if (
               getSpaceLeft(
                 currentPositions,
@@ -176,7 +175,7 @@ export const getSumOptions = (
                 playerID
               ) === 1
             ) {
-              return makeSumOption(diceSums, [true, false]);
+              return makeSumOption(diceSums, [true, true], /*forceSplit*/ true);
             } else {
               return makeSumOption(diceSums);
             }
