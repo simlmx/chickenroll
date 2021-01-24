@@ -573,11 +573,11 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
 
   // Those are for quick debugging.
   // for (let i = 0; i < ctx.numPlayers; ++i) {
-  //   const id = i.toString();
-  //   checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  //   scores[id] = (i % 2) + 1;
+  // const id = i.toString();
+  // checkpointPositions[id] = { 6: 13, 7: 12, 8: 7 };
+  // scores[id] = (i % 2) + 1;
 
-  //   playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
+  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
   // }
   // numVictories[0] = 1;
   // numVictories[2] = 1;
@@ -589,12 +589,12 @@ const setup = (ctx, setupData: SetupDataType): GameType => {
   // blockedSums[4] = "0";
   // blockedSums[5] = "2";
 
-  // for (let i = 0; i < 10; ++i) {
-  // messages.push({
-  // playerID: (i % 3).toString(),
-  // text: "asdf aosidjf osidjf soidj fsoidj faosidjf asoidfj",
-  // ts: new Date().getTime(),
-  // });
+  // for (let i = 0; i < 7; ++i) {
+  //   messages.push({
+  //     playerID: (i % 3).toString(),
+  //     text: "asdf aosidjf osidjf soidj fsoidj faosidjf asoidfj",
+  //     ts: new Date().getTime(),
+  //   });
   // }
 
   return {
@@ -701,9 +701,18 @@ const CantStop = {
         },
       },
       moves: {
-        rollDice,
-        stop,
-        pickSumOption,
+        rollDice: {
+          ignoreStaleStateID: true,
+          move: rollDice,
+        },
+        stop: {
+          ignoreStaleStateID: true,
+          move: stop,
+        },
+        pickSumOption: {
+          ignoreStaleStateID: true,
+          move: pickSumOption,
+        },
         sendMessage,
       },
       next: "gameover",
