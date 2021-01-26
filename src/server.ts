@@ -31,9 +31,13 @@ const PORT = env.PORT ? parseInt(env.PORT) : 8000;
 // the herokuapp address get redirected there.
 const CANTSTOP_HOST = env.CANTSTOP_HOST || undefined;
 
-server.app.use(
-  sslify({ resolver: xForwardedProtoResolver, hostname: CANTSTOP_HOST })
-);
+if (!(env?.SKIP_SSLIFY === 'true')) {
+  server.app.use(
+    sslify({ resolver: xForwardedProtoResolver, hostname: CANTSTOP_HOST })
+  );
+} else {
+  console.log('Skipping sslify');
+}
 
 server.app.use(async (ctx, next) => {
   // If the hostname doesn't match the environment variable, we redirect there.
