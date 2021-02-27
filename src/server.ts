@@ -2,6 +2,7 @@ import { Server } from "boardgame.io/server";
 import { PostgresStore } from "bgio-postgres";
 import path from "path";
 import serve from "koa-static";
+import compress from "koa-compress";
 import CantStop from "./Game";
 import sslify, { xForwardedProtoResolver } from "koa-sslify";
 
@@ -31,12 +32,12 @@ const PORT = env.PORT ? parseInt(env.PORT) : 8000;
 // the herokuapp address get redirected there.
 const CANTSTOP_HOST = env.CANTSTOP_HOST || undefined;
 
-if (!(env?.SKIP_SSLIFY === 'true')) {
+if (!(env?.SKIP_SSLIFY === "true")) {
   server.app.use(
     sslify({ resolver: xForwardedProtoResolver, hostname: CANTSTOP_HOST })
   );
 } else {
-  console.log('Skipping sslify');
+  console.log("Skipping sslify");
 }
 
 server.app.use(async (ctx, next) => {
@@ -48,6 +49,8 @@ server.app.use(async (ctx, next) => {
   }
   await next();
 });
+
+server.app.use(compress());
 
 // Build path relative to the server.js file
 const frontEndAppBuildPath = path.resolve(__dirname, "../build");

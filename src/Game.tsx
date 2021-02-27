@@ -42,8 +42,6 @@ export interface Move {
 
 export type ShowProbsType = "before" | "after" | "never";
 
-type GameMode = "pass-and-play" | "remote";
-
 export interface GameType {
   diceValues: number[];
   currentPositions: { [key: number]: number };
