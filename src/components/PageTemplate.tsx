@@ -65,8 +65,6 @@ const Header = (props: HeaderProps) => {
   );
 };
 
-type FooterProps = {};
-
 const Footer = (props) => {
   return (
     <footer>
