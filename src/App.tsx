@@ -20,7 +20,7 @@ const TITLE =
   "Chicken Roll - Online alternative to Can't Stop, the classic push-your-luck board game";
 
 const DESCRIPTION =
-  "Play with your friends, either online or on the same device. Chicken Roll is free, open source and addictive!.";
+  "Play with your friends, either online or on the same device. Chicken Roll is an online dice game that is free and open source.";
 
 /*
  * Component that does some `action` on the first render.
