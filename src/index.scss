@@ -1945,3 +1945,9 @@ $mountainRatio: 0.67;
   box-shadow: none;
   border-color: transparent;
 }
+
+.loading {
+  background-color: $bgcolor;
+  height: 100%;
+  width: 100%;
+}

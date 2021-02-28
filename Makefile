@@ -1,4 +1,4 @@
-.PHONY: db build serve
+.PHONY: db build serve start test format
 
 # Start the database
 db:
@@ -25,3 +25,6 @@ serve: build
 
 test:
 	yarn test
+
+format:
+	yarn format
