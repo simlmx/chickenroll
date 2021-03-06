@@ -1,6 +1,7 @@
 import React from "react";
 import { DieLogo } from "./Die";
 import getSoundPlayer from "../audio";
+import bmc from '../images/bmc.svg'
 
 /*
  * volume: 0 (mute), 1, 2, 3 (max)
@@ -70,7 +71,7 @@ const InGameIcons = (props: InGameIconsProps) => {
           >
             <img
               className="coffee"
-              src={`${process.env.PUBLIC_URL}/bmc.svg`}
+              src={bmc}
               alt="buy me a coffee"
             />
           </a>

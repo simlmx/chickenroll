@@ -1,6 +1,9 @@
 import React from "react";
 import { Background } from "./Die";
 import { Helmet } from "react-helmet";
+import bmc from '../images/bmc.svg'
+import discord from '../images/discord.svg'
+import gh from '../images/gh.png'
 
 interface HeaderProps {
   path: string;
@@ -86,7 +89,7 @@ const Footer = (props) => {
         >
           <img
             className="icon"
-            src={`${process.env.PUBLIC_URL}/gh.png`}
+            src={gh}
             alt="github"
           />
         </a>
@@ -100,7 +103,7 @@ const Footer = (props) => {
         >
           <img
             className="icon"
-            src={`${process.env.PUBLIC_URL}/bmc.svg`}
+            src={bmc}
             alt="Buy me a coffee"
           />
         </a>
@@ -114,7 +117,7 @@ const Footer = (props) => {
         >
           <img
             className="icon discordIcon"
-            src={`${process.env.PUBLIC_URL}/discord.svg`}
+            src={discord}
             alt="Discord"
           />
         </a>
