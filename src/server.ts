@@ -19,6 +19,12 @@ if (env.CANTSTOP_DB_URI) {
     // Without this option the ORM used by PostgresStore ends up printing all the moves
     // in the database for every move.
     logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
   });
   serverOptions.db = db;
 }
