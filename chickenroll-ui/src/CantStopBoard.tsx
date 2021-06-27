@@ -133,7 +133,7 @@ export class Info extends React.Component<InfoProps> {
   }
 }
 
-export const CantStopBoard = (props: BoardProps<GameType>) => {
+export const Board = (props: BoardProps<GameType>) => {
   const [mouseOverPossibility, setMouseOverPossibility] = useState<
     { buttonRow: number; buttonColumn: number } | undefined
   >(undefined);
