@@ -1,9 +1,18 @@
 import React, { useMemo } from "react";
-import { getNumStepsForSum, isSumOptionSplit, SumOption } from "../math";
-import { PlayerID, PlayerInfo, MountainShape, SameSpace } from "../types";
+
+import { UserId } from "bgkit";
+import {
+  getNumStepsForSum,
+  isSumOptionSplit,
+  SumOption,
+  PlayerInfo,
+  MountainShape,
+  SameSpace,
+  NUM_STEPS,
+  climbOneStep,
+} from "chickenroll-game";
+
 import Chicken from "./Chicken";
-import { NUM_STEPS } from "../constants";
-import { climbOneStep } from "../Game";
 
 export const Climber = (props: {
   color?: number;
@@ -126,7 +135,7 @@ interface MountainProps {
   checkpointPositions: { [key: string]: { [key: number]: number } };
   playerInfos: { [key: string]: PlayerInfo };
   blockedSums: { [key: number]: string };
-  currentPlayer: PlayerID;
+  currentPlayer: UserId;
   diceSumOptions?: SumOption[];
   mouseOverPossibility?: { buttonRow: number; buttonColumn: number };
   mountainShape: MountainShape;

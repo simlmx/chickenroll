@@ -1,30 +1,40 @@
 import React, { useState, useEffect, useMemo } from "react";
 
+import { UserId } from "bgkit";
+import { useSelector, useDispatch } from "bgkit-ui";
+
+import {
+  ChickenrollBoard,
+  isSumOptionSplit,
+  PlayerInfo,
+  roll,
+  stop,
+} from "chickenroll-game";
+// import { GameType } from "../Game";
+
+
+import { State } from './types';
 import { DiceBoard } from "./DiceBoard";
 import { Mountain, EggsLeft, Climber } from "./Mountain";
 import { ScoreBoard } from "./ScoreBoard";
-import GameSetup from "./GameSetup";
 import MoveButtons from "./MoveButtons";
 import MoveHistory from "./MoveHistory";
-import { GameType } from "../Game";
-import { PlayerID, PlayerInfo } from "../types";
+
 import InGameIcons from "./InGameIcons";
 import Rules from "./Rules";
-import getSoundPlayer from "../audio";
-import localStorage from "../utils/localStorage";
-import { isIOS } from "../utils/platform";
+import getSoundPlayer from "./audio";
+import localStorage from "./utils/localStorage";
 import { BustProb } from "./Bust";
-import { isSumOptionSplit } from "../math";
 
-import { BoardProps } from "boardgame.io/react";
+import { isIOS } from "./utils/platform";
 
 interface InfoProps {
-  info?: { code: string; playerID?: PlayerID };
+  info?: { code: string; userId?: UserId };
   endOfTurnBustProb?: number;
   onClick: () => void;
   playerInfos: { [key: string]: PlayerInfo };
-  // playerID of the client instance.
-  playerID: PlayerID;
+  // userId of the client instance.
+  userId: UserId;
   // When it's your turn, we add it to the Info.
   itsYourTurn: boolean;
 }
@@ -39,11 +49,11 @@ export class Info extends React.Component<InfoProps> {
 
     const { code } = info;
 
-    const itsMe = this.props.playerID === info.playerID;
+    const itsMe = this.props.userId === info.userId;
 
     const playerName = itsMe
       ? "You"
-      : info.playerID && playerInfos[info.playerID].name;
+      : info.userId && playerInfos[info.userId].name;
 
     const probMsg = endOfTurnBustProb != null && (
       <div className="probMsgWrap">
@@ -58,7 +68,7 @@ export class Info extends React.Component<InfoProps> {
 
     const itsYourTurnTag = itsYourTurn ? (
       <div
-        className={`itsYourTurn color${playerInfos[this.props.playerID].color}`}
+        className={`itsYourTurn color${playerInfos[this.props.userId].color}`}
       >
         It's your turn!
       </div>
@@ -70,7 +80,7 @@ export class Info extends React.Component<InfoProps> {
       playerNameTag = (
         <strong
           className={`infoPlayerName color${
-            playerInfos[info.playerID as PlayerID].color
+            playerInfos[info.userId as UserId].color
           }`}
         >
           {playerName}
@@ -133,12 +143,17 @@ export class Info extends React.Component<InfoProps> {
   }
 }
 
-export const Board = (props: BoardProps<GameType>) => {
+export const Board = () => {
   const [mouseOverPossibility, setMouseOverPossibility] = useState<
     { buttonRow: number; buttonColumn: number } | undefined
   >(undefined);
 
-  const { moves, matchID, ctx, G, matchData } = props;
+  const dispatch = useDispatch();
+
+  //FIXME useSelector instead of this
+  const board = useSelector((state: State) => state.board);
+  const userId = useSelector((state: State) => state.userId);
+
   const {
     checkpointPositions,
     currentPositions,
@@ -150,14 +165,16 @@ export const Board = (props: BoardProps<GameType>) => {
     numVictories,
     bustProb,
     endOfTurnBustProb,
-    passAndPlay,
     numColsToWin,
     moveHistory,
     showProbs,
     mountainShape,
     sameSpace,
-  } = G;
-  const { currentPlayer, phase, numPlayers, playOrder } = ctx;
+    currentPlayer,
+    numPlayers,
+    playerOrder,
+    stage,
+  } = board;
 
   const [showInfo, setShowInfo] = useState(true);
   const [modal, setModal] = useState<undefined | "history" | "rules">(
@@ -220,20 +237,10 @@ export const Board = (props: BoardProps<GameType>) => {
     _setVolume(newVolume);
   };
 
-  const itsYourTurn =
-    phase === "main" &&
-    !props.G.passAndPlay &&
-    props.ctx.currentPlayer === props.playerID;
+  const itsYourTurn = currentPlayer === userId;
 
-  // This verifies if the game has already started without us.
-  // Once the game is started, `G.numPlayers` is set to the number of players that
-  // have joined. If our playerID is bigger than that, it means we are not part of
-  // those players.
-  const gameStartedWithoutYou =
-    props.playerID && parseInt(props.playerID) >= props.G.numPlayers;
-
-  const infoCode = props.G.info?.code;
-  const infoTs = props.G.info?.ts;
+  const infoCode = board.info?.code;
+  const infoTs = board.info?.ts;
 
   // Deal with the info popup. If it changes, we cleanup the last timer and start a new
   // one.
@@ -302,7 +309,7 @@ export const Board = (props: BoardProps<GameType>) => {
 
   // We want to forget about mouseOverPossibility as soon as we are not in the moving
   // stage. This prevents some flickering of the black eggs.
-  const stageIsMoving = ctx?.activePlayers?.[currentPlayer] === "moving";
+  const stageIsMoving = stage === "moving";
   const realMouseOverPossibility = stageIsMoving
     ? mouseOverPossibility
     : undefined;
@@ -343,62 +350,15 @@ export const Board = (props: BoardProps<GameType>) => {
     sameSpace,
   ]);
 
-  // If the game has already started we show a sorry message with a crying cat.
-  if (gameStartedWithoutYou) {
-    return (
-      <>
-        <InGameIcons />
-        <div className="gameStartedWithoutYou container">
-          <div>
-            <p>It seems like this match has already started... without you!</p>
-            <h1>
-              <span role="img" aria-label="crying cat">
-                😿
-              </span>
-            </h1>
-            <a className="btn btn-primary" href="/match">
-              Create a new match of your own!
-            </a>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  // If we are in pass-and-play mode, then the playerID is always "0". The
-  // "currentPlayer" is what we mean.
-  const playerID = passAndPlay ? currentPlayer : props.playerID;
-
-  if (phase === "setup") {
-    return (
-      <GameSetup
-        {...{
-          playerInfos,
-          playerID,
-          moves,
-          maxNumPlayers: numPlayers,
-          matchID,
-          passAndPlay,
-          numColsToWin,
-          showProbs,
-          mountainShape,
-          sameSpace,
-          matchData,
-        }}
-      />
-    );
-  }
-
   const scoreBoard = (
     <ScoreBoard
       {...{
         scores,
         playerInfos,
         currentPlayer,
-        playOrder,
+        playerOrder,
         numVictories,
         numColsToWin,
-        matchData,
       }}
     />
   );
@@ -414,63 +374,42 @@ export const Board = (props: BoardProps<GameType>) => {
     />
   );
 
-  const buttons =
-    props.ctx.phase === "gameover" ? (
-      <div className="actionButtons">
-        <button
-          onClick={() => {
-            moves.playAgain();
-            setShowInfo(false);
-          }}
-          className={`btn btnAction ${
-            playerID == null ? "" : `bgcolor${playerInfos[playerID].color}`
-          }`}
-        >
-          Play again!
-        </button>
-      </div>
-    ) : (
-      <MoveButtons
-        {...{
-          moves,
-          ctx,
-          G,
-          playerID,
-          // Use this player's color if there is a player otherwise use the current
-          // player's color.
-          playerColor:
-            playerInfos[playerID == null ? currentPlayer : playerID].color,
-          onRoll: () => {
-            moves.rollDice();
-            setShowInfo(false);
-          },
-          onStop: () => {
-            moves.stop();
-            setShowInfo(false);
-          },
-          showProbs,
-          bustProb,
-        }}
-        onMouseEnter={(buttonRow, buttonColumn) => {
-          setMouseOverPossibility({ buttonRow, buttonColumn });
-        }}
-        onMouseLeave={() => {
-          setMouseOverPossibility(undefined);
-        }}
-      />
-    );
+  const buttons = (
+    <MoveButtons
+      {...{
+        userId,
+        // Use this player's color if there is a player otherwise use the current
+        // player's color.
+        playerColor: playerInfos[userId == null ? currentPlayer : userId].color,
+        onRoll: () => {
+          dispatch(roll());
+          setShowInfo(false);
+        },
+        onStop: () => {
+          dispatch(stop());
+          setShowInfo(false);
+        },
+        showProbs,
+        bustProb,
+      }}
+      onMouseEnter={(buttonRow, buttonColumn) => {
+        setMouseOverPossibility({ buttonRow, buttonColumn });
+      }}
+      onMouseLeave={() => {
+        setMouseOverPossibility(undefined);
+      }}
+    />
+  );
 
   const infoTag = showInfo ? (
     <Info
       {...{
-        info: G.info,
+        info: board.info,
         endOfTurnBustProb:
           showProbs === "never" ? undefined : endOfTurnBustProb,
         onClick: () => setShowInfo(false),
         playerInfos,
-        // For pass and play we ignore the playerID.
-        // This means we never right "You" but always "player name".
-        playerID: passAndPlay || playerID == null ? "-1" : playerID,
+        userId: userId == null ? "-1" : userId,
         itsYourTurn,
       }}
     />
@@ -557,7 +496,7 @@ export const Board = (props: BoardProps<GameType>) => {
       changeVolume={() => {
         changeVolume();
       }}
-      showVolume={!passAndPlay}
+      showVolume={true}
       historyOnClick={() =>
         setModal(modal === "history" ? undefined : "history")
       }

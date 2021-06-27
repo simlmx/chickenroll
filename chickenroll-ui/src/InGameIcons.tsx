@@ -1,7 +1,6 @@
 import React from "react";
 import { DieLogo } from "./Die";
-import getSoundPlayer from "../audio";
-import bmc from '../images/bmc.svg'
+import getSoundPlayer from "./audio";
 
 /*
  * volume: 0 (mute), 1, 2, 3 (max)
@@ -29,7 +28,6 @@ const SoundIcon = (props: { volume: number }) => {
 
 type InGameIconsProps = {
   howToPlayOnClick?: () => void;
-  showCoffee?: boolean;
   volume?: number;
   changeVolume?: () => void;
   showVolume?: boolean;
@@ -38,16 +36,12 @@ type InGameIconsProps = {
 
 const InGameIcons = (props: InGameIconsProps) => {
   let {
-    showCoffee,
     howToPlayOnClick,
     volume,
     changeVolume,
     showVolume,
     historyOnClick,
   } = props;
-  if (showCoffee == null) {
-    showCoffee = true;
-  }
   if (showVolume == null) {
     showVolume = false;
   }
@@ -61,22 +55,6 @@ const InGameIcons = (props: InGameIconsProps) => {
           <DieLogo />
         </a>
       </div>
-      {showCoffee && (
-        <div className="inGameIcon">
-          <a
-            href="https://www.buymeacoffee.com/simlmx"
-            title="Buy Me A Coffee"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              className="coffee"
-              src={bmc}
-              alt="buy me a coffee"
-            />
-          </a>
-        </div>
-      )}
       {howToPlayOnClick && (
         <div className="inGameIcon">
           <div

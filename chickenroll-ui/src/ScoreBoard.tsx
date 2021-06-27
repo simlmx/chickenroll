@@ -1,7 +1,9 @@
 import React from "react";
-import { PlayerID, PlayerInfo } from "../types";
+
+import { UserId } from 'bgkit';
+import { PlayerInfo } from "chickenroll-game";
+
 import Chicken from "./Chicken";
-import { FilteredMetadata } from "boardgame.io";
 
 const Trophy = (props: { value: number; color: number | "gold" }) => {
   const { color, value } = props;
@@ -57,22 +59,20 @@ interface ScoreBoardProps {
   scores: { [key: string]: number };
   numVictories: { [key: string]: number };
   playerInfos: { [key: string]: PlayerInfo };
-  currentPlayer: PlayerID;
-  playOrder: PlayerID[];
+  currentPlayer: UserId;
+  playerOrder: UserId[];
   numColsToWin: number | "auto";
-  matchData?: FilteredMetadata;
 }
 
 export class ScoreBoard extends React.Component<ScoreBoardProps> {
   render() {
     const {
-      playOrder,
+      playerOrder,
       playerInfos,
       scores,
       currentPlayer,
       numVictories,
       numColsToWin,
-      matchData,
     } = this.props;
 
     if (numColsToWin === "auto") {
@@ -81,12 +81,11 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
 
     const maxNumVictories = Math.max(...Object.values(numVictories));
 
-    const content = playOrder.map((playerID) => {
-      const name = playerInfos[playerID].name;
-      const color = playerInfos[playerID].color;
-      const points = scores[playerID];
-      const numVictoriesPlayer = numVictories[playerID];
-      const isConnected = matchData == null || matchData[playerID].isConnected;
+    const content = playerOrder.map((userId) => {
+      const name = playerInfos[userId].name;
+      const color = playerInfos[userId].color;
+      const points = scores[userId];
+      const numVictoriesPlayer = numVictories[userId];
 
       // In theory we can finish with 2 more stars than required. For this reason we add
       // 2 transparent stars at the end so that the layout doens't change when it
@@ -107,22 +106,18 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
           }
           return (
             <td className="starCol" key={i}>
-              <div {...{ className }} key={playerID}>
+              <div {...{ className }} key={userId}>
                 <Chicken />
               </div>
             </td>
           );
         });
       let opts: any = { className: `scoreBoardPlayerName bgcolor${color}` };
-      if (playerID === currentPlayer) {
+      if (userId === currentPlayer) {
         opts.className += " scoreBoardPlayerNameCurrent littleFlash";
       }
-      if (!isConnected) {
-        opts.className += " playerDisconnected scorePlayerDisconnected";
-        opts.title = "Player has disconnected";
-      }
       return (
-        <tr key={playerID}>
+        <tr key={userId}>
           <td className="numVictoriesCol">
             <Trophy
               value={numVictoriesPlayer}

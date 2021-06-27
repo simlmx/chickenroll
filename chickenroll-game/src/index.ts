@@ -15,8 +15,23 @@ import {
   isSumOptionSplit,
 } from "./math";
 
-import { PlayerInfo, MountainShape, SameSpace } from "./types";
 import { getAllowedColumns, getOddsCalculator } from "./math/probs";
+export { OddsCalculator } from "./math/probs";
+export { DICE_INDICES, makeSumOption } from "./math";
+
+import { DiceSum, PlayerInfo, MountainShape, SameSpace } from "./types";
+export { NUM_STEPS } from "./constants";
+
+// Imports that should also be exported.
+export {
+  DiceSum,
+  PlayerInfo,
+  MountainShape,
+  SameSpace,
+  SumOption,
+  getNumStepsForSum,
+  isSumOptionSplit,
+};
 
 interface Info {
   // Player that is referred by the message.

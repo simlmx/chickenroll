@@ -1,8 +1,9 @@
 import React from "react";
+
+import { UserId } from 'bgkit';
+import { DICE_INDICES, PlayerInfo, Move } from 'chickenroll-game';
+
 import { DiceBoard } from "./DiceBoard";
-import { DICE_INDICES } from "../math";
-import { PlayerID, PlayerInfo } from "../types";
-import { Move } from "../Game";
 import { BustEmoji } from "./Bust";
 
 const ActionBtn = (props: { text: string; color: number }) => (
@@ -20,7 +21,7 @@ const MoveHistory = (props: MoveHistoryProps) => {
   const { moveHistory, playerInfos } = props;
 
   let index = 1;
-  let lastPlayerID: PlayerID;
+  let lastUserId: UserId;
 
   if (moveHistory.length === 0) {
     return <i style={{ color: "lightgrey" }}>No moves yet</i>;
@@ -31,7 +32,7 @@ const MoveHistory = (props: MoveHistoryProps) => {
       {moveHistory
         // .slice(0, 1)
         .map((move, i) => {
-          const { diceValues, diceSplitIndex, diceUsed, playerID, bust } = move;
+          const { diceValues, diceSplitIndex, diceUsed, userId, bust } = move;
 
           if (diceValues == null) {
             return null;
@@ -58,14 +59,14 @@ const MoveHistory = (props: MoveHistoryProps) => {
 
           // Increment the index if we have the same player as before, otherwise set
           // back to 0.
-          if (lastPlayerID == null || playerID !== lastPlayerID) {
+          if (lastUserId == null || userId !== lastUserId) {
             index = 1;
           } else {
             index += 1;
           }
-          lastPlayerID = playerID;
+          lastUserId = userId;
 
-          const playerColor = playerInfos[playerID].color;
+          const playerColor = playerInfos[userId].color;
 
           const indexEl = <div className="moveIndex">{index}</div>;
 

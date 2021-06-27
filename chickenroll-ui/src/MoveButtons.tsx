@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { GameType, ShowProbsType } from "../Game";
-import { PlayerID } from "../types";
-import { SumOption, isSumOptionSplit } from "../math";
+import React, { useState, useEffect, useRef } from "react";
+
+import { UserId } from "bgkit";
+import { useSelector, useDispatch } from "bgkit-ui";
+import {
+  ShowProbsType,
+  SumOption,
+  isSumOptionSplit,
+  pick,
+} from "chickenroll-game";
+
+import { State } from "./types";
 import { BustProb } from "./Bust";
 import { DiceSplit } from "./icons";
-import getSoundPlayer from "../audio";
+import getSoundPlayer from "./audio";
 
 /*
  * Given if it's us playing (itsMe) and if the button should be enabled, we return the
@@ -101,8 +109,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
 };
 
 /* Dice sum possibilities we can choose from */
-class Possibilities extends React.Component<{
-  moves: any;
+const Possibilities = (props: {
   // We'll highlight the last selected option
   lastPickedDiceSumOption?: number[];
   diceSumOptions?: SumOption[];
@@ -112,125 +119,124 @@ class Possibilities extends React.Component<{
   color: number;
   imThePrevious: boolean;
   currentPlayerHasStarted: boolean;
-}> {
-  touch: boolean;
-  constructor(props) {
-    super(props);
-    this.touch = false;
-  }
+}) => {
+  const touch = useRef(false);
 
-  render() {
-    const {
-      lastPickedDiceSumOption,
-      diceSumOptions,
-      itsMe,
-      imThePrevious,
-      color,
-      moves,
-      onMouseEnter,
-      onMouseLeave,
-      currentPlayerHasStarted,
-    } = this.props;
-    return (
-      <div className="actionButtons">
-        {diceSumOptions != null &&
-          diceSumOptions.map((sumOption: SumOption, i: number) => {
-            // If both sums have the same "enabled" value and if they are not split,
-            // then we'll have 2 buttons.
-            const justOneButton =
-              sumOption.enabled[0] === sumOption.enabled[1] &&
-              !isSumOptionSplit(sumOption);
+  const dispatch = useDispatch();
 
-            // We make sure we have an array of arrays of sum.
-            // [[7, 12]] means one button with 2 sums.
-            // [[7], [12]] means 2 different buttons.
-            const sumsList = justOneButton
-              ? [sumOption.diceSums]
-              : sumOption.diceSums.map((x) => [x]);
+  const {
+    lastPickedDiceSumOption,
+    diceSumOptions,
+    itsMe,
+    imThePrevious,
+    color,
+    onMouseEnter,
+    onMouseLeave,
+    currentPlayerHasStarted,
+  } = props;
+  return (
+    <div className="actionButtons">
+      {diceSumOptions != null &&
+        diceSumOptions.map((sumOption: SumOption, i: number) => {
+          // If both sums have the same "enabled" value and if they are not split,
+          // then we'll have 2 buttons.
+          const justOneButton =
+            sumOption.enabled[0] === sumOption.enabled[1] &&
+            !isSumOptionSplit(sumOption);
 
-            const buttons: JSX.Element[] = [];
+          // We make sure we have an array of arrays of sum.
+          // [[7, 12]] means one button with 2 sums.
+          // [[7], [12]] means 2 different buttons.
+          const sumsList = justOneButton
+            ? [sumOption.diceSums]
+            : sumOption.diceSums.map((x) => [x]);
 
-            sumsList.forEach((sums, j) => {
-              const enabled = sumOption.enabled[j];
+          const buttons: JSX.Element[] = [];
 
-              const wasSelected =
-                lastPickedDiceSumOption != null &&
-                lastPickedDiceSumOption[0] === i &&
-                lastPickedDiceSumOption[1] === j;
+          sumsList.forEach((sums, j) => {
+            const enabled = sumOption.enabled[j];
 
-              let className = "btnPossibilities ";
+            const wasSelected =
+              lastPickedDiceSumOption != null &&
+              lastPickedDiceSumOption[0] === i &&
+              lastPickedDiceSumOption[1] === j;
 
-              className += getButtonClassNames(
-                itsMe || (imThePrevious && !currentPlayerHasStarted),
-                enabled,
-                color
-              );
+            let className = "btnPossibilities ";
 
-              if (wasSelected) {
-                className += " lastChoiceOtherPlayer";
-              }
+            className += getButtonClassNames(
+              itsMe || (imThePrevious && !currentPlayerHasStarted),
+              enabled,
+              color
+            );
 
-              let pairHighlight = [false, false];
-              if (justOneButton) {
-                pairHighlight = [true, true];
-              } else {
-                pairHighlight[j] = true;
-              }
+            if (wasSelected) {
+              className += " lastChoiceOtherPlayer";
+            }
 
-              buttons.push(
-                <button
-                  type="button"
-                  key={j}
-                  onClick={() => {
-                    itsMe && enabled && moves.pickSumOption(i, j);
-                  }}
-                  // Using mouse over and mouse out because the behaviour is
-                  // nicer!
-                  onMouseOver={() =>
-                    itsMe && enabled && !this.touch && onMouseEnter(i, j)
-                  }
-                  onMouseLeave={() => {
-                    itsMe && enabled && !this.touch && onMouseLeave();
-                  }}
-                  onTouchStart={() => {
-                    this.touch = true;
-                  }}
-                  onTouchEnd={() => {
-                    this.touch = false;
-                  }}
-                  disabled={!this.props.itsMe || !enabled}
-                  {...{ className }}
-                >
-                  <DiceSplit split={i} pairHighlight={pairHighlight} />
-                  {sums.length === 1 ? (
+            let pairHighlight = [false, false];
+            if (justOneButton) {
+              pairHighlight = [true, true];
+            } else {
+              pairHighlight[j] = true;
+            }
+
+            buttons.push(
+              <button
+                type="button"
+                key={j}
+                onClick={() => {
+                  itsMe &&
+                    enabled &&
+                    dispatch(
+                      pick({
+                        diceSplitIndex: i,
+                        choiceIndex: j,
+                      })
+                    );
+                }}
+                // Using mouse over and mouse out because the behaviour is
+                // nicer!
+                onMouseOver={() =>
+                  itsMe && enabled && !touch.current && onMouseEnter(i, j)
+                }
+                onMouseLeave={() => {
+                  itsMe && enabled && !touch.current && onMouseLeave();
+                }}
+                onTouchStart={() => {
+                  touch.current = true;
+                }}
+                onTouchEnd={() => {
+                  touch.current = false;
+                }}
+                disabled={!itsMe || !enabled}
+                {...{ className }}
+              >
+                <DiceSplit split={i} pairHighlight={pairHighlight} />
+                {sums.length === 1 ? (
+                  <div className="possNumber">{sums[0]}</div>
+                ) : (
+                  <>
                     <div className="possNumber">{sums[0]}</div>
-                  ) : (
-                    <>
-                      <div className="possNumber">{sums[0]}</div>
-                      <div className="possNumberSeparator"></div>
-                      <div className="possNumber">{sums[1]}</div>
-                    </>
-                  )}
-                </button>
-              );
-            });
+                    <div className="possNumberSeparator"></div>
+                    <div className="possNumber">{sums[1]}</div>
+                  </>
+                )}
+              </button>
+            );
+          });
 
-            return buttons.length > 0 ? (
-              <div className="possibilitiesRow" key={i}>
-                {buttons}
-              </div>
-            ) : null;
-          })}
-      </div>
-    ); // render return
-  } // render
-} // class
+          return buttons.length > 0 ? (
+            <div className="possibilitiesRow" key={i}>
+              {buttons}
+            </div>
+          ) : null;
+        })}
+    </div>
+  );
+};
 
 interface MoveButtonsProps {
-  ctx: any;
-  moves: any;
-  G: GameType;
-  playerID: PlayerID | null;
+  userId: UserId | null;
   playerColor: number;
   onMouseEnter: (buttonRow: number, buttonColumn: number) => void;
   onMouseLeave: () => void;
@@ -243,29 +249,36 @@ interface MoveButtonsProps {
 // export default class MoveButtons extends React.Component<MoveButtonsProps> {
 const MoveButtons = (props: MoveButtonsProps) => {
   const {
-    moves,
     onRoll,
     onStop,
     onMouseEnter,
     onMouseLeave,
-    playerID,
-    ctx,
     playerColor,
     showProbs,
     bustProb,
   } = props;
-  const currentPlayer = ctx.currentPlayer;
-  const stage = ctx.activePlayers[currentPlayer];
-  const itsMe = playerID === currentPlayer;
-  const {
-    lastPickedDiceSumOption,
-    diceSumOptions,
-    currentPlayerHasStarted,
-    previousPlayer,
-    lastOutcome,
-  } = props.G;
 
-  const imThePrevious = playerID === previousPlayer;
+  const userId = useSelector((state: State) => state.userId);
+  const currentPlayer = useSelector(
+    (state: State) => state.board.currentPlayer
+  );
+  const stage = useSelector((state: State) => state.board.stage);
+  const lastPickedDiceSumOption = useSelector(
+    (state: State) => state.board.lastPickedDiceSumOption
+  );
+  const diceSumOptions = useSelector(
+    (state: State) => state.board.diceSumOptions
+  );
+  const currentPlayerHasStarted = useSelector(
+    (state: State) => state.board.currentPlayerHasStarted
+  );
+  const previousPlayer = useSelector(
+    (state: State) => state.board.previousPlayer
+  );
+  const lastOutcome = useSelector((state: State) => state.board.lastOutcome);
+
+  const itsMe = userId === currentPlayer;
+  const imThePrevious = userId === previousPlayer;
 
   // There are two possibilities: either we show the Roll/Stop buttons, or we show the
   // Possibilities.
@@ -329,7 +342,6 @@ const MoveButtons = (props: MoveButtonsProps) => {
         }
         onMouseLeave={() => onMouseLeave()}
         {...{
-          moves,
           itsMe,
           color: playerColor,
           lastPickedDiceSumOption,

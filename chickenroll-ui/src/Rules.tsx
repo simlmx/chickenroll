@@ -1,8 +1,9 @@
 import React from "react";
+
+import { MountainShape, SameSpace, makeSumOption } from 'chickenroll-game'
+
 import { Die } from "./Die";
 import { Climber, Mountain } from "./Mountain";
-import { MountainShape, SameSpace } from "../types";
-import { makeSumOption } from "../math";
 
 const Rules = (props) => {
   const playerID = "0";

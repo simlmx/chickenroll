@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BustProb } from "./Bust";
-import { OddsCalculator } from "../math/probs";
+import { OddsCalculator } from "chickenroll-game";
 
 const DEFAULT_SELECTED = [
   false,
