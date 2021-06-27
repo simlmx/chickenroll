@@ -1,3 +1,6 @@
+// FIXME merge inside index?
+
+// FIXME use bgkit's UserId instead.
 export type PlayerID = string;
 export type DiceSum = number;
 
