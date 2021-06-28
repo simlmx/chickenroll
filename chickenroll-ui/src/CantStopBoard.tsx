@@ -9,11 +9,12 @@ import {
   PlayerInfo,
   roll,
   stop,
+  playAgain,
 } from "chickenroll-game";
 
-import './index.scss'
+import "./index.scss";
 
-import { State } from './types';
+import { State } from "./types";
 import { DiceBoard } from "./DiceBoard";
 import { Mountain, EggsLeft, Climber } from "./Mountain";
 import { ScoreBoard } from "./ScoreBoard";
@@ -374,32 +375,48 @@ export const Board = () => {
     />
   );
 
-  const buttons = (
-    <MoveButtons
-      {...{
-        userId,
-        // Use this player's color if there is a player otherwise use the current
-        // player's color.
-        playerColor: playerInfos[userId == null ? currentPlayer : userId].color,
-        onRoll: () => {
-          dispatch(roll());
-          setShowInfo(false);
-        },
-        onStop: () => {
-          dispatch(stop());
-          setShowInfo(false);
-        },
-        showProbs,
-        bustProb,
-      }}
-      onMouseEnter={(buttonRow, buttonColumn) => {
-        setMouseOverPossibility({ buttonRow, buttonColumn });
-      }}
-      onMouseLeave={() => {
-        setMouseOverPossibility(undefined);
-      }}
-    />
-  );
+  const buttons =
+    stage === "gameover" ? (
+      <div className="actionButtons">
+        <button
+          onClick={() => {
+            dispatch(playAgain());
+            setShowInfo(false);
+          }}
+          className={`btn btnAction ${
+            userId == null ? "" : `bgcolor${playerInfos[userId].color}`
+          }`}
+        >
+          Play again!
+        </button>
+      </div>
+    ) : (
+      <MoveButtons
+        {...{
+          userId,
+          // Use this player's color if there is a player otherwise use the current
+          // player's color.
+          playerColor:
+            playerInfos[userId == null ? currentPlayer : userId].color,
+          onRoll: () => {
+            dispatch(roll());
+            setShowInfo(false);
+          },
+          onStop: () => {
+            dispatch(stop());
+            setShowInfo(false);
+          },
+          showProbs,
+          bustProb,
+        }}
+        onMouseEnter={(buttonRow, buttonColumn) => {
+          setMouseOverPossibility({ buttonRow, buttonColumn });
+        }}
+        onMouseLeave={() => {
+          setMouseOverPossibility(undefined);
+        }}
+      />
+    );
 
   const infoTag = showInfo ? (
     <Info

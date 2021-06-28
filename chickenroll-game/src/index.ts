@@ -77,8 +77,7 @@ export type ChickenrollBoard = {
   // UserId -> name, color, etc.
   playerInfos: { [key: string]: PlayerInfo };
   // Number of columns to complete to win.
-  // FIXME use something deterministic ,no options
-  // 2 palyers: 4
+  // 2 players: 4
   // 3 players: 3
   // 4 players: 3
   // 5 players: 2
@@ -216,14 +215,10 @@ export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
 export const [PICKED, picked] = createBoardUpdate("picked");
 export const [STOPPED, stopped] = createBoardUpdate("stopped");
 
-// FIXME We might want to move that to the platform!
-// export const [PLAY_AGAIN, playAgain] = createMove("playAgain");
-// export const [PLAYED_AGAIN, playedAgain] = createBoardUpdate("playedAgain");
+export const [PLAY_AGAIN, playAgain] = createMove("playAgain");
+export const [PLAYED_AGAIN, playedAgain] = createBoardUpdate("playedAgain");
 
-/*
- * This is what happens when we have a winner.
- */
-const endRound = (board: ChickenrollBoard): void => {
+const resetForNextRound = (board: ChickenrollBoard): void => {
   // The first player becomes last.
   const firstPlayer = board.playerOrder.shift();
   board.playerOrder.push(firstPlayer);
@@ -264,7 +259,7 @@ const moves: Moves<ChickenrollBoard> = {
     canDo({ userId, board }) {
       return board.currentPlayer === userId && board.stage === "rolling";
     },
-    *execute() {
+    *executeNow() {
       yield stopped();
     },
   },
@@ -273,9 +268,17 @@ const moves: Moves<ChickenrollBoard> = {
       // FIXME Also check that we can choose *that* move option
       return board.currentPlayer === userId && board.stage === "moving";
     },
-    *execute({ payload }) {
+    *executeNow({ payload }) {
       // Simply forward the payload from the move.
       yield picked(payload);
+    },
+  },
+  [PLAY_AGAIN]: {
+    canDo({ board }) {
+      return board.stage === "gameover";
+    },
+    *executeNow() {
+      yield playedAgain();
     },
   },
 };
@@ -343,7 +346,7 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
         ts: new Date().getTime(),
       };
       board.numVictories[board.currentPlayer] += 1;
-      endRound(board);
+      gotoStage(board, "gameover");
     } else {
       board.info = {
         code: "stop",
@@ -387,6 +390,9 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
     updateBustProb(board, /* endOfTurn */ false);
     gotoStage(board, "rolling");
   },
+  [PLAYED_AGAIN]: (board) => {
+    resetForNextRound(board);
+  }
 };
 
 const options: GameOptions = {
@@ -493,11 +499,12 @@ const initialBoard = ({ players, matchOptions, random }): ChickenrollBoard => {
     currentPlayerHasStarted: false,
     numColsToWin: numPlayersToNumCols(numPlayers),
     moveHistory: [],
-    showProbs: "after",
     bustProb: 0,
     endOfTurnBustProb: 0,
-    mountainShape: "debug",
-    sameSpace: "share",
+    // For now we hard-code the shape to our own default.
+    mountainShape: "tall",
+    sameSpace: matchOptions.sameSpace,
+    showProbs: matchOptions.showProbs,
     lastOutcome: "stop",
 
     currentPlayerIndex: 0,

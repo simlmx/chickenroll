@@ -62,7 +62,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
     bustProb,
   } = props;
 
-  // This provents showing the Stop button for a fraction of a second after having
+  // This prevents showing the Stop button for a fraction of a second after having
   // rolled... I think.
   const [canStop, setCanStop] = useState(currentPlayerHasStarted);
   useEffect(() => {
