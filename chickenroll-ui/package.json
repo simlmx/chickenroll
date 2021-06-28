@@ -43,7 +43,7 @@
   "dependencies": {
     "bgkit": "^1.0.0",
     "bgkit-ui": "^1.0.0",
-    "bootstrap": "^5.0.2",
+    "bootstrap": "^4.5.3",
     "chickenroll-game": "^1.0.0",
     "classnames": "^2.3.1",
     "react-spring": "^9.1.2"

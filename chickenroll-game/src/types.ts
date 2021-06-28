@@ -1,7 +1,3 @@
-// FIXME merge inside index?
-
-// FIXME use bgkit's UserId instead.
-export type PlayerID = string;
 export type DiceSum = number;
 
 export type PlayerInfo = {
@@ -10,7 +6,7 @@ export type PlayerInfo = {
   ready: boolean;
 };
 
-export type MountainShape = "classic" | "tall";
+export type MountainShape = "classic" | "tall" | "debug";
 
 // What to do when players occupy the same space.
 // share: tokens can share the same space

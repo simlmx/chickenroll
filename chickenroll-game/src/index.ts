@@ -193,6 +193,11 @@ const endTurn = (board: ChickenrollBoard, outcome: "bust" | "stop"): void => {
   board.currentPlayerIndex++;
   board.currentPlayerIndex %= board.playerOrder.length;
   board.currentPlayer = board.playerOrder[board.currentPlayerIndex];
+
+  board.currentPositions = {};
+  gotoStage(board, "rolling");
+  board.currentPlayerHasStarted = false;
+  updateBustProb(board, /* endOfTurn */ true);
 };
 
 export const [ROLL, roll] = createMove("roll");
@@ -215,11 +220,30 @@ export const [STOPPED, stopped] = createBoardUpdate("stopped");
 // export const [PLAY_AGAIN, playAgain] = createMove("playAgain");
 // export const [PLAYED_AGAIN, playedAgain] = createBoardUpdate("playedAgain");
 
-// FIXME For now we have replaced the ctx.events.endPhase with this.
-// We have a winner, we finish the round;
+/*
+ * This is what happens when we have a winner.
+ */
 const endRound = (board: ChickenrollBoard): void => {
-  // FIXME do something more celver that the old version for the playerOrder
-  // FIXME reset a lot of things
+  // The first player becomes last.
+  const firstPlayer = board.playerOrder.shift();
+  board.playerOrder.push(firstPlayer);
+
+  board.currentPlayerIndex = 0;
+  board.currentPlayer = board.playerOrder[0];
+
+  board.playerOrder.forEach((userId, i) => {
+    board.scores[userId] = 0;
+    board.checkpointPositions[userId] = {};
+  });
+
+  board.blockedSums = {};
+  board.currentPositions = {};
+  board.diceSumOptions = undefined;
+  board.lastPickedDiceSumOption = undefined;
+  board.info = { code: "start", ts: new Date().getTime() };
+  board.bustProb = 0;
+  board.lastOutcome = "stop";
+  board.stage = "rolling";
 };
 
 const moves: Moves<ChickenrollBoard> = {
@@ -378,7 +402,7 @@ const options: GameOptions = {
     label: "Show probability of cracking",
     options: [
       { value: "before", label: "Before every roll" },
-      { value: "after", label: "At the end of the turn" },
+      { value: "after", label: "At the end of the turn", default: true },
       { value: "never", label: "Never" },
     ],
     help: "When to show the probability of cracking.",
@@ -405,6 +429,7 @@ const numPlayersToNumCols = (numPlayers: number): number => {
 const initialBoard = ({ players, matchOptions, random }): ChickenrollBoard => {
   const scores: { [key: number]: number } = {};
   const checkpointPositions = {};
+
   const numVictories = {};
   const playerInfos = {};
 
@@ -418,7 +443,7 @@ const initialBoard = ({ players, matchOptions, random }): ChickenrollBoard => {
     checkpointPositions[userId] = {};
     numVictories[userId] = 0;
     playerInfos[userId] = {
-      name: players[userId].name,
+      name: players[userId].username,
       color: i,
     };
   });
@@ -471,7 +496,7 @@ const initialBoard = ({ players, matchOptions, random }): ChickenrollBoard => {
     showProbs: "after",
     bustProb: 0,
     endOfTurnBustProb: 0,
-    mountainShape: "tall",
+    mountainShape: "debug",
     sameSpace: "share",
     lastOutcome: "stop",
 

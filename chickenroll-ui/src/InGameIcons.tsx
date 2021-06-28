@@ -1,5 +1,4 @@
 import React from "react";
-import { DieLogo } from "./Die";
 import getSoundPlayer from "./audio";
 
 /*
@@ -50,11 +49,6 @@ const InGameIcons = (props: InGameIconsProps) => {
 
   return (
     <div className="homeLinkWrap">
-      <div className="inGameIcon homeLinkIcon">
-        <a href="/" title="Home">
-          <DieLogo />
-        </a>
-      </div>
       {howToPlayOnClick && (
         <div className="inGameIcon">
           <div

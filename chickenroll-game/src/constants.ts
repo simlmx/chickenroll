@@ -30,6 +30,14 @@ export const AUTO_NUM_COLS_TO_WIN = new Map([
 
 // Number of steps for each columns for the different modes.
 export const NUM_STEPS = {
+  debug: {
+    2: 3,
+    3: 3,
+    4: 3,
+    5: 3,
+    6: 3,
+    7: 3,
+  },
   classic: {
     2: 3,
     3: 5,

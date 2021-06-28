@@ -156,6 +156,7 @@ body {
   font-family: Verdana, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: transparent;
 }
 
 @include media-breakpoint-up(xl) {
@@ -1465,6 +1466,12 @@ $mountainRatio: 0.67;
   $width: 96vw / 11;
   $height: $width * $mountainRatio;
   @include cellSize($height, 11, 16);
+}
+
+.debugMountainWrap {
+  $width: 50vw / 11;
+  $height: $width * $mountainRatio;
+  @include cellSize($height, 11, 3);
 }
 
 @if $debug {
