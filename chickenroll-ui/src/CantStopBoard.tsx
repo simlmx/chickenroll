@@ -10,8 +10,8 @@ import {
   roll,
   stop,
 } from "chickenroll-game";
-// import { GameType } from "../Game";
 
+import './index.scss'
 
 import { State } from './types';
 import { DiceBoard } from "./DiceBoard";

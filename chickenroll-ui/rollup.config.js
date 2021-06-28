@@ -1,7 +1,8 @@
 import typescript from "@rollup/plugin-typescript";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-// import postcss from "rollup-plugin-postcss";
+import scss from "rollup-plugin-scss";
+import sass from "sass";
 
 export default {
   input: "src/index.ts",
@@ -10,11 +11,6 @@ export default {
     format: "esm",
     sourcemap: true,
   },
-  plugins: [
-    commonjs(),
-    nodeResolve(),
-    typescript(),
-    // postcss(),
-  ],
+  plugins: [commonjs(), nodeResolve(), typescript(), scss({ sass })],
   external: ["react", "react-dom", "react-redux"],
 };
