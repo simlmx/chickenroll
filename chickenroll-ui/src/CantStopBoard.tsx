@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 import { UserId } from "bgkit";
-import { useSelector, useDispatch } from "bgkit-ui";
+import { useSelector, useDispatch, usePlaySound } from "bgkit-ui";
 
 import {
   ChickenrollBoard,
@@ -181,7 +181,7 @@ export const Board = () => {
   const [modal, setModal] = useState<undefined | "history" | "rules">(
     undefined
   );
-  const soundPlayer = getSoundPlayer();
+  const playSound = usePlaySound();
 
   const setPlayerVolume = (volume: number): void => {
     // We map our 0-3 volume non-linearly between 0. and 1.
@@ -203,7 +203,6 @@ export const Board = () => {
         volumeInPlayer = 0.0;
         break;
     }
-    soundPlayer.setVolume(volumeInPlayer);
   };
 
   const getInitVolume = () => {
@@ -212,7 +211,8 @@ export const Board = () => {
       localStorage.getItem("volume", isIOS() ? "3" : "2") as string
     );
     // Use it to set the player's volume.
-    setPlayerVolume(initVol);
+    // FIXME
+    // setPlayerVolume(initVol);
 
     return initVol;
   };
@@ -288,11 +288,9 @@ export const Board = () => {
 
   // Make a sound when it's your turn.
   useEffect(() => {
-    if (!itsYourTurn || volume === 0) {
-      return;
+    if (itsYourTurn) {
+      playSound("yourturn");
     }
-
-    soundPlayer.play("yourturn");
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itsYourTurn]);
