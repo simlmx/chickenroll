@@ -12,7 +12,6 @@ import {
 import { State } from "./types";
 import { BustProb } from "./Bust";
 import { DiceSplit } from "./icons";
-import getSoundPlayer from "./audio";
 
 /*
  * Given if it's us playing (itsMe) and if the button should be enabled, we return the
@@ -69,8 +68,6 @@ const ActionButtons = (props: ActionButtonsProps) => {
     setCanStop(currentPlayerHasStarted);
   }, [currentPlayerHasStarted]);
 
-  const soundPlayer = getSoundPlayer();
-
   let rollClassName = getButtonClassNames(itsMe, true, color);
   const stopClassName = getButtonClassNames(itsMe, canStop, color);
 
@@ -83,7 +80,6 @@ const ActionButtons = (props: ActionButtonsProps) => {
       <button
         onClick={() => {
           onRoll();
-          soundPlayer.init();
         }}
         className={rollClassName}
         disabled={!itsMe}

@@ -23,11 +23,8 @@ import MoveHistory from "./MoveHistory";
 
 import InGameIcons from "./InGameIcons";
 import Rules from "./Rules";
-import getSoundPlayer from "./audio";
 import localStorage from "./utils/localStorage";
 import { BustProb } from "./Bust";
-
-import { isIOS } from "./utils/platform";
 
 interface InfoProps {
   info?: { code: string; userId?: UserId };
@@ -182,61 +179,6 @@ export const Board = () => {
     undefined
   );
   const playSound = usePlaySound();
-
-  const setPlayerVolume = (volume: number): void => {
-    // We map our 0-3 volume non-linearly between 0. and 1.
-    let volumeInPlayer: number;
-    switch (volume) {
-      case 0:
-        volumeInPlayer = 0.0;
-        break;
-      case 1:
-        volumeInPlayer = 0.1;
-        break;
-      case 2:
-        volumeInPlayer = 0.4;
-        break;
-      case 3:
-        volumeInPlayer = 1.0;
-        break;
-      default:
-        volumeInPlayer = 0.0;
-        break;
-    }
-  };
-
-  const getInitVolume = () => {
-    // Load the volume setting we have in storage.
-    const initVol = parseInt(
-      localStorage.getItem("volume", isIOS() ? "3" : "2") as string
-    );
-    // Use it to set the player's volume.
-    // FIXME
-    // setPlayerVolume(initVol);
-
-    return initVol;
-  };
-
-  const [volume, _setVolume] = useState(getInitVolume);
-
-  const changeVolume = () => {
-    let newVolume;
-    if (isIOS()) {
-      // On iOS we just toggle on/off.
-      if (volume === 0) {
-        newVolume = 3;
-      } else {
-        newVolume = 0;
-      }
-    } else {
-      // On other devices we cycle between 0 and 3.
-      newVolume = (volume + 1) % 4;
-    }
-
-    setPlayerVolume(newVolume);
-    localStorage.setItem("volume", newVolume.toString());
-    _setVolume(newVolume);
-  };
 
   const itsYourTurn = currentPlayer === userId;
 
@@ -507,11 +449,6 @@ export const Board = () => {
   const inGameIcons = (
     <InGameIcons
       howToPlayOnClick={() => setModal(modal === "rules" ? undefined : "rules")}
-      volume={volume}
-      changeVolume={() => {
-        changeVolume();
-      }}
-      showVolume={true}
       historyOnClick={() =>
         setModal(modal === "history" ? undefined : "history")
       }
