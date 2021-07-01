@@ -1,4 +1,5 @@
-import { DiceSum, MountainShape, SameSpace, PlayerID } from "../types";
+import { UserId } from "bgkit";
+import { DiceSum, MountainShape, SameSpace } from "../types";
 import { NUM_STEPS } from "../constants";
 
 export const DICE_INDICES = [
@@ -60,10 +61,10 @@ const getSpaceLeft = (
   mountainShape: MountainShape,
   sameSpace: SameSpace,
   column: number,
-  playerID: PlayerID
+  userId: UserId
 ) => {
   const startStep =
-    currentPositions[column] || checkpointPositions[playerID]?.[column] || 0;
+    currentPositions[column] || checkpointPositions[userId]?.[column] || 0;
 
   let space = getNumStepsForSum(column, mountainShape) - startStep;
 
@@ -96,7 +97,7 @@ export const getSumOptions = (
   blockedSums: { [key: number]: string },
   mountainShape: MountainShape,
   sameSpace: SameSpace,
-  playerID: PlayerID
+  userId: UserId
 ): SumOption[] => {
   if (diceValues.length !== 4) {
     throw new Error("Should have 4 values");
@@ -119,7 +120,7 @@ export const getSumOptions = (
       mountainShape,
       sameSpace,
       diceSum,
-      playerID
+      userId
     );
 
     currentClimberSpaceLeft.set(diceSum, space);
@@ -172,7 +173,7 @@ export const getSumOptions = (
                 mountainShape,
                 sameSpace,
                 diceSum,
-                playerID
+                userId
               ) === 1
             ) {
               return makeSumOption(diceSums, [true, true], /*forceSplit*/ true);

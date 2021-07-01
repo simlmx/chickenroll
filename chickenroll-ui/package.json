@@ -12,8 +12,7 @@
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./dist",
     "compile": "rollup --config && tsc --emitDeclarationOnly",
-    "watch": "NODE_ENV=development rollup --config --watch",
-    "test": "jest --verbose"
+    "watch": "NODE_ENV=development rollup --config --watch"
   },
   "author": "Simon Lemieux",
   "license": "ISC",
