@@ -625,38 +625,12 @@ $diceSize: 3.4rem;
   box-shadow: 0 0 0.14rem black;
 }
 
-.littleFlash {
-  animation: littleFlash;
-  animation-duration: 0.5s;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-timing-function: ease-in-out;
-}
-
 .flashVibrate {
-  animation: flash, vibrate;
-  animation-duration: 0.5s, 2.5s;
+  animation: vibrate;
+  animation-duration: 2.5s;
   animation-iteration-count: infinite;
-  animation-direction: alternate, reverse;
-  animation-timing-function: ease-in-out, linear;
-}
-
-@keyframes flash {
-  from {
-    filter: brightness(0.9);
-  }
-  to {
-    filter: brightness(1.1);
-  }
-}
-
-@keyframes littleFlash {
-  from {
-    filter: brightness(0.9);
-  }
-  to {
-    filter: brightness(1.1);
-  }
+  animation-direction: reverse;
+  animation-timing-function: linear;
 }
 
 @keyframes vibrate {
