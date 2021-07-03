@@ -115,7 +115,7 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
         });
       let opts: any = { className: `scoreBoardPlayerName bgcolor${color}` };
       if (playerID === currentPlayer) {
-        opts.className += " scoreBoardPlayerNameCurrent littleFlash";
+        opts.className += " scoreBoardPlayerNameCurrent";
       }
       if (!isConnected) {
         opts.className += " playerDisconnected scorePlayerDisconnected";
