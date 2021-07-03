@@ -3,6 +3,8 @@ import { DieLogo } from "./Die";
 import getSoundPlayer from "../audio";
 import bmc from '../images/bmc.svg'
 
+import bmc from '../images/bmc.svg'
+
 /*
  * volume: 0 (mute), 1, 2, 3 (max)
  */

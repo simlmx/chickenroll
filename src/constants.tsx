@@ -47,3 +47,5 @@ export const NUM_STEPS = {
     7: 16,
   },
 };
+
+export const LANGUAGES = ['en', 'fr']
