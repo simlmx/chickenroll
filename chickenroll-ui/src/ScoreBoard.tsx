@@ -1,6 +1,6 @@
 import React from "react";
 
-import { UserId } from 'bgkit';
+import { UserId } from "bgkit";
 import { PlayerInfo } from "chickenroll-game";
 
 import Chicken from "./Chicken";
@@ -125,7 +125,9 @@ export class ScoreBoard extends React.Component<ScoreBoardProps> {
             />
           </td>
           <td>
-            <div {...opts}>{name}</div>
+            <div className="scoreBoardNameWrap">
+              <div {...opts}>{name}</div>
+            </div>
           </td>
           {starColumns}
         </tr>

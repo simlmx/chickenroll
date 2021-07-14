@@ -207,6 +207,7 @@ p a {
   transition: none;
 }
 
+// NOTE those colors are duplicated in the game definition
 $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
 
 @for $i from 1 through length($colors) {
@@ -597,6 +598,11 @@ $diceSize: 3.4rem;
   height: 100%;
 }
 
+.scoreBoardNameWrap {
+  width: 9rem;
+  overflow: hidden;
+}
+
 .scoreBoardPlayerName,
 .scoreBoardNumVictories {
   border-radius: 0.2rem;
@@ -604,13 +610,13 @@ $diceSize: 3.4rem;
   padding-right: 0.2rem;
   font-size: 0.8rem;
   margin: 0.1rem;
-
-  display: flex;
-  align-items: center;
 }
 .scoreBoardPlayerName {
-  width: 9rem;
   border: 0.05rem solid transparent;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .scoreBoardNumVictories {
@@ -618,6 +624,9 @@ $diceSize: 3.4rem;
   justify-content: flex-end;
   font-weight: bold;
   border: 0;
+
+  display: flex;
+  align-items: center;
 }
 
 .scoreBoardPlayerNameCurrent {

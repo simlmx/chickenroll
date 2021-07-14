@@ -6,6 +6,8 @@ import {
   GameOptions,
   GameDef,
   UserId,
+  GamePlayerOptions,
+  PlayerOptionType,
 } from "bgkit";
 
 import {
@@ -392,10 +394,10 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
   },
   [PLAYED_AGAIN]: (board) => {
     resetForNextRound(board);
-  }
+  },
 };
 
-const options: GameOptions = {
+const gameOptions: GameOptions = {
   sameSpace: {
     label: "Player Interaction",
     options: [
@@ -419,20 +421,15 @@ const options: GameOptions = {
  * Determine the number of columns to finish to win
  */
 const numPlayersToNumCols = (numPlayers: number): number => {
-  switch (numPlayers) {
-    case 2:
-      return 4;
-    case 3:
-    case 4:
-      return 3;
-    case 5:
-      return 2;
-    default:
-      throw new Error("unsuported number of players");
+  const mapping = [null, null, 4, 4, 3, 2];
+  const numCols = mapping[numPlayers];
+  if (numCols == null) {
+    throw new Error("unsuported number of players");
   }
+  return numCols;
 };
 
-const initialBoard = ({ players, matchOptions, random }): ChickenrollBoard => {
+const initialBoard = ({ players, matchOptions, matchPlayersOptions, random }): ChickenrollBoard => {
   const scores: { [key: number]: number } = {};
   const checkpointPositions = {};
 
@@ -450,7 +447,7 @@ const initialBoard = ({ players, matchOptions, random }): ChickenrollBoard => {
     numVictories[userId] = 0;
     playerInfos[userId] = {
       name: players[userId].username,
-      color: i,
+      color: parseInt(matchPlayersOptions[userId].color),
     };
   });
 
@@ -514,9 +511,28 @@ const initialBoard = ({ players, matchOptions, random }): ChickenrollBoard => {
   };
 };
 
+const gamePlayerOptions: GamePlayerOptions = {
+  color: {
+    label: "Color",
+    options: [
+      // NOTE those colors are duplicated in the game definition
+      { label: "#07df9e", value: "0" },
+      { label: "#01a4df", value: "1" },
+      { label: "#ff7c36", value: "2" },
+      { label: "#ffde0a", value: "3" },
+      { label: "#c7233f", value: "4" },
+      { label: "#f35076", value: "5" },
+      { label: "#a32ea3", value: "6" },
+    ],
+    type: "color" as PlayerOptionType,
+    exclusive: true,
+  },
+};
+
 export const game: GameDef<ChickenrollBoard> = {
   initialBoard,
   moves,
   boardUpdates,
-  options,
+  gameOptions,
+  gamePlayerOptions,
 };
