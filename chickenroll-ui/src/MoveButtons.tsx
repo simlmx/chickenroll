@@ -7,6 +7,7 @@ import {
   SumOption,
   isSumOptionSplit,
   pick,
+  canStop,
 } from "chickenroll-game";
 
 import { State } from "./types";
@@ -61,15 +62,10 @@ const ActionButtons = (props: ActionButtonsProps) => {
     bustProb,
   } = props;
 
-  // This prevents showing the Stop button for a fraction of a second after having
-  // rolled... I think.
-  const [canStop, setCanStop] = useState(currentPlayerHasStarted);
-  useEffect(() => {
-    setCanStop(currentPlayerHasStarted);
-  }, [currentPlayerHasStarted]);
+  const currentPlayerCanStop = useSelector((state: State) => canStop(state.board));
 
   let rollClassName = getButtonClassNames(itsMe, true, color);
-  const stopClassName = getButtonClassNames(itsMe, canStop, color);
+  const stopClassName = getButtonClassNames(itsMe, currentPlayerCanStop, color);
 
   if (!currentPlayerHasStarted && itsMe) {
     rollClassName += " flashVibrate";
@@ -96,7 +92,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
           onStop();
         }}
         className={stopClassName}
-        disabled={!itsMe || !canStop}
+        disabled={!itsMe || !currentPlayerCanStop}
       >
         Stop
       </button>

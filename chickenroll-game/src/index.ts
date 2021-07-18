@@ -21,7 +21,14 @@ import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 export { OddsCalculator } from "./math/probs";
 export { DICE_INDICES, makeSumOption } from "./math";
 
-import { DiceSum, PlayerInfo, MountainShape, SameSpace } from "./types";
+import {
+  DiceSum,
+  PlayerInfo,
+  MountainShape,
+  SameSpace,
+  CurrentPositions,
+  CheckpointPositions,
+} from "./types";
 export { NUM_STEPS } from "./constants";
 
 // Imports that should also be exported.
@@ -62,8 +69,8 @@ type Stage = "moving" | "rolling" | "gameover";
 
 export type ChickenrollBoard = {
   diceValues: number[];
-  currentPositions: { [key: number]: number };
-  checkpointPositions: { [userId: string]: { [key: number]: number } };
+  currentPositions: CurrentPositions;
+  checkpointPositions: CheckpointPositions;
   diceSumOptions?: SumOption[];
   lastPickedDiceSumOption?: number[];
   blockedSums: { [key: number]: string };
@@ -138,8 +145,8 @@ const updateBustProb = (board: ChickenrollBoard, endOfTurn: boolean): void => {
  * This is trivial in "share" mode but not in "jump" mode.
  */
 export const climbOneStep = (
-  currentPositions: { [key: number]: number },
-  checkpointPositions: { [key: string]: { [key: number]: number } },
+  currentPositions: CurrentPositions,
+  checkpointPositions: CheckpointPositions,
   column: number,
   userId: UserId,
   sameSpace: SameSpace
@@ -155,7 +162,7 @@ export const climbOneStep = (
     newStep = checkpoint + 1;
   }
 
-  if (sameSpace === "share") {
+  if (sameSpace === "share" || sameSpace === "nostop") {
     return newStep;
   } else if (sameSpace === "jump") {
     let weJumped = true;
@@ -243,6 +250,45 @@ const resetForNextRound = (board: ChickenrollBoard): void => {
   board.stage = "rolling";
 };
 
+// Compare the current positions with the checkpoint positions to see if anything
+// overlaps. Useful for the "nostop" mode.
+export const isCurrentPlayerOverlapping = (
+  currentPositions: CurrentPositions,
+  checkpointPositions: CheckpointPositions
+): boolean => {
+  for (let [col, step] of Object.entries(currentPositions)) {
+    for (let positions2 of Object.values(checkpointPositions)) {
+      if (positions2[col] === step) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+/* Can the current player hit the "Stop" button?
+ */
+export const canStop = (board: ChickenrollBoard): boolean => {
+  // Must be rolling stage.
+  if (board.stage !== "rolling") {
+    return false;
+  }
+  // If we haven't rolled yet we can't stop.
+  if (!board.currentPlayerHasStarted) {
+    return false;
+  }
+
+  // Other than that only the "nostop" mode is tricky.
+  if (board.sameSpace !== "nostop") {
+    return true;
+  }
+
+  // In case of the "nostop" mode, we need to check if we are on the same spot
+  // as someone else.
+  const { currentPositions, checkpointPositions } = board;
+  return !isCurrentPlayerOverlapping(currentPositions, checkpointPositions);
+};
+
 const moves: Moves<ChickenrollBoard> = {
   [ROLL]: {
     canDo({ userId, board }) {
@@ -259,7 +305,7 @@ const moves: Moves<ChickenrollBoard> = {
   },
   [STOP]: {
     canDo({ userId, board }) {
-      return board.currentPlayer === userId && board.stage === "rolling";
+      return board.currentPlayer === userId && canStop(board);
     },
     *executeNow() {
       yield stopped();
@@ -403,6 +449,7 @@ const gameOptions: GameOptions = {
     options: [
       { value: "share", label: "None" },
       { value: "jump", label: "Jump over other players" },
+      { value: "nostop", label: "Can't stay on same space" },
     ],
     help: "What happens when two players end up on the same space.",
   },
@@ -421,7 +468,7 @@ const gameOptions: GameOptions = {
  * Determine the number of columns to finish to win
  */
 const numPlayersToNumCols = (numPlayers: number): number => {
-  const mapping = [null, null, 4, 4, 3, 2];
+  const mapping = [null, null, 4, 3, 3, 2];
   const numCols = mapping[numPlayers];
   if (numCols == null) {
     throw new Error("unsuported number of players");
@@ -429,7 +476,12 @@ const numPlayersToNumCols = (numPlayers: number): number => {
   return numCols;
 };
 
-const initialBoard = ({ players, matchOptions, matchPlayersOptions, random }): ChickenrollBoard => {
+const initialBoard = ({
+  players,
+  matchOptions,
+  matchPlayersOptions,
+  random,
+}): ChickenrollBoard => {
   const scores: { [key: number]: number } = {};
   const checkpointPositions = {};
 
