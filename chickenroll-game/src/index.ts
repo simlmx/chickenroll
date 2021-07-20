@@ -453,6 +453,14 @@ const gameOptions: GameOptions = {
     ],
     help: "What happens when two players end up on the same space.",
   },
+  mountainShape: {
+    label: "Column heights",
+    options: [
+      { value: "tall", label: "Modern" },
+      { value: "classic", label: "Classic" },
+    ],
+    help: "Height of the columns",
+  },
   showProbs: {
     label: "Show probability of cracking",
     options: [
@@ -551,7 +559,7 @@ const initialBoard = ({
     bustProb: 0,
     endOfTurnBustProb: 0,
     // For now we hard-code the shape to our own default.
-    mountainShape: "tall",
+    mountainShape: matchOptions.mountainShape,
     sameSpace: matchOptions.sameSpace,
     showProbs: matchOptions.showProbs,
     lastOutcome: "stop",
