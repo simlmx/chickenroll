@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 import { UserId } from "bgkit";
-import { useSelector, useDispatch, usePlaySound } from "bgkit-ui";
+import { useSelector, useDispatch, playSound } from "bgkit-ui";
 
 import {
   ChickenrollBoard,
@@ -23,7 +23,6 @@ import MoveHistory from "./MoveHistory";
 
 import InGameIcons from "./InGameIcons";
 import Rules from "./Rules";
-import localStorage from "./utils/localStorage";
 import { BustProb } from "./Bust";
 
 interface InfoProps {
@@ -178,8 +177,6 @@ export const Board = () => {
   const [modal, setModal] = useState<undefined | "history" | "rules">(
     undefined
   );
-  const playSound = usePlaySound();
-
   const itsYourTurn = currentPlayer === userId;
 
   const infoCode = board.info?.code;
