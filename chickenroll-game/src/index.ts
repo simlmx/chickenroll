@@ -459,7 +459,7 @@ const gameOptions: GameOptions = {
       { value: "tall", label: "Modern" },
       { value: "classic", label: "Classic" },
     ],
-    help: "Height of the columns",
+    help: "Height of the columns.",
   },
   showProbs: {
     label: "Show probability of cracking",

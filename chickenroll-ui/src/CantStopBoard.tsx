@@ -230,8 +230,6 @@ export const Board = () => {
     if (itsYourTurn) {
       playSound("yourturn");
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itsYourTurn]);
 
   // Add listener to close modals on "escape".
