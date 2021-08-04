@@ -44,7 +44,6 @@ export const Info = ({
   endOfTurnBustProb,
   onClick,
 }: InfoProps) => {
-
   const username = useUsername(info.userId);
 
   if (info == null) {
@@ -465,6 +464,11 @@ export const Board = () => {
       sums = [sumOption.diceSums[buttonColumn]];
     } else {
       sums = sumOption.diceSums;
+      // In the case of both numbers being the same, we'll actually only need one egg,
+      // so we hackily remove one of the two here.
+      if (sums[0] === sums[1]) {
+        sums = [sums[0]];
+      }
     }
 
     sums.forEach((sum) => {
