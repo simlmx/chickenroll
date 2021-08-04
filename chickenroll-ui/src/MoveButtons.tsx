@@ -238,7 +238,6 @@ interface MoveButtonsProps {
   bustProb: number;
 }
 
-// export default class MoveButtons extends React.Component<MoveButtonsProps> {
 const MoveButtons = (props: MoveButtonsProps) => {
   const {
     onRoll,
@@ -284,14 +283,6 @@ const MoveButtons = (props: MoveButtonsProps) => {
     // If I'm playing, I want to see the real thing!
     if (itsMe) {
       setShowPossibilities(stage === "moving");
-      return;
-    }
-
-    // If I'm not playing I'll always see the possibilities when showProbs != before.
-    // There is no need to see the Roll/Stop buttons. We still show it while the current
-    // player has not started, otherwise there would be nothing to show.
-    if (showProbs !== "before") {
-      setShowPossibilities(currentPlayerHasStarted);
       return;
     }
 
