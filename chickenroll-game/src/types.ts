@@ -1,7 +1,6 @@
 export type DiceSum = number;
 
 export type PlayerInfo = {
-  name: string;
   color: number;
   ready: boolean;
 };

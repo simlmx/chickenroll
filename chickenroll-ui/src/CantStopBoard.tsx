@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 import { UserId } from "bgkit";
-import { useSelector, useDispatch, playSound } from "bgkit-ui";
+import { useSelector, useDispatch, playSound, useUsername } from "bgkit-ui";
 
 import {
   ChickenrollBoard,
@@ -36,109 +36,111 @@ interface InfoProps {
   itsYourTurn: boolean;
 }
 
-export class Info extends React.Component<InfoProps> {
-  renderContent(): JSX.Element | undefined {
-    const { info, playerInfos, itsYourTurn, endOfTurnBustProb } = this.props;
+export const Info = ({
+  userId,
+  info,
+  playerInfos,
+  itsYourTurn,
+  endOfTurnBustProb,
+  onClick,
+}: InfoProps) => {
 
-    if (info == null) {
-      return undefined;
-    }
+  const username = useUsername(info.userId);
 
-    const { code } = info;
+  if (info == null) {
+    return undefined;
+  }
 
-    const itsMe = this.props.userId === info.userId;
+  const { code } = info;
 
-    const playerName = itsMe
-      ? "You"
-      : info.userId && playerInfos[info.userId].name;
+  const itsMe = userId === info.userId;
 
-    const probMsg = endOfTurnBustProb != null && (
-      <div className="probMsgWrap">
-        <BustProb
-          prob={endOfTurnBustProb}
-          prob2text={(prob) =>
-            `The probability of cracking was ${(prob * 100).toFixed(1)}%`
-          }
-        />
-      </div>
-    );
+  const playerName = itsMe ? "You" : info.userId && username;
 
-    const itsYourTurnTag = itsYourTurn ? (
-      <div
-        className={`itsYourTurn color${playerInfos[this.props.userId].color}`}
+  const probMsg = endOfTurnBustProb != null && (
+    <div className="probMsgWrap">
+      <BustProb
+        prob={endOfTurnBustProb}
+        prob2text={(prob) =>
+          `The probability of cracking was ${(prob * 100).toFixed(1)}%`
+        }
+      />
+    </div>
+  );
+
+  const itsYourTurnTag = itsYourTurn ? (
+    <div className={`itsYourTurn color${playerInfos[userId].color}`}>
+      It's your turn!
+    </div>
+  ) : undefined;
+
+  let playerNameTag: JSX.Element | undefined;
+
+  if (["bust", "stop", "win"].includes(code)) {
+    playerNameTag = (
+      <strong
+        className={`infoPlayerName color${
+          playerInfos[info.userId as UserId].color
+        }`}
       >
-        It's your turn!
-      </div>
-    ) : undefined;
-
-    let playerNameTag: JSX.Element | undefined;
-
-    if (["bust", "stop", "win"].includes(code)) {
-      playerNameTag = (
-        <strong
-          className={`infoPlayerName color${
-            playerInfos[info.userId as UserId].color
-          }`}
-        >
-          {playerName}
-        </strong>
-      );
-    }
-
-    switch (code) {
-      case "bust":
-        return (
-          <div>
-            {itsYourTurnTag}
-            <div>
-              {playerNameTag}{" "}
-              <span className="badge badge-danger">cracked</span>
-            </div>
-            {probMsg}
-          </div>
-        );
-      case "stop":
-        return (
-          <div>
-            {itsYourTurnTag}
-            <div>
-              {playerNameTag}{" "}
-              <span className="badge badge-success">stopped</span>
-            </div>
-            {probMsg}
-          </div>
-        );
-      case "win":
-        return (
-          <span>
-            {playerNameTag} won!{" "}
-            <span role="img" aria-label="party">
-              🎉
-            </span>
-          </span>
-        );
-      case "start":
-        return itsYourTurnTag;
-      default:
-        return undefined;
-    }
-  }
-
-  render() {
-    const content = this.renderContent();
-    if (content == null) {
-      return null;
-    }
-
-    return (
-      <div className="infoWrap" onClick={() => this.props.onClick()}>
-        <div className="infoBackground">
-          <div className="text-center info">{content}</div>
-        </div>
-      </div>
+        {playerName}
+      </strong>
     );
   }
-}
+
+  let content;
+  switch (code) {
+    case "bust":
+      content = (
+        <div>
+          {itsYourTurnTag}
+          <div>
+            {playerNameTag} <span className="badge badge-danger">cracked</span>
+          </div>
+          {probMsg}
+        </div>
+      );
+      break;
+    case "stop":
+      content = (
+        <div>
+          {itsYourTurnTag}
+          <div>
+            {playerNameTag} <span className="badge badge-success">stopped</span>
+          </div>
+          {probMsg}
+        </div>
+      );
+      break;
+    case "win":
+      content = (
+        <span>
+          {playerNameTag} won!{" "}
+          <span role="img" aria-label="party">
+            🎉
+          </span>
+        </span>
+      );
+      break;
+    case "start":
+      content = itsYourTurnTag;
+      break;
+    default:
+      content = undefined;
+  }
+
+  if (content == null) {
+    return null;
+  }
+
+  return (
+    <div className="infoWrap" onClick={() => onClick()}>
+      <div className="infoBackground">
+        <div className="text-center info">{content}</div>
+      </div>
+    </div>
+  );
+};
 
 export const Board = () => {
   const [mouseOverPossibility, setMouseOverPossibility] = useState<

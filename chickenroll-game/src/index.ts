@@ -83,7 +83,7 @@ export type ChickenrollBoard = {
   // Number of victories for the current match.
   numVictories: { [userId: string]: number };
   currentPlayerHasStarted: boolean;
-  // UserId -> name, color, etc.
+  // UserId -> color, etc.
   playerInfos: { [key: string]: PlayerInfo };
   // Number of columns to complete to win.
   // 2 players: 4
@@ -496,7 +496,7 @@ const initialBoard = ({
   const numVictories = {};
   const playerInfos = {};
 
-  const userIds = Object.keys(players);
+  const userIds = players;
   const numPlayers = userIds.length;
 
   const playerOrder = random.shuffled(userIds);
@@ -506,7 +506,6 @@ const initialBoard = ({
     checkpointPositions[userId] = {};
     numVictories[userId] = 0;
     playerInfos[userId] = {
-      name: players[userId].username,
       color: parseInt(matchPlayersOptions[userId].color),
     };
   });
@@ -519,7 +518,7 @@ const initialBoard = ({
   // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
   // scores[id] = (i % 2) + 1;
 
-  // playerInfos[id] = { name: `player name ${i + 1}`, color: (i + 1) % 4 };
+  // playerInfos[id] = { color: (i + 1) % 4 };
   // }
   // numVictories[0] = 1;
   // numVictories[2] = 1;

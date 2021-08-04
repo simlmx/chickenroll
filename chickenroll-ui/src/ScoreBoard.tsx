@@ -1,6 +1,7 @@
 import React from "react";
 
 import { UserId } from "bgkit";
+import { useUsernames } from "bgkit-ui";
 import { PlayerInfo } from "chickenroll-game";
 
 import Chicken from "./Chicken";
@@ -64,80 +65,79 @@ interface ScoreBoardProps {
   numColsToWin: number | "auto";
 }
 
-export class ScoreBoard extends React.Component<ScoreBoardProps> {
-  render() {
-    const {
-      playerOrder,
-      playerInfos,
-      scores,
-      currentPlayer,
-      numVictories,
-      numColsToWin,
-    } = this.props;
+export const ScoreBoard = ({
+  playerOrder,
+  playerInfos,
+  scores,
+  currentPlayer,
+  numVictories,
+  numColsToWin,
+}: ScoreBoardProps) => {
 
-    if (numColsToWin === "auto") {
-      throw new Error("invalid num cols to win");
-    }
+  if (numColsToWin === "auto") {
+    throw new Error("invalid num cols to win");
+  }
 
-    const maxNumVictories = Math.max(...Object.values(numVictories));
+  const usernames = useUsernames();
 
-    const content = playerOrder.map((userId) => {
-      const name = playerInfos[userId].name;
-      const color = playerInfos[userId].color;
-      const points = scores[userId];
-      const numVictoriesPlayer = numVictories[userId];
+  const maxNumVictories = Math.max(...Object.values(numVictories));
 
-      // In theory we can finish with 2 more stars than required. For this reason we add
-      // 2 transparent stars at the end so that the layout doens't change when it
-      // happens.
-      const starColumns = Array(numColsToWin + 2)
-        .fill(null)
-        .map((_, i) => {
-          const hasStar = points > i;
-          let className = "scoreChicken";
-          if (hasStar) {
-            className += ` scoreChicken${color}`;
-            // style['textShadow'] = ''
-            // style['color'] = 'transparent'
-          } else if (i < numColsToWin) {
-            className += " emptyChicken";
-          } else {
-            className += " transparentChicken";
-          }
-          return (
-            <td className="starCol" key={i}>
-              <div {...{ className }} key={userId}>
-                <Chicken />
-              </div>
-            </td>
-          );
-        });
-      let opts: any = { className: `scoreBoardPlayerName bgcolor${color}` };
-      if (userId === currentPlayer) {
-        opts.className += " scoreBoardPlayerNameCurrent";
-      }
-      return (
-        <tr key={userId}>
-          <td className="numVictoriesCol">
-            <Trophy
-              value={numVictoriesPlayer}
-              color={numVictoriesPlayer === maxNumVictories ? "gold" : color}
-            />
-          </td>
-          <td>
-            <div className="scoreBoardNameWrap">
-              <div {...opts}>{name}</div>
+  const content = playerOrder.map((userId) => {
+    const name = usernames[userId];
+    const color = playerInfos[userId].color;
+    const points = scores[userId];
+    const numVictoriesPlayer = numVictories[userId];
+
+    // In theory we can finish with 2 more stars than required. For this reason we add
+    // 2 transparent stars at the end so that the layout doens't change when it
+    // happens.
+    const starColumns = Array(numColsToWin + 2)
+      .fill(null)
+      .map((_, i) => {
+        const hasStar = points > i;
+        let className = "scoreChicken";
+        if (hasStar) {
+          className += ` scoreChicken${color}`;
+          // style['textShadow'] = ''
+          // style['color'] = 'transparent'
+        } else if (i < numColsToWin) {
+          className += " emptyChicken";
+        } else {
+          className += " transparentChicken";
+        }
+        return (
+          <td className="starCol" key={i}>
+            <div {...{ className }} key={userId}>
+              <Chicken />
             </div>
           </td>
-          {starColumns}
-        </tr>
-      );
-    });
-
+        );
+      });
+    let opts: any = { className: `scoreBoardPlayerName bgcolor${color}` };
+    if (userId === currentPlayer) {
+      opts.className += " scoreBoardPlayerNameCurrent";
+    }
     return (
-      <table className="scoreBoard">
-        <tbody>{content}</tbody>
-      </table>
+      <tr key={userId}>
+        <td className="numVictoriesCol">
+          <Trophy
+            value={numVictoriesPlayer}
+            color={numVictoriesPlayer === maxNumVictories ? "gold" : color}
+          />
+        </td>
+        <td>
+          <div className="scoreBoardNameWrap">
+            <div {...opts}>{name}</div>
+          </div>
+        </td>
+        {starColumns}
+      </tr>
     );
-  }
-}
+  });
+
+  return (
+    <table className="scoreBoard">
+      <tbody>{content}</tbody>
+    </table>
+  );
+};
