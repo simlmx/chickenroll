@@ -191,7 +191,7 @@ export const climbOneStep = (
     }
     return newStep;
   } else {
-    throw new Error("unexpected value for sameSpace");
+    throw new Error(`unexpected value for sameSpace: "${sameSpace}"`);
   }
 };
 
@@ -248,6 +248,7 @@ const resetForNextRound = (board: ChickenrollBoard): void => {
   board.bustProb = 0;
   board.lastOutcome = "stop";
   board.stage = "rolling";
+  board.currentPlayerHasStarted = false;
 };
 
 // Compare the current positions with the checkpoint positions to see if anything
