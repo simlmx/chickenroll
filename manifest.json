@@ -1,6 +1,6 @@
 {
   "name": "Chicken Roll",
-  "description": "Push-your-luck dice game.",
+  "description": "A push-your-luck dice game.",
   "author": "simlmx",
   "minPlayers": 2,
   "maxPlayers": 5
