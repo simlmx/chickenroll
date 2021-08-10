@@ -446,27 +446,27 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
 
 const gameOptions: GameOptions = {
   sameSpace: {
-    label: "Player Interaction",
+    label: "Egg overlap",
     options: [
-      { value: "share", label: "None" },
-      { value: "jump", label: "Jump over other players" },
-      { value: "nostop", label: "Can't stay on same space" },
+      { value: "share", label: "Allow"},
+      { value: "jump", label: "Jump over" },
+      { value: "nostop", label: "Can't stop" },
     ],
-    help: "What happens when two players end up on the same space.",
+    help: "What happens when two eggs end up on the same space.",
   },
   mountainShape: {
-    label: "Column heights",
+    label: "Column height",
     options: [
       { value: "tall", label: "Modern" },
       { value: "classic", label: "Classic" },
     ],
-    help: "Height of the columns.",
+    help: "Height of the columns. Modern is taller and better calibrated than Classic.",
   },
   showProbs: {
-    label: "Show probability of cracking",
+    label: "Show probabilities",
     options: [
-      { value: "before", label: "Before every roll" },
-      { value: "after", label: "At the end of the turn", default: true },
+      { value: "before", label: "Always" },
+      { value: "after", label: "End of the turn", default: true },
       { value: "never", label: "Never" },
     ],
     help: "When to show the probability of cracking.",
