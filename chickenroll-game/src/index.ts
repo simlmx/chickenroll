@@ -444,25 +444,29 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
   },
 };
 
-const gameOptions: GameOptions = {
-  sameSpace: {
+const gameOptions: GameOptions = [
+  {
+    key: "sameSpace",
     label: "Egg overlap",
     options: [
-      { value: "share", label: "Allow"},
+      { value: "share", label: "Allow" },
       { value: "jump", label: "Jump over" },
       { value: "nostop", label: "Can't stop" },
     ],
     help: "What happens when two eggs end up on the same space.",
   },
-  mountainShape: {
+  {
+    key: "mountainShape",
     label: "Column height",
     options: [
       { value: "tall", label: "Modern" },
       { value: "classic", label: "Classic" },
     ],
-    help: "Height of the columns. Modern is taller and better calibrated than Classic.",
+    help:
+      "Height of the columns. Modern is taller and better calibrated than Classic.",
   },
-  showProbs: {
+  {
+    key: "showProbs",
     label: "Show probabilities",
     options: [
       { value: "before", label: "Always" },
@@ -471,7 +475,7 @@ const gameOptions: GameOptions = {
     ],
     help: "When to show the probability of cracking.",
   },
-};
+];
 
 /*
  * Determine the number of columns to finish to win
