@@ -451,7 +451,7 @@ const gameOptions: GameOptions = [
     options: [
       { value: "share", label: "Allow" },
       { value: "jump", label: "Jump over" },
-      { value: "nostop", label: "Can't stop" },
+      { value: "nostop", label: "Must roll" },
     ],
     help: "What happens when two eggs end up on the same space.",
   },
