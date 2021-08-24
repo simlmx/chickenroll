@@ -1925,3 +1925,34 @@ $mountainRatio: 0.67;
   height: 100%;
   width: 100%;
 }
+
+.lefunLink {
+  font-size: 1.4rem;
+  /* background-color: $primary; */
+  padding: 0.3rem 2rem;
+  box-shadow: 3px 2px 0.3rem black;
+  margin: 0.4rem auto;
+  /* color: white; */
+  /* border-radius: 0.3rem; */
+}
+
+.newVersionWrap {
+  border: 3px solid $primary;
+  background-color: white;
+  padding: 0.3rem 1rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+
+.newVersionText {
+  margin: auto;
+  font-weight: bold;
+  /* color: $primary; */
+}
+
+.lefunDetails {
+  margin: auto;
+  font-size: 0.8rem;
+}

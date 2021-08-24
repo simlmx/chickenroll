@@ -73,6 +73,18 @@ const Home = (): JSX.Element => {
 
   return (
     <div className="homeContent">
+      <div className="newVersionWrap">
+        <span className="newVersionText">New improved version at</span>
+        <a
+          className="lefunLink btn btn-primary btn-sm playEmphasis"
+          href="https://lefun.fun"
+        >
+          lefun.fun
+        </a>
+        <span className="lefunDetails">
+          With a chat, a new mode, and more! 🙊
+        </span>
+      </div>
       <h1>
         {" "}
         Chicken Roll{" "}

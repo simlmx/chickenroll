@@ -12,6 +12,11 @@ const serverOptions: any = {
   games: [CantStop],
 };
 
+const SKIP_SSL = env?.SKIP_SSLIFY === "true";
+if (SKIP_SSL) {
+  console.log("skipping SSL");
+}
+
 // Add the DB if we have environment variables defining it.
 // Otherwise we'll use the default backend.
 if (env.CANTSTOP_DB_URI) {
@@ -19,12 +24,14 @@ if (env.CANTSTOP_DB_URI) {
     // Without this option the ORM used by PostgresStore ends up printing all the moves
     // in the database for every move.
     logging: false,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
+    dialectOptions: SKIP_SSL
+      ? {}
+      : {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        },
   });
   serverOptions.db = db;
 }
@@ -38,12 +45,10 @@ const PORT = env.PORT ? parseInt(env.PORT) : 8000;
 // the herokuapp address get redirected there.
 const CANTSTOP_HOST = env.CANTSTOP_HOST || undefined;
 
-if (!(env?.SKIP_SSLIFY === "true")) {
+if (!SKIP_SSL) {
   server.app.use(
     sslify({ resolver: xForwardedProtoResolver, hostname: CANTSTOP_HOST })
   );
-} else {
-  console.log("Skipping sslify");
 }
 
 server.app.use(async (ctx, next) => {

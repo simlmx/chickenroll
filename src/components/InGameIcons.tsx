@@ -1,7 +1,7 @@
 import React from "react";
 import { DieLogo } from "./Die";
 import getSoundPlayer from "../audio";
-import bmc from '../images/bmc.svg'
+import bmc from "../images/bmc.svg";
 
 /*
  * volume: 0 (mute), 1, 2, 3 (max)
@@ -69,11 +69,7 @@ const InGameIcons = (props: InGameIconsProps) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img
-              className="coffee"
-              src={bmc}
-              alt="buy me a coffee"
-            />
+            <img className="coffee" src={bmc} alt="buy me a coffee" />
           </a>
         </div>
       )}

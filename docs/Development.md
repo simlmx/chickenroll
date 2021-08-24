@@ -2,17 +2,18 @@
 
 ### Installing dependencies
 ```
-yarn install
+make install
 ```
 
 ### Start a client without a server
 ```
-yarn start
+make start
 ```
 
 ### Start a server *and* the client
 ```
-yarn build && yarn serve
+make build
+make serve
 ```
 
 

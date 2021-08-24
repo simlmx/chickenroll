@@ -1,4 +1,8 @@
-.PHONY: db build serve start test format
+.PHONY: install db build serve start test format
+
+
+install:
+	yarn install
 
 # Start the database
 db:
@@ -20,7 +24,7 @@ start:
 	yarn start
 
 # Serve the web app. You need to run `make db` in a different window.
-serve: build
+serve:
 	SKIP_SSLIFY=true CANTSTOP_DB_URI=postgres://postgres:postgres@0.0.0.0:5454/postgres yarn serve
 
 test:
