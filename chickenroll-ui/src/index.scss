@@ -1223,55 +1223,6 @@ $diceSize: 3.4rem;
   align-items: center;
 }
 
-.numVictoriesCol {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.trophyWrap {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  margin-right: 0.1rem;
-}
-
-.trophyWrap > svg {
-  width: 1.4rem;
-  height: 1.4rem;
-}
-
-.trophyValue {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  line-height: 1.05rem;
-  text-align: center;
-  z-index: 1;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-.trophyDoubleDigits {
-  font-size: 0.7rem;
-  line-height: 1rem;
-}
-
-.trophyGold {
-  fill: url(#goldGradient);
-}
-
-.trophyGoldValue {
-  color: white;
-  text-shadow: 0 0.05rem 0.05rem black;
-}
-
 .darkgold {
   stop-color: #5e4f20;
 }

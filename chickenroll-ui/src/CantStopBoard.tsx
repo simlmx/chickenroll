@@ -9,7 +9,6 @@ import {
   PlayerInfo,
   roll,
   stop,
-  playAgain,
 } from "chickenroll-game";
 
 import "./index.scss";
@@ -160,7 +159,6 @@ export const Board = () => {
     playerInfos,
     diceValues,
     scores,
-    numVictories,
     bustProb,
     endOfTurnBustProb,
     numColsToWin,
@@ -294,7 +292,6 @@ export const Board = () => {
         playerInfos,
         currentPlayer,
         playerOrder,
-        numVictories,
         numColsToWin,
       }}
     />
@@ -312,21 +309,7 @@ export const Board = () => {
   );
 
   const buttons =
-    stage === "gameover" ? (
-      <div className="actionButtons">
-        <button
-          onClick={() => {
-            dispatch(playAgain());
-            setShowInfo(false);
-          }}
-          className={`btn btnAction ${
-            userId == null ? "" : `bgcolor${playerInfos[userId].color}`
-          }`}
-        >
-          Play again!
-        </button>
-      </div>
-    ) : (
+    stage === "gameover" ? null : (
       <MoveButtons
         {...{
           userId,

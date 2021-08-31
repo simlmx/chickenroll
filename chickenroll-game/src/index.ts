@@ -8,6 +8,8 @@ import {
   UserId,
   GamePlayerOptions,
   PlayerOptionType,
+  endMatch,
+  pointsToRank,
 } from "bgkit";
 
 import {
@@ -81,7 +83,6 @@ export type ChickenrollBoard = {
   // people will join.
   numPlayers: number;
   // Number of victories for the current match.
-  numVictories: { [userId: string]: number };
   currentPlayerHasStarted: boolean;
   // UserId -> color, etc.
   playerInfos: { [key: string]: PlayerInfo };
@@ -224,33 +225,6 @@ export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
 export const [PICKED, picked] = createBoardUpdate("picked");
 export const [STOPPED, stopped] = createBoardUpdate("stopped");
 
-export const [PLAY_AGAIN, playAgain] = createMove("playAgain");
-export const [PLAYED_AGAIN, playedAgain] = createBoardUpdate("playedAgain");
-
-const resetForNextRound = (board: ChickenrollBoard): void => {
-  // The first player becomes last.
-  const firstPlayer = board.playerOrder.shift();
-  board.playerOrder.push(firstPlayer);
-
-  board.currentPlayerIndex = 0;
-  board.currentPlayer = board.playerOrder[0];
-
-  board.playerOrder.forEach((userId, i) => {
-    board.scores[userId] = 0;
-    board.checkpointPositions[userId] = {};
-  });
-
-  board.blockedSums = {};
-  board.currentPositions = {};
-  board.diceSumOptions = undefined;
-  board.lastPickedDiceSumOption = undefined;
-  board.info = { code: "start", ts: new Date().getTime() };
-  board.bustProb = 0;
-  board.lastOutcome = "stop";
-  board.stage = "rolling";
-  board.currentPlayerHasStarted = false;
-};
-
 // Compare the current positions with the checkpoint positions to see if anything
 // overlaps. Useful for the "nostop" mode.
 export const isCurrentPlayerOverlapping = (
@@ -311,6 +285,12 @@ const moves: Moves<ChickenrollBoard> = {
     *executeNow() {
       yield stopped();
     },
+    *execute({ board }) {
+      if (board.stage === "gameover") {
+        const winners = pointsToRank(board.scores);
+        yield endMatch({ winners });
+      }
+    },
   },
   [PICK]: {
     canDo({ userId, board, payload }) {
@@ -320,14 +300,6 @@ const moves: Moves<ChickenrollBoard> = {
     *executeNow({ payload }) {
       // Simply forward the payload from the move.
       yield picked(payload);
-    },
-  },
-  [PLAY_AGAIN]: {
-    canDo({ board }) {
-      return board.stage === "gameover";
-    },
-    *executeNow() {
-      yield playedAgain();
     },
   },
 };
@@ -394,7 +366,6 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
         userId: board.currentPlayer,
         ts: new Date().getTime(),
       };
-      board.numVictories[board.currentPlayer] += 1;
       gotoStage(board, "gameover");
     } else {
       board.info = {
@@ -438,9 +409,6 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
     });
     updateBustProb(board, /* endOfTurn */ false);
     gotoStage(board, "rolling");
-  },
-  [PLAYED_AGAIN]: (board) => {
-    resetForNextRound(board);
   },
 };
 
@@ -495,10 +463,9 @@ const initialBoard = ({
   matchPlayersOptions,
   random,
 }): ChickenrollBoard => {
-  const scores: { [key: number]: number } = {};
-  const checkpointPositions = {};
+  const scores: { [userId: string]: number } = {};
+  const checkpointPositions: CheckpointPositions = {};
 
-  const numVictories = {};
   const playerInfos = {};
 
   const userIds = players;
@@ -509,7 +476,6 @@ const initialBoard = ({
   userIds.forEach((userId, i) => {
     scores[userId] = 0;
     checkpointPositions[userId] = {};
-    numVictories[userId] = 0;
     playerInfos[userId] = {
       color: parseInt(matchPlayersOptions[userId].color),
     };
@@ -552,7 +518,6 @@ const initialBoard = ({
     scores,
     playerInfos,
     numPlayers,
-    numVictories,
     // This will contain the details about the last info we want to show to the user.
     info: { code: "start", ts: new Date().getTime() },
     // This tells us if the current player has started playing. When this is true we'll
