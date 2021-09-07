@@ -11,6 +11,11 @@ export default {
     format: "esm",
     sourcemap: true,
   },
-  plugins: [commonjs(), nodeResolve(), typescript(), scss({ sass })],
+  plugins: [
+    commonjs(),
+    nodeResolve(),
+    typescript({ tsconfig: "./tsconfig.json" }),
+    scss({ sass }),
+  ],
   external: ["react", "react-dom", "react-redux"],
 };

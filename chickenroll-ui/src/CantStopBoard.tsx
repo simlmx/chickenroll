@@ -21,7 +21,6 @@ import MoveButtons from "./MoveButtons";
 import MoveHistory from "./MoveHistory";
 
 import InGameIcons from "./InGameIcons";
-import Rules from "./Rules";
 import { BustProb } from "./Bust";
 
 interface InfoProps {
@@ -351,42 +350,6 @@ export const Board = () => {
     />
   ) : null;
 
-  const rulesModal = (
-    <div className="modal" tabIndex={-1}>
-      <div className="modal-dialog modal-lg modal-dialog-scrollable">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">How To Play</h5>
-            <button
-              type="button"
-              className="close"
-              data-dismiss="modal"
-              aria-label="Close"
-              onClick={() => setModal(undefined)}
-            >
-              <span aria-hidden="false">&times;</span>
-            </button>
-          </div>
-          <div className="modal-body">
-            <div className="rules">
-              <Rules />
-            </div>
-          </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-primary"
-              data-dismiss="modal"
-              onClick={() => setModal(undefined)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   const historyModal = (
     <div className="modal" tabIndex={-1}>
       <div className="modal-dialog moveHistoryModal modal-sm modal-dialog-scrollable">
@@ -482,7 +445,6 @@ export const Board = () => {
   return (
     <div className="cantStopBoard manipulation" onClick={() => {}}>
       {infoTag}
-      {modal === "rules" && rulesModal}
       {modal === "history" && historyModal}
       {inGameIcons}
       <div className={`megaWrap ${mountainShape}MountainWrap`}>

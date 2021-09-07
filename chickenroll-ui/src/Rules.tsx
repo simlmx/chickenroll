@@ -5,6 +5,8 @@ import { MountainShape, SameSpace, makeSumOption } from 'chickenroll-game'
 import { Die } from "./Die";
 import { Climber, Mountain } from "./Mountain";
 
+import './index.scss'
+
 const Rules = (props) => {
   const playerID = "0";
   const color = 0;
@@ -178,7 +180,8 @@ const Rules = (props) => {
   );
 
   return (
-    <>
+    <div className='rules' onScroll={() => console.log('scrolling cr')}>
+      <h1>Rules of Chicken Roll</h1>
       <h2>Overview</h2>
       <p>
         You must climb the different columns faster than your opponents, by
@@ -232,7 +235,7 @@ const Rules = (props) => {
         You change your <strong>black eggs</strong> into{" "}
         <strong>colored eggs</strong> and end your turn.
       </p>
-    </>
+    </div>
   );
 };
 

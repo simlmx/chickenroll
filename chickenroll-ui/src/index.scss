@@ -359,11 +359,6 @@ nav {
   font-weight: normal;
 }
 
-h1 {
-  font-weight: bold;
-  text-align: center;
-}
-
 .pageContent h2 {
   padding-top: 1rem;
 }
@@ -1544,13 +1539,12 @@ $mountainRatio: 0.67;
 // We reuse a bunch of components in the Rules, but we need to adjust some of the
 // parameters.
 .rules {
-  font-size: 1rem;
   p,
   li {
     text-align: justify;
   }
 
-  @include setDice(1rem);
+  @include setDice(1.2rem);
 
   .die {
     border-radius: 0.1rem;
@@ -1877,4 +1871,24 @@ $mountainRatio: 0.67;
   background-color: $bgcolor;
   height: 100%;
   width: 100%;
+}
+
+
+/* Make sure the rules look somewhat uniform with the other game's rules */
+#rules {
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    all: revert;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  padding: 0.5rem;
 }
