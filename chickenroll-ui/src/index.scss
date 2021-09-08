@@ -40,19 +40,6 @@ $buttonsHeight: 175px;
 
 @import "node_modules/bootstrap/scss/bootstrap";
 
-// https://stackoverflow.com/questions/6654958/make-body-have-100-of-the-browser-height/25829844#25829844
-html {
-  width: 100%;
-  height: 100%;
-  display: table;
-}
-
-body {
-  width: 100%;
-  height: 100%;
-  display: table-cell;
-}
-
 .manipulation {
   touch-action: manipulation;
 }
