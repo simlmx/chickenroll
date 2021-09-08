@@ -4,14 +4,14 @@
   "type": "module",
   "description": "",
   "main": "dist/index",
-  "types": "dist/index",
+  "types": "dist/types/index",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./dist",
-    "compile": "rollup --config && tsc --emitDeclarationOnly",
+    "compile": "rollup --config",
     "watch": "NODE_ENV=development rollup --config --watch"
   },
   "author": "Simon Lemieux",
