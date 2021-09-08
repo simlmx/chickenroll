@@ -121,24 +121,6 @@ footer {
   width: 100%;
 }
 
-.backgroundWrap {
-  // https://stackoverflow.com/a/31267758/1067132
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  background-color: $bgcolor;
-}
-
-// Make sure the main content is on top of the background
-.backgroundWrap > div {
-  position: relative;
-  z-index: 10;
-}
-
-.backgroundWrap > svg {
-  z-index: 1;
-}
-
 body {
   font-family: Verdana, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
