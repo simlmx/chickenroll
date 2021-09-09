@@ -172,7 +172,7 @@ export const Board = () => {
   } = board;
 
   const [showInfo, setShowInfo] = useState(true);
-  const [modal, setModal] = useState<undefined | "history" | "rules">(
+  const [modal, setModal] = useState<undefined | "history">(
     undefined
   );
   const itsYourTurn = currentPlayer === userId;
@@ -390,7 +390,6 @@ export const Board = () => {
 
   const inGameIcons = (
     <InGameIcons
-      howToPlayOnClick={() => setModal(modal === "rules" ? undefined : "rules")}
       historyOnClick={() =>
         setModal(modal === "history" ? undefined : "history")
       }
