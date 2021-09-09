@@ -193,9 +193,6 @@ const Rules = (props) => {
         </span>
         ?
       </p>
-      <div className="fullMountain">
-        <Mountain {...mountainOptions} />
-      </div>
       <h2>On your turn </h2>
       <p>
         You can either {actionBtn("Roll")} or {actionBtn("Stop")}. When rolling,
