@@ -10,6 +10,7 @@ import {
   PlayerOptionType,
   endMatch,
   pointsToRank,
+  itsYourTurn,
 } from "bgkit";
 
 import {
@@ -219,7 +220,14 @@ type PickPayload = {
 export const [PICK, pick] = createMove<PickPayload>("pick");
 
 type RolledPayload = {
+  // Dice values we rolled.
   diceValues: number[];
+  // diceSumOptions after this roll (if any!)
+  diceSumOptions: SumOption[];
+  // The move to add to the history.
+  move: Move;
+  // This we bust on that roll or not.
+  busted: boolean;
 };
 export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
 export const [PICKED, picked] = createBoardUpdate("picked");
@@ -273,9 +281,31 @@ const moves: Moves<ChickenrollBoard> = {
       // FIXME we need to set a flag saying we are rolling. This way in the UI we can have
       // something.
     },
-    *execute({ random }) {
+    *execute({ board, random }) {
       const diceValues = random.d6(4);
-      yield rolled({ diceValues });
+
+      const move: Move = { diceValues, userId: board.currentPlayer };
+
+      const diceSumOptions = getSumOptions(
+        diceValues,
+        board.currentPositions,
+        board.checkpointPositions,
+        board.blockedSums,
+        board.mountainShape,
+        board.sameSpace,
+        board.currentPlayer
+      );
+
+      // Check if busted.
+      const busted = diceSumOptions.every((sumOption: SumOption) =>
+        sumOption.enabled.every((x) => !x)
+      );
+
+      yield rolled({ diceValues, diceSumOptions, move, busted });
+
+      if (busted) {
+        yield itsYourTurn({ userIds: [board.currentPlayer] });
+      }
     },
   },
   [STOP]: {
@@ -289,6 +319,8 @@ const moves: Moves<ChickenrollBoard> = {
       if (board.stage === "gameover") {
         const winners = pointsToRank(board.scores);
         yield endMatch({ winners });
+      } else {
+        yield itsYourTurn({ userIds: [board.currentPlayer] });
       }
     },
   },
@@ -306,25 +338,12 @@ const moves: Moves<ChickenrollBoard> = {
 
 const boardUpdates: BoardUpdates<ChickenrollBoard> = {
   [ROLLED]: (board, payload: RolledPayload) => {
-    const { diceValues } = payload;
+    const { diceValues, diceSumOptions, move, busted } = payload;
     board.diceValues = diceValues;
 
-    const move: Move = { diceValues, userId: board.currentPlayer };
-
     board.lastPickedDiceSumOption = undefined;
-    board.diceSumOptions = getSumOptions(
-      board.diceValues,
-      board.currentPositions,
-      board.checkpointPositions,
-      board.blockedSums,
-      board.mountainShape,
-      board.sameSpace,
-      board.currentPlayer
-    );
-    // Check if busted.
-    const busted = board.diceSumOptions.every((sumOption: SumOption) =>
-      sumOption.enabled.every((x) => !x)
-    );
+    board.diceSumOptions = diceSumOptions;
+
     if (busted) {
       board.info = {
         code: "bust",
@@ -560,6 +579,9 @@ const gamePlayerOptions: GamePlayerOptions = {
 
 export const game: GameDef<ChickenrollBoard> = {
   initialBoard,
+  initialItsYourTurn({ board }) {
+    return [board.currentPlayer];
+  },
   moves,
   boardUpdates,
   gameOptions,
