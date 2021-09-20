@@ -11,6 +11,7 @@ import {
   endMatch,
   pointsToRank,
   itsYourTurn,
+  Bot,
 } from "bgkit";
 
 import {
@@ -577,6 +578,15 @@ const gamePlayerOptions: GamePlayerOptions = {
   },
 };
 
+const bot: Bot<ChickenrollBoard> = {
+  play({board, random}) {
+    if (random.coin()) {
+      return roll();
+    }
+    return stop();
+  }
+}
+
 export const game: GameDef<ChickenrollBoard> = {
   initialBoard,
   initialItsYourTurn({ board }) {
@@ -586,4 +596,5 @@ export const game: GameDef<ChickenrollBoard> = {
   boardUpdates,
   gameOptions,
   gamePlayerOptions,
+  bots: [bot],
 };
