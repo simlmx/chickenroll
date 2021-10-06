@@ -317,8 +317,7 @@ const moves: Moves<ChickenrollBoard> = {
     },
     *execute({ board }) {
       if (board.stage === "gameover") {
-        const winners = pointsToRank(board.scores);
-        yield endMatch({ winners });
+        yield endMatch({ ranks: pointsToRank(board.scores) });
       } else {
         yield itsYourTurn({ userIds: [board.currentPlayer] });
       }
@@ -503,22 +502,14 @@ const initialBoard = ({
   const blockedSums = {};
 
   // Those are for quick debugging.
-  // for (let i = 0; i < ctx.numPlayers; ++i) {
-  // const id = i.toString();
-  // checkpointPositions[id] = { 6: 10, 7: 12, 8: 7 };
-  // scores[id] = (i % 2) + 1;
-
-  // playerInfos[id] = { color: (i + 1) % 4 };
-  // }
-  // numVictories[0] = 1;
-  // numVictories[2] = 1;
-  // numVictories[1] = 7;
-  // checkpointPositions["0"][3] = 4;
-  // checkpointPositions["2"][7] = 4;
-  // checkpointPositions["1"][7] = 2;
-  // checkpointPositions["1"][8] = 2;
-  // blockedSums[4] = "0";
-  // blockedSums[5] = "2";
+  // const [p0, p1] = userIds;
+  // scores[p0] = 2;
+  // checkpointPositions[p0][2] = 2;
+  // checkpointPositions[p0][3] = 5;
+  // checkpointPositions[p0][4] = 7;
+  // checkpointPositions[p0][7] = 14;
+  // checkpointPositions[p0][6] = 12;
+  // checkpointPositions[p1][12] = 2;
 
   return {
     /*
