@@ -37,10 +37,13 @@ const Home = (): JSX.Element => {
         <a
           style={{ width: "50%", fontSize: "1.5rem" }}
           className="btn btn-primary"
-          href="/match"
+          href="https://lefun.fun/create-match/chickenroll"
         >
           Play
         </a>
+      </div>
+      <div className="playLegacyWrap">
+        <a href="/match">Play (legacy version)</a>
       </div>
     </>
   );
@@ -74,7 +77,7 @@ const Home = (): JSX.Element => {
   return (
     <div className="homeContent">
       <div className="newVersionWrap">
-        <span className="newVersionText">New improved version at</span>
+        <span className="newVersionText">Chicken Roll has moved to</span>
         <a
           className="lefunLink btn btn-primary btn-sm playEmphasis"
           href="https://lefun.fun"
@@ -82,7 +85,7 @@ const Home = (): JSX.Element => {
           lefun.fun
         </a>
         <span className="lefunDetails">
-          With a chat, a new mode, and more! 🙊
+          It now has a chat, extra options, and <b>more</b>! 🙊
         </span>
       </div>
       <h1>
