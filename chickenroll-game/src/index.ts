@@ -434,9 +434,10 @@ const gameOptions: GameOptions = [
   {
     key: "sameSpace",
     label: "Egg overlap",
+    shortLabel: null,
     options: [
-      { value: "share", label: "Allow" },
-      { value: "jump", label: "Jump over" },
+      { value: "share", label: "Allow", shortLabel: null },
+      { value: "jump", label: "Jump over", shortLabel: 'Jump' },
       { value: "nostop", label: "Must roll" },
     ],
     help: "What happens when two eggs end up on the same space.",
@@ -444,8 +445,9 @@ const gameOptions: GameOptions = [
   {
     key: "mountainShape",
     label: "Column height",
+    shortLabel: null,
     options: [
-      { value: "tall", label: "Modern" },
+      { value: "tall", label: "Modern", shortLabel: null },
       { value: "classic", label: "Classic" },
     ],
     help:
@@ -454,9 +456,10 @@ const gameOptions: GameOptions = [
   {
     key: "showProbs",
     label: "Show probabilities",
+    shortLabel: 'Probs',
     options: [
       { value: "before", label: "Always" },
-      { value: "after", label: "End of the turn", default: true },
+      { value: "after", label: "End of the turn", default: true, shortLabel: null },
       { value: "never", label: "Never" },
     ],
     help: "When to show the probability of cracking.",
