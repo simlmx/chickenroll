@@ -1,7 +1,15 @@
 {
   "name": "Chicken Roll",
-  "description": "A push-your-luck dice game.",
   "author": "simlmx",
   "minPlayers": 2,
-  "maxPlayers": 5
+  "maxPlayers": 5,
+  "meta": {
+    "relatedGames": {
+      "how": "inspired",
+      "game": "Can't Stop",
+      "link": "https://boardgamegeek.com/boardgame/41/cant-stop"
+    },
+    "tagline": "A push-your-luck dice game.",
+    "description": "Roll your dice to make progress on the board, but don't push your luck too far: you might lose everything! A game where the line between luck and strategy is thin."
+  }
 }
