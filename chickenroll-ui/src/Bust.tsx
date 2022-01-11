@@ -18,7 +18,7 @@ export const NoBustEmoji = () => {
 
 export const BustProb = (props: {
   prob: number;
-  prob2text?: (number) => string;
+  prob2text?: (prob: number) => string;
   bust?: boolean;
 }) => {
   const { prob, prob2text } = props;

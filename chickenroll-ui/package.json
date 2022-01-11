@@ -12,7 +12,8 @@
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./dist",
     "compile": "rollup --config",
-    "watch": "NODE_ENV=development rollup --config --watch"
+    "watch": "NODE_ENV=development rollup --config --watch",
+    "test": "jest --verbose"
   },
   "author": "Simon Lemieux",
   "license": "ISC",
@@ -29,6 +30,7 @@
     "autoprefixer": "^10.4.0",
     "eslint": "^8.3.0",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^27.3.1",
     "rollup": "^2.60.1",
     "rollup-plugin-scss": "^2.6.1",
@@ -42,6 +44,7 @@
   "dependencies": {
     "bgkit": "^1.0.0",
     "bgkit-ui": "^1.0.0",
+    "bgkit-ui-testing": "^1.0.0",
     "bootstrap": "^4.5.3",
     "chickenroll-game": "^1.0.0",
     "classnames": "^2.3.1",

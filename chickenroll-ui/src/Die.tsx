@@ -1,4 +1,4 @@
-import React from "react";
+import React, { MouseEvent } from "react";
 
 /*
  * Define the dots as circles in a 100x100 squre
@@ -91,11 +91,11 @@ export class Die extends React.Component<DieProps> {
     if (highlight) {
       className += " dieHighlight";
     }
-    const opts = { className };
+    const opts: any = { className };
 
     if (onClick) {
       // onMousedown doesn't fall laggy compared to onClick
-      opts["onMouseDown"] = (e) => {
+      opts["onMouseDown"] = (e: MouseEvent) => {
         e.preventDefault();
         onClick();
       };
@@ -179,7 +179,7 @@ export class Background extends React.Component {
   }
 }
 
-export const DieLogo = (props) => {
+export const DieLogo = () => {
   return (
     <div className="logoWrap">
       <div className="logoRow">

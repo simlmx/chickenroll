@@ -1,0 +1,25 @@
+import { MatchTester as MatchTesterOrig, UserId } from "bgkit";
+import { render } from "bgkit-ui-testing";
+
+import { game, ChickenrollBoard } from "chickenroll-game";
+
+import { Board } from "./CantStopBoard";
+class MatchTester extends MatchTesterOrig<ChickenrollBoard> {}
+
+let utils: any;
+const renderForPlayer = (match: MatchTester, userId: UserId) => {
+  // For some reason it's a pain to do multiple renders in the same test. This makes it
+  // possible.
+  if (utils) {
+    utils.unmount();
+  }
+  utils = render(Board, match.getState(userId));
+};
+
+test("render initial board", () => {
+  const match = new MatchTester(game, 3);
+  // Render for a player.
+  renderForPlayer(match, match.board.playerOrder[0])
+  // Render for a spectator
+  renderForPlayer(match, 'spectatorId')
+});

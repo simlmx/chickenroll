@@ -7,7 +7,7 @@ import { Climber, Mountain } from "./Mountain";
 
 import './index.scss'
 
-const Rules = (props) => {
+const Rules = () => {
   const playerID = "0";
   const color = 0;
 

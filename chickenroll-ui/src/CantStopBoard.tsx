@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, ReactNode } from "react";
 
 import { UserId } from "bgkit";
-import { useSelector, useDispatch, playSound, useUsername } from "bgkit-ui";
+import { useSelector, useDispatch, playSound, useUsername, useIsPlayer } from "bgkit-ui";
 
 import {
   ChickenrollBoard,
@@ -42,10 +42,10 @@ export const Info = ({
   endOfTurnBustProb,
   onClick,
 }: InfoProps) => {
-  const username = useUsername(info.userId);
+  const username = useUsername(info?.userId);
 
   if (info == null) {
-    return undefined;
+    return null;
   }
 
   const { code } = info;
@@ -71,7 +71,7 @@ export const Info = ({
     </div>
   ) : undefined;
 
-  let playerNameTag: JSX.Element | undefined;
+  let playerNameTag: ReactNode;
 
   if (["bust", "stop", "win"].includes(code)) {
     playerNameTag = (
@@ -145,6 +145,7 @@ export const Board = () => {
   >(undefined);
 
   const dispatch = useDispatch();
+  const isPlayer = useIsPlayer();
 
   //FIXME useSelector instead of this
   const board = useSelector((state: State) => state.board);
@@ -172,9 +173,7 @@ export const Board = () => {
   } = board;
 
   const [showInfo, setShowInfo] = useState(true);
-  const [modal, setModal] = useState<undefined | "history">(
-    undefined
-  );
+  const [modal, setModal] = useState<undefined | "history">(undefined);
   const itsYourTurn = currentPlayer === userId;
 
   const infoCode = board.info?.code;
@@ -204,7 +203,7 @@ export const Board = () => {
       return;
     }
     const title = document.title;
-    let interval;
+    let interval: ReturnType<typeof setInterval>;
     if (itsYourTurn) {
       const titles = ["It's your turn!", title];
       // Call it right way to display "It's your turn!" as fast as possible. Then re-run
@@ -232,7 +231,7 @@ export const Board = () => {
 
   // Add listener to close modals on "escape".
   useEffect(() => {
-    const escHandler = (e) => {
+    const escHandler = (e: KeyboardEvent) => {
       if (e.keyCode === 27) {
         setModal(undefined);
       }
@@ -315,7 +314,7 @@ export const Board = () => {
           // Use this player's color if there is a player otherwise use the current
           // player's color.
           playerColor:
-            playerInfos[userId == null ? currentPlayer : userId].color,
+            playerInfos[userId == null || !isPlayer ? currentPlayer : userId].color,
           onRoll: () => {
             dispatch(roll());
             setShowInfo(false);
@@ -403,7 +402,7 @@ export const Board = () => {
 
     const sumOption = diceSumOptions[buttonRow];
 
-    let sums;
+    let sums: number[];
 
     if (isSumOptionSplit(sumOption)) {
       sums = [sumOption.diceSums[buttonColumn]];

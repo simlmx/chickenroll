@@ -131,10 +131,11 @@ export const ColNum = (props: {
 };
 
 interface MountainProps {
-  currentPositions: { [key: number]: number };
-  checkpointPositions: { [key: string]: { [key: number]: number } };
-  playerInfos: { [key: string]: PlayerInfo };
-  blockedSums: { [key: number]: string };
+  currentPositions: { [col: string]: number };
+  checkpointPositions: { [userId: string]: { [col: string]: number } };
+  playerInfos: { [userId: string]: PlayerInfo };
+  // sum -> userId of the player blocking it
+  blockedSums: { [sum: string]: string };
   currentPlayer: UserId;
   diceSumOptions?: SumOption[];
   mouseOverPossibility?: { buttonRow: number; buttonColumn: number };
