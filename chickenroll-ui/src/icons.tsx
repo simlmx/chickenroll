@@ -24,28 +24,6 @@ export const Pencil = (props: { color?: number }) => {
   );
 };
 
-// From: https://iconify.design/icon-sets/mdi/connection.html
-// Ended up not being used but keeping to revision in case we revisit.
-export const Disconnected = (props: { title?: string }) => {
-  const { title } = props;
-  return (
-    <div className="disconnected" title={title}>
-      <svg
-        aria-hidden={true}
-        focusable={false}
-        style={{ transform: "rotate(360deg)" }}
-        preserveAspectRatio="xMidYMid meet"
-        viewBox="1 1 23 23"
-      >
-        <path
-          d="M21.4 7.5c.8.8.8 2.1 0 2.8l-2.8 2.8l-7.8-7.8l2.8-2.8c.8-.8 2.1-.8 2.8 0l1.8 1.8l3-3l1.4 1.4l-3 3l1.8 1.8m-5.8 5.8l-1.4-1.4l-2.8 2.8l-2.1-2.1l2.8-2.8l-1.4-1.4l-2.8 2.8l-1.5-1.4l-2.8 2.8c-.8.8-.8 2.1 0 2.8l1.8 1.8l-4 4l1.4 1.4l4-4l1.8 1.8c.8.8 2.1.8 2.8 0l2.8-2.8l-1.4-1.4l2.8-2.9z"
-          fill="#626262"
-        />
-      </svg>
-    </div>
-  );
-};
-
 interface DiceSplitProps {
   // Which split (0=horizontal, 1=vertical, 2=diagonal)
   split: number;

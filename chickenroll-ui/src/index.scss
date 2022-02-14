@@ -44,83 +44,6 @@ $buttonsHeight: 175px;
   touch-action: manipulation;
 }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-}
-
-.nav-link {
-  padding: 0.2rem;
-}
-
-.navbar {
-  padding: 0;
-  height: 3rem;
-}
-
-.playEmphasis {
-  font-weight: bold !important;
-}
-
-footer {
-  margin-top: 0.6rem;
-  margin-bottom: 0.4rem;
-  display: flex;
-  justify-content: center;
-}
-
-.footerIcon {
-  margin: 0 0.4rem;
-  width: 1.8rem;
-  height: 1.8rem;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.footerIcon .icon {
-  max-height: 1.4rem;
-  max-width: 1.4rem;
-}
-
-.footerIcon > * {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.footerIcon .discordIcon {
-  max-height: 1.6rem;
-  max-width: 1.6rem;
-
-  // Micro-adjustments.
-  margin-left: -3px;
-  margin-top: 3px;
-}
-
-.atIcon,
-.atIcon:hover,
-.atIcon:focus,
-.atIcon:active,
-.atIcon:visited,
-.atIcon:hover {
-  font-size: 1.6rem;
-  color: $black;
-  text-decoration: none !important;
-  // Hack to center it.
-  padding-bottom: 5px;
-}
-
-#root,
-.bgio-client {
-  display: flex;
-  height: 100% !important;
-  width: 100%;
-}
-
 body {
   font-family: Verdana, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -154,22 +77,8 @@ button {
   margin: 2px;
 }
 
-nav li {
-  margin: 0 0.2rem;
-  font-weight: bold;
-}
-
 p a {
   font-weight: bold;
-}
-
-.nav-link.active {
-  text-decoration: underline;
-}
-
-.nav-link {
-  color: color.adjust($primary, $lightness: -20%);
-  font-weight: normal;
 }
 
 .btn {
@@ -263,24 +172,6 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
 @include setPaleColors(0);
 @include setPaleColors(3);
 
-.pageContentWrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100%;
-}
-
-// Smaller font-size on xs devices
-nav {
-  font-size: 0.9rem;
-}
-
-@include media-breakpoint-up(sm) {
-  nav {
-    font-size: 1rem;
-  }
-}
-
 .howToPlayWrap {
   display: flex;
 
@@ -309,15 +200,6 @@ nav {
   pointer-events: none;
 }
 
-.pageContent {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100%;
-  padding: 1rem;
-}
-
 .homeTitle {
   font-weight: bold;
   text-align: center;
@@ -326,10 +208,6 @@ nav {
 .homePageLink,
 .homePageLink:hover {
   font-weight: normal;
-}
-
-.pageContent h2 {
-  padding-top: 1rem;
 }
 
 // No margin at the bottom of the last paragraph of a section.
@@ -382,6 +260,8 @@ p:last-child {
 
 .cantStopBoard {
   display: flex;
+  justify-items: center;
+  align-items: center;
   flex-direction: column;
   height: 100% !important;
   width: 100%;
@@ -841,326 +721,6 @@ $diceSize: 3.4rem;
   stroke: transparent;
 }
 
-.gameSetupWrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.gameSetupContentWrapWrap {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
-
-.gameSetupContentWrap {
-  // Mimicking the padding of .pageContent
-  padding: 1rem 0;
-  max-width: 18rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  .sectionName {
-    align-self: flex-start !important;
-    font-weight: bold;
-    margin-top: 0.7rem;
-    font-size: 1.2rem;
-    color: $primary;
-  }
-}
-
-.startButton {
-  align-self: center;
-}
-
-.playerDisconnected {
-  color: $danger;
-  font-style: italic;
-}
-
-.scorePlayerDisconnected {
-  // Same as for disabled secondary buttons, which we used for disabled buttons
-  background-color: rgba($secondary, 0.65);
-}
-
-.disconnected {
-  width: 1.2em;
-  height: 1.2rem;
-  border-radius: 0.2rem;
-  border: 0.1rem solid $danger;
-  margin-left: 1rem;
-
-  align-self: center;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: rgba($danger, 0.1);
-
-  > svg {
-    width: 0.8rem;
-    height: 0.8rem;
-    padding: 0.05rem;
-  }
-  path {
-    fill: $danger;
-  }
-}
-
-.gameSetupPlayer {
-  height: 2.8rem;
-  width: 100%;
-  border-radius: 0.2rem;
-  background-color: white;
-
-  padding: 0.2rem 0.3rem;
-  margin: 0.3rem;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .gameButtonWrap {
-    flex: 1;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-  }
-
-  .pencil > svg {
-    width: 0.9rem;
-    height: 0.9rem;
-    vertical-align: bottom;
-  }
-
-  .playerName {
-    flex: 1;
-    padding: 0;
-    padding-left: 0.3rem;
-    margin-left: 0.3rem;
-    margin-right: 0.7rem;
-    border: none;
-
-    display: flex;
-
-    .pencil {
-      margin-top: -0.4rem;
-      margin-left: 0.1rem;
-      display: flex;
-    }
-
-    .pencil > svg > path {
-      fill: $primary;
-    }
-  }
-
-  .colorWrap {
-    .pencil {
-      margin-right: 0.2rem;
-      margin-top: 0.2rem;
-    }
-  }
-
-  .playerNameInput,
-  .playerNameInput > input {
-    flex: 1;
-  }
-
-  .colorWrap {
-    position: relative;
-    padding-right: 0.4rem;
-  }
-
-  .colorPopupWrap {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    display: flex;
-  }
-}
-
-.editButton {
-  align-self: flex-start;
-}
-
-.gameSetupColorButton {
-  padding: 0;
-  min-width: 2rem;
-  min-height: 2rem;
-  max-width: 2rem;
-  max-height: 2rem;
-  border: none !important;
-  border-radius: 0.2rem;
-  z-index: 20;
-  transition: none;
-
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-
-  font-size: 0.6rem;
-
-  // This is to ignore the effect bootstrap adds for disabled buttons.
-  opacity: 1 !important;
-}
-
-.gameSetupColorButtonDisabled {
-  color: transparent !important;
-}
-
-.gameSetupColorButtonDisabled:hover {
-  filter: none !important;
-}
-
-.gameSetupPlayerFree {
-  background-color: white;
-  border: 2px dotted grey;
-  opacity: 0.5;
-  color: grey;
-  text-align: center;
-  box-shadow: 0 0 0 white;
-  justify-content: center;
-}
-
-.readyWrap {
-  width: 3.3rem;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.readyText {
-  font-size: 0.6rem;
-  cursor: pointer;
-  transition: none;
-}
-
-.readyCheckWrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.readyCheck {
-  margin: 0.2rem;
-  transform: scale(1.5);
-  border: 2px solid green;
-  border-radius: 1rem;
-}
-
-.readyCheck:checked {
-  background-color: green;
-  cursor: pointer;
-}
-
-.custom-switch {
-  // It's just off otherwise!
-  padding-left: 2.7rem;
-}
-
-.custom-control-input:checked ~ .custom-control-label::before {
-  background-color: $success !important;
-  border-color: $success !important;
-  cursor: pointer;
-}
-.custom-switch .custom-control-label::before,
-.custom-switch .custom-control-label::after {
-  cursor: pointer;
-}
-
-.gameSetupInviteWrap {
-  width: 100%;
-  padding: 0.4rem;
-  padding-left: 2.8rem;
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: 0px 0px 10px black;
-}
-
-.inviteOffset {
-  width: calc(100vw - 0.4rem - 2.8rem);
-  flex: 1;
-}
-
-.inviteContentWrap {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.inviteLinkWrap {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  max-width: calc(100vw - 0.4rem - 2.8rem);
-  justify-content: center;
-}
-
-.inviteLink {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-right: 0.4rem;
-  margin-top: 0.2rem;
-  margin-bottom: 0.2rem;
-}
-
-.qrcodeWrap {
-  position: relative;
-  background-color: black;
-  text-align: center;
-}
-
-.qrcode {
-  position: absolute;
-  left: -64px;
-  top: calc(100% + 1rem);
-  width: 128px !important;
-  height: 128px !important;
-  z-index: 999;
-}
-
-.copyBtn {
-  font-size: 0.6rem;
-  font-weight: bold;
-  padding: 0.1rem;
-  margin: 0.2rem 0;
-}
-
-.settingsWrap {
-  width: 100%;
-  margin: 0.5rem 0;
-}
-
-.settingsButton .gear {
-  margin: 0.3rem;
-  height: 1.5rem;
-  width: 1.5rem;
-  filter: drop-shadow(0.1rem 0.1rem 0.05rem black);
-  path {
-    fill: $primary;
-  }
-}
-
-.matchId {
-  font-family: courier new;
-  font-size: 12pt;
-}
 
 .dieHighlight {
   filter: brightness(1.1);
@@ -1185,13 +745,6 @@ $diceSize: 3.4rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.darkgold {
-  stop-color: #5e4f20;
-}
-.lightgold {
-  stop-color: #e3bc3d;
 }
 
 .megaWrap {
