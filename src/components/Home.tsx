@@ -37,7 +37,7 @@ const Home = (): JSX.Element => {
         <a
           style={{ width: "50%", fontSize: "1.5rem" }}
           className="btn btn-primary"
-          href="https://lefun.fun/create-match/chickenroll"
+          href="https://lefun.fun/g/chickenroll"
         >
           Play
         </a>
