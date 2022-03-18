@@ -1,6 +1,6 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import { LobbyClient } from "boardgame.io/client";
-import { SERVER, MAX_PLAYERS } from "./constants";
+import { URL_PREFIX, MAX_PLAYERS } from "./constants";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Loading from "./components/Loading";
@@ -41,7 +41,7 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.lobbyClient = new LobbyClient({ server: SERVER });
+    this.lobbyClient = new LobbyClient({ server: URL_PREFIX });
   }
 
   async createMatch(): Promise<string | undefined> {
@@ -78,10 +78,21 @@ class App extends React.Component {
         <BrowserRouter>
           <Suspense fallback={<Loading />}>
             <Switch>
-              {/* Pass and play match */}
-              <Route path="/patate" render={() => <Loading />} />
+              {/* Home */}
               <Route
-                path="/:numPlayers([2345])"
+                path={`${URL_PREFIX}/`}
+                exact
+                render={(props) => {
+                  return (
+                    <Page path="/" title={TITLE} description={DESCRIPTION}>
+                      <Home />
+                    </Page>
+                  );
+                }}
+              ></Route>
+              {/* Pass and play match */}
+              <Route
+                path={`${URL_PREFIX}/:numPlayers([2345])`}
                 render={(props) => {
                   const numPlayers = parseInt(props.match.params.numPlayers);
                   return (
@@ -98,7 +109,7 @@ class App extends React.Component {
 
               {/* Create a match */}
               <Route
-                path="/match"
+                path={`${URL_PREFIX}/match`}
                 exact={true}
                 render={() => {
                   return (
@@ -112,7 +123,7 @@ class App extends React.Component {
                           const matchID = await this.createMatch();
                           if (matchID != null) {
                             window.location.replace(
-                              `${SERVER}/match/${matchID}`
+                              `${URL_PREFIX}/match/${matchID}`
                             );
                           }
                         }}
@@ -127,7 +138,7 @@ class App extends React.Component {
 
               {/* Regular match with match ID */}
               <Route
-                path="/match/:matchID"
+                path={`${URL_PREFIX}/match/:matchID`}
                 render={(props) => {
                   const { matchID } = props.match.params;
                   return (
@@ -144,7 +155,7 @@ class App extends React.Component {
 
               {/* How to play */}
               <Route
-                path="/howtoplay"
+                path={`${URL_PREFIX}/howtoplay`}
                 render={(props) => {
                   return (
                     <Page
@@ -160,7 +171,7 @@ class App extends React.Component {
 
               {/* About */}
               <Route
-                path="/about"
+                path={`${URL_PREFIX}/about`}
                 render={(props) => {
                   return (
                     <Page
@@ -178,7 +189,7 @@ class App extends React.Component {
 
               {/* Math */}
               <Route
-                path="/math"
+                path={`${URL_PREFIX}/math`}
                 render={(props) => {
                   return (
                     <Page
@@ -193,24 +204,12 @@ class App extends React.Component {
                   );
                 }}
               />
-
               {/* Redirect to the home page for anything else.
               This has to be *after* all the other routes.*/}
               <Route
-                path="/:other"
-                render={(props) => {
-                  window.location.replace(`${SERVER}`);
-                }}
-              />
-              {/* Home */}
-              <Route
                 path="/"
-                render={(props) => {
-                  return (
-                    <Page path="/" title={TITLE} description={DESCRIPTION}>
-                      <Home />
-                    </Page>
-                  );
+                render={() => {
+                  window.location.replace(`${URL_PREFIX}`);
                 }}
               ></Route>
             </Switch>

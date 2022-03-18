@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DiceBoard } from "./DiceBoard";
-import { SERVER, MAX_PLAYERS } from "../constants";
+import { URL_PREFIX, MAX_PLAYERS } from "../constants";
 import { rollDie, pickColor } from "../math/probs";
 
 const Home = (): JSX.Element => {
@@ -43,7 +43,7 @@ const Home = (): JSX.Element => {
         </a>
       </div>
       <div className="playLegacyWrap">
-        <a href="/match">Play (legacy version)</a>
+        <a href={`${URL_PREFIX}/match`}>Play (legacy version)</a>
       </div>
     </>
   );
@@ -62,7 +62,7 @@ const Home = (): JSX.Element => {
               <button
                 className="btn btn-primary btn-sm"
                 onClick={() => {
-                  window.location.href = `${SERVER}/${i + 2}`;
+                  window.location.href = `${URL_PREFIX}/${i + 2}`;
                 }}
                 key={i}
               >

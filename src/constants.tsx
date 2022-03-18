@@ -1,16 +1,12 @@
-let server;
+export const URL_PREFIX = process.env.PUBLIC_URL;
 
+let origin;
 // We also use the constants on the backend server, for which `window` is not defined.
 if (typeof window !== "undefined") {
-  const { protocol, hostname, port } = window.location;
-
-  server = `${protocol}//${hostname}`;
-
-  if (port) {
-    server += `:${port}`;
-  }
+  ({ origin } = window.location);
 }
-export const SERVER = server;
+
+export const ORIGIN = origin;
 
 export const MAX_PLAYERS = 5;
 

@@ -2,6 +2,7 @@ import React from "react";
 import { DieLogo } from "./Die";
 import getSoundPlayer from "../audio";
 import bmc from "../images/bmc.svg";
+import { URL_PREFIX } from "../constants";
 
 /*
  * volume: 0 (mute), 1, 2, 3 (max)
@@ -57,7 +58,7 @@ const InGameIcons = (props: InGameIconsProps) => {
   return (
     <div className="homeLinkWrap">
       <div className="inGameIcon homeLinkIcon">
-        <a href="/" title="Home">
+        <a href={`${URL_PREFIX}`} title="Home">
           <DieLogo />
         </a>
       </div>

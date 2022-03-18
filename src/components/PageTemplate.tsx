@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import bmc from "../images/bmc.svg";
 import discord from "../images/discord.svg";
 import gh from "../images/gh.png";
+import { URL_PREFIX } from "../constants";
 
 interface HeaderProps {
   path: string;
@@ -12,18 +13,18 @@ interface HeaderProps {
 const Header = (props: HeaderProps) => {
   const navItems = [
     {
-      path: "/",
+      path: URL_PREFIX,
       name: "Play",
       component: (
         <button className="btn btn-primary btn-sm playEmphasis">Play</button>
       ),
     },
     {
-      path: "/howtoplay",
+      path: `${URL_PREFIX}/howtoplay`,
       name: "How To Play",
     },
     {
-      path: "/math",
+      path: `${URL_PREFIX}/math`,
       name: "Math",
     },
     {
@@ -32,7 +33,7 @@ const Header = (props: HeaderProps) => {
       external: true,
     },
     {
-      path: "/about",
+      path: `${URL_PREFIX}/about`,
       name: "About",
     },
   ];

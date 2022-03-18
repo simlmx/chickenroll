@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { PlayerID, PlayerInfo, MountainShape, SameSpace } from "../types";
 import {
-  SERVER,
+  ORIGIN,
+  URL_PREFIX,
   NUM_COLORS,
   AUTO_NUM_COLS_TO_WIN,
   PLAYER_NAME_MAX_LEN,
@@ -373,7 +374,7 @@ const GameSetup = (props: GameSetupProps): JSX.Element => {
 
   const numPlayers = Object.values(playerInfos).length;
   const numFreeSpots = maxNumPlayers - Object.keys(playerInfos).length;
-  const matchLink = `${SERVER}/match/${matchID}`;
+  const matchLink = `${ORIGIN}${URL_PREFIX}/match/${matchID}`;
   const imTheOwner = playerID === "0";
 
   const qrcode = (

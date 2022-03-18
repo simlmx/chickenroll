@@ -7,7 +7,7 @@ import { PlayerID } from "../types";
 import Loading from "./Loading";
 import localStorage from "../utils/localStorage";
 import { LobbyClient } from "boardgame.io/client";
-import { SERVER, MAX_PLAYERS } from "../constants";
+import { URL_PREFIX, MAX_PLAYERS } from "../constants";
 
 export default class Match extends React.Component<
   { matchID: string; lobbyClient: LobbyClient },
@@ -26,7 +26,7 @@ export default class Match extends React.Component<
       game: CantStop,
       numPlayers: MAX_PLAYERS,
       board: CantStopBoard,
-      multiplayer: SocketIO({ server: SERVER }),
+      multiplayer: SocketIO({ server: "http://localhost:6001" }),
       // debug: { impl: Debug },
     });
   }
@@ -40,7 +40,7 @@ export default class Match extends React.Component<
       alert(
         "There was a problem. Make sure you have the right url and try again."
       );
-      window.location.replace(`${SERVER}/`);
+      window.location.replace(`${URL_PREFIX}`);
       return;
     }
 
