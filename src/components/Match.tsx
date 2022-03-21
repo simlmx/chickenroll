@@ -26,7 +26,9 @@ export default class Match extends React.Component<
       game: CantStop,
       numPlayers: MAX_PLAYERS,
       board: CantStopBoard,
-      multiplayer: SocketIO({ server: "http://localhost:6001" }),
+      multiplayer: SocketIO({
+        socketOpts: { path: `${URL_PREFIX}/socket.io/` },
+      }),
       // debug: { impl: Debug },
     });
   }
@@ -40,7 +42,7 @@ export default class Match extends React.Component<
       alert(
         "There was a problem. Make sure you have the right url and try again."
       );
-      window.location.replace(`${URL_PREFIX}`);
+      window.location.replace(`${URL_PREFIX}/`);
       return;
     }
 

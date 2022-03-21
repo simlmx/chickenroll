@@ -13,7 +13,7 @@ interface HeaderProps {
 const Header = (props: HeaderProps) => {
   const navItems = [
     {
-      path: URL_PREFIX,
+      path: `${URL_PREFIX}/`,
       name: "Play",
       component: (
         <button className="btn btn-primary btn-sm playEmphasis">Play</button>

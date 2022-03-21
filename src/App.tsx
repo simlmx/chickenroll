@@ -209,7 +209,7 @@ class App extends React.Component {
               <Route
                 path="/"
                 render={() => {
-                  window.location.replace(`${URL_PREFIX}`);
+                  window.location.replace(`${URL_PREFIX}/`);
                 }}
               ></Route>
             </Switch>

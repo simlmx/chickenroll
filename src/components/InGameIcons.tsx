@@ -58,7 +58,7 @@ const InGameIcons = (props: InGameIconsProps) => {
   return (
     <div className="homeLinkWrap">
       <div className="inGameIcon homeLinkIcon">
-        <a href={`${URL_PREFIX}`} title="Home">
+        <a href={`${URL_PREFIX}/`} title="Home">
           <DieLogo />
         </a>
       </div>
