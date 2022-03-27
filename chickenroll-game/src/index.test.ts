@@ -57,7 +57,11 @@ test.each([
 
 test("happy path", () => {
   const random = new RandomMock();
-  const match = new MatchTester<ChickenrollBoard>(game, 3, { random });
+  const match = new MatchTester<ChickenrollBoard>({
+    gameDef: game,
+    numPlayers: 3,
+    random,
+  });
 
   const [p0, p1, p2] = match.board.playerOrder;
 

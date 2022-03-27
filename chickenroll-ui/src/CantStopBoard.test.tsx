@@ -17,9 +17,9 @@ const renderForPlayer = (match: MatchTester, userId: UserId) => {
 };
 
 test("render initial board", () => {
-  const match = new MatchTester(game, 3);
+  const match = new MatchTester({ gameDef: game, numPlayers: 3 });
   // Render for a player.
-  renderForPlayer(match, match.board.playerOrder[0])
+  renderForPlayer(match, match.board.playerOrder[0]);
   // Render for a spectator
-  renderForPlayer(match, 'spectatorId')
+  renderForPlayer(match, "spectatorId");
 });
