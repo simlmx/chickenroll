@@ -17,35 +17,14 @@ export const DICE_INDICES = [
   ],
 ];
 
+// For one split of dices.
 export type SumOption = {
-  // The 2 numbers
-  diceSums: number[];
-  // In a non-split case this contains only one element.
-  enabled: boolean[];
-  forceSplit: boolean;
-};
-
-/*
- * Convenient function to create a SumOption object
- */
-export const makeSumOption = (
-  diceSums: number[],
-  enabled?: boolean[],
-  forceSplit?: boolean
-): SumOption => {
-  forceSplit = forceSplit == null ? false : true;
-  enabled = enabled == null ? [true, true] : enabled;
-  return {
-    diceSums,
-    enabled,
-    forceSplit,
-  };
-};
-
-// We split if we can only select one of the two options.
-// Force split is for when we can select both options but not at the same time.
-export const isSumOptionSplit = (sumOption: SumOption): boolean => {
-  return sumOption?.forceSplit || sumOption.enabled[0] !== sumOption.enabled[1];
+  // The 2 sums that correspond to the two columns
+  diceSums: [number, number];
+  // Split-case: can we select each of the sum.
+  enabled: [boolean, boolean];
+  // Is it two different options?
+  split: boolean;
 };
 
 /*
@@ -135,26 +114,28 @@ export const getSumOptions = (
   // First compute all the dice sums.
   const allDiceSums = DICE_INDICES.map((group): SumOption => {
     // Compute the 2 sums.
-    const diceSums: DiceSum[] = group.map((twoDiceIndices): DiceSum => {
-      return twoDiceIndices.map((i) => diceValues[i]).reduce((a, b) => a + b);
-    });
+    const diceSums: [DiceSum, DiceSum] = group.map(
+      (twoDiceIndices): DiceSum => {
+        return twoDiceIndices.map((i) => diceValues[i]).reduce((a, b) => a + b);
+      }
+    ) as [DiceSum, DiceSum];
 
     if (diceSums[0] === diceSums[1]) {
       // Both of the sums are the same.
       const diceSum = diceSums[0];
       // If the column is blocked, there are no options.
       if (updatedBlockedSums.has(diceSum)) {
-        return makeSumOption(diceSums, [false, false]);
+        return { diceSums, enabled: [false, false], split: false };
       }
       if (currentClimberSpaceLeft.has(diceSum)) {
         // Are we already climbing that "sum"?
         if (currentClimberSpaceLeft.get(diceSum) === 1) {
           // If the columns has one space left, we can choose the sum only once.
-          return makeSumOption(diceSums, [true, true], /*forceSplit*/ true);
+          return { diceSums, enabled: [true, true], split: true };
         } else {
           // Otherwise the column is not blocked and we have more than 1 space: we can
           // use both sums.
-          return makeSumOption(diceSums);
+          return { diceSums, enabled: [true, true], split: false };
         }
       } else {
         // We are not climbing the column. We can play it if we have a climber left.
@@ -171,12 +152,12 @@ export const getSumOptions = (
               userId
             ) === 1
           ) {
-            return makeSumOption(diceSums, [true, true], /*forceSplit*/ true);
+            return { diceSums, enabled: [true, true], split: true };
           } else {
-            return makeSumOption(diceSums);
+            return { diceSums, enabled: [true, true], split: false };
           }
         } else {
-          return makeSumOption(diceSums, [false, false]);
+          return { diceSums, enabled: [false, false], split: false };
         }
       }
     } else {
@@ -197,19 +178,22 @@ export const getSumOptions = (
         // We can use that number if the column is not blocked and if we have some
         // climbers left or if we are already climbing it.
         return !isBlocked && (numClimbersLeft > 0 || alreadyClimbingIt);
-      });
+      }) as [boolean, boolean];
 
       // Now the only tricky case left is if we are allowed for both sums, *but not
       // at the same time*.
       // This happens when we have only one climber left, and if the two sums are new
       // sums that we are not already climbing.
-      const forceSplit =
-        numClimbersLeft === 1 && !climbingAtLeastOne && enabled.every((x) => x);
+      const split =
+        (numClimbersLeft === 1 &&
+          !climbingAtLeastOne &&
+          enabled.every((x) => x)) ||
+        enabled[0] !== enabled[1];
 
       return {
         diceSums,
         enabled,
-        forceSplit,
+        split,
       };
     }
   });

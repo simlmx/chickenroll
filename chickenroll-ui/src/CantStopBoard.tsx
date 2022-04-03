@@ -5,7 +5,6 @@ import { useSelector, useDispatch, playSound, useUsername, useIsPlayer } from "b
 
 import {
   ChickenrollBoard,
-  isSumOptionSplit,
   PlayerInfo,
   roll,
   stop,
@@ -404,7 +403,7 @@ export const Board = () => {
 
     let sums: number[];
 
-    if (isSumOptionSplit(sumOption)) {
+    if (sumOption.split) {
       sums = [sumOption.diceSums[buttonColumn]];
     } else {
       sums = sumOption.diceSums;

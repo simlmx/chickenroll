@@ -3,7 +3,6 @@ import React, { useMemo } from "react";
 import { UserId } from "bgkit";
 import {
   getNumStepsForSum,
-  isSumOptionSplit,
   SumOption,
   PlayerInfo,
   MountainShape,
@@ -274,7 +273,7 @@ export const Mountain = (props: MountainProps) => {
     const sumOption = diceSumOptions[buttonRow];
 
     let highlightSums;
-    if (isSumOptionSplit(sumOption)) {
+    if (sumOption.split) {
       highlightSums = [sumOption.diceSums[buttonColumn]];
     } else {
       highlightSums = sumOption.diceSums;

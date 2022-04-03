@@ -1,11 +1,11 @@
 import React from "react";
 
-import { MountainShape, SameSpace, makeSumOption } from 'chickenroll-game'
+import { MountainShape, SameSpace } from "chickenroll-game";
 
 import { Die } from "./Die";
 import { Climber, Mountain } from "./Mountain";
 
-import './index.scss'
+import "./index.scss";
 
 const Rules = () => {
   const playerID = "0";
@@ -86,7 +86,9 @@ const Rules = () => {
           maxRow: 3,
           // Ok now this is ugly
           mouseOverPossibility: { buttonRow: 0, buttonColumn: 0 },
-          diceSumOptions: [makeSumOption([9, 0], [true, false])],
+          diceSumOptions: [
+            { diceSums: [9, 0], enabled: [true, false], split: true },
+          ],
         }}
       />
     </div>
@@ -180,7 +182,7 @@ const Rules = () => {
   );
 
   return (
-    <div className='rules' onScroll={() => console.log('scrolling cr')}>
+    <div className="rules" onScroll={() => console.log("scrolling cr")}>
       <h1>Rules of Chicken Roll</h1>
       <h2>Overview</h2>
       <p>

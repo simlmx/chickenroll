@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from "bgkit-ui";
 import {
   ShowProbsType,
   SumOption,
-  isSumOptionSplit,
   pick,
   canStop,
 } from "chickenroll-game";
@@ -130,18 +129,12 @@ const Possibilities = (props: {
     <div className="actionButtons">
       {diceSumOptions != null &&
         diceSumOptions.map((sumOption: SumOption, i: number) => {
-          // If both sums have the same "enabled" value and if they are not split,
-          // then we'll have 2 buttons.
-          const justOneButton =
-            sumOption.enabled[0] === sumOption.enabled[1] &&
-            !isSumOptionSplit(sumOption);
-
           // We make sure we have an array of arrays of sum.
           // [[7, 12]] means one button with 2 sums.
           // [[7], [12]] means 2 different buttons.
-          const sumsList = justOneButton
-            ? [sumOption.diceSums]
-            : sumOption.diceSums.map((x) => [x]);
+          const sumsList = sumOption.split
+            ? sumOption.diceSums.map((x) => [x])
+            : [sumOption.diceSums]
 
           const buttons: JSX.Element[] = [];
 
@@ -166,7 +159,7 @@ const Possibilities = (props: {
             }
 
             let pairHighlight = [false, false];
-            if (justOneButton) {
+            if (!sumOption.split) {
               pairHighlight = [true, true];
             } else {
               pairHighlight[j] = true;

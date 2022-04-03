@@ -1,4 +1,4 @@
-import { getSumOptions, SumOption, makeSumOption } from "../math";
+import { getSumOptions, SumOption } from "../math";
 
 /*
  * Convenient function to create a SumOption object
@@ -8,15 +8,15 @@ const so = (
   d1,
   enabled0?: boolean,
   enabled1?: boolean,
-  forceSplit?: boolean
+  forceSplit = false
 ): SumOption => {
-  const sumOptions = [d0, d1];
-  const enabled = [
+  const diceSums: [number, number] = [d0, d1];
+  const enabled: [boolean, boolean] = [
     enabled0 == null ? true : enabled0,
     enabled1 == null ? true : enabled1,
   ];
 
-  return makeSumOption(sumOptions, enabled, forceSplit);
+  return { diceSums, enabled, split: enabled0 !== enabled1 || forceSplit };
 };
 
 test.each([

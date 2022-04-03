@@ -13,16 +13,11 @@ import {
   itsYourTurn,
 } from "bgkit";
 
-import {
-  getSumOptions,
-  getNumStepsForSum,
-  SumOption,
-  isSumOptionSplit,
-} from "./math";
+import { getSumOptions, getNumStepsForSum, SumOption } from "./math";
 
 import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 export { OddsCalculator } from "./math/probs";
-export { DICE_INDICES, makeSumOption } from "./math";
+export { DICE_INDICES } from "./math";
 
 import {
   DiceSum,
@@ -42,7 +37,6 @@ export {
   SameSpace,
   SumOption,
   getNumStepsForSum,
-  isSumOptionSplit,
 };
 
 interface Info {
@@ -391,6 +385,7 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
         userId: board.currentPlayer,
         ts: new Date().getTime(),
       };
+
       endTurn(board, "stop");
     }
   },
@@ -399,24 +394,27 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
 
     const move = getLastMove(board);
     move.diceSplitIndex = diceSplitIndex;
+
     // Should not happen but makes typescript happy.
     if (board.diceSumOptions == null) {
       throw new Error("assert false");
     }
     const sumOption = board.diceSumOptions[diceSplitIndex];
-    let { diceSums, enabled } = sumOption;
+    const { diceSums, enabled } = sumOption;
+    let newDiceSums: number[];
 
-    if (isSumOptionSplit(sumOption)) {
-      diceSums = [diceSums[choiceIndex]];
+    if (sumOption.split) {
+      newDiceSums = [diceSums[choiceIndex]];
       move.diceUsed = [choiceIndex];
     } else {
+      newDiceSums = diceSums;
       move.diceUsed = diceSums
         .map((s, i) => (enabled[i] ? i : null))
         .filter((x) => x != null) as number[];
     }
     board.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
 
-    diceSums.forEach((col, i) => {
+    newDiceSums.forEach((col, i) => {
       board.currentPositions[col] = climbOneStep(
         board.currentPositions,
         board.checkpointPositions,
@@ -557,6 +555,41 @@ const initialBoard = ({
   };
 };
 
+const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
+  board,
+  userId,
+  random,
+}) => {
+  // First roll ever.
+  if (!board.currentPlayerHasStarted && board.stage === "rolling") {
+    return roll();
+  } else if (board.stage === "moving") {
+    const options: {
+      // arguments for the `pick()` move.
+      diceSplitIndex: number;
+      choiceIndex;
+      // data to do some math with
+      cols: number[];
+    }[] = [];
+
+    // board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
+    //   if (isSumOptionSplit
+    //   options.push({diceSplitIndex})
+    // })
+    // for (const sumOption of board.diceSumOptions) {
+    //   if (isSumOptionSplit(sumOption)) {
+    //   }
+    //   if (option.enabled) {
+    //     return pick({})
+    //   }
+    // }
+
+    // }
+    // Stop otherwise
+    // return stop();
+  }
+};
+
 const gamePlayerOptions: GamePlayerOptions = {
   color: {
     label: "Color",
@@ -584,4 +617,5 @@ export const game: GameDef<ChickenrollBoard> = {
   boardUpdates,
   gameOptions,
   gamePlayerOptions,
+  // autoMove,
 };
