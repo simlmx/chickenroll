@@ -437,7 +437,7 @@ const gameOptions: GameOptions = [
     shortLabel: null,
     options: [
       { value: "share", label: "Allow", shortLabel: null },
-      { value: "jump", label: "Jump over", shortLabel: 'Jump' },
+      { value: "jump", label: "Jump over", shortLabel: "Jump" },
       { value: "nostop", label: "Must roll" },
     ],
     help: "What happens when two eggs end up on the same space.",
@@ -450,16 +450,20 @@ const gameOptions: GameOptions = [
       { value: "tall", label: "Modern", shortLabel: null },
       { value: "classic", label: "Classic" },
     ],
-    help:
-      "Height of the columns. Modern is taller and better calibrated than Classic.",
+    help: "Height of the columns. Modern is taller and better calibrated than Classic.",
   },
   {
     key: "showProbs",
     label: "Show probabilities",
-    shortLabel: 'Probs',
+    shortLabel: "Probs",
     options: [
       { value: "before", label: "Always" },
-      { value: "after", label: "End of the turn", default: true, shortLabel: null },
+      {
+        value: "after",
+        label: "End of the turn",
+        default: true,
+        shortLabel: null,
+      },
       { value: "never", label: "Never" },
     ],
     help: "When to show the probability of cracking.",
