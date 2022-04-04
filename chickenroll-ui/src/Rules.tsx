@@ -182,7 +182,7 @@ const Rules = () => {
   );
 
   return (
-    <div className="rules" onScroll={() => console.log("scrolling cr")}>
+    <div className="rules">
       <h1>Rules of Chicken Roll</h1>
       <h2>Overview</h2>
       <p>
