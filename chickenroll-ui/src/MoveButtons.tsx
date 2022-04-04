@@ -2,12 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { UserId } from "bgkit";
 import { useSelector, useDispatch } from "bgkit-ui";
-import {
-  ShowProbsType,
-  SumOption,
-  pick,
-  canStop,
-} from "chickenroll-game";
+import { ShowProbsType, SumOption, pick, canStop } from "chickenroll-game";
 
 import { State } from "./types";
 import { BustProb } from "./Bust";
@@ -61,7 +56,9 @@ const ActionButtons = (props: ActionButtonsProps) => {
     bustProb,
   } = props;
 
-  const currentPlayerCanStop = useSelector((state: State) => canStop(state.board));
+  const currentPlayerCanStop = useSelector((state: State) =>
+    canStop(state.board)
+  );
 
   let rollClassName = getButtonClassNames(itsMe, true, color);
   const stopClassName = getButtonClassNames(itsMe, currentPlayerCanStop, color);
@@ -134,7 +131,7 @@ const Possibilities = (props: {
           // [[7], [12]] means 2 different buttons.
           const sumsList = sumOption.split
             ? sumOption.diceSums.map((x) => [x])
-            : [sumOption.diceSums]
+            : [sumOption.diceSums];
 
           const buttons: JSX.Element[] = [];
 

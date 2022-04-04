@@ -156,6 +156,18 @@ test.each([
       so(12, 12, true, true, true),
     ],
   ],
+  // We are already climbing 2 columns.
+  [
+    [1, 2, 3, 4],
+    { "6": 1, "12": 1 },
+    {},
+    {},
+    [
+      so(3, 7, true, true, true),
+      so(4, 6, true, true, false),
+      so(5, 5, true, true, false),
+    ],
+  ],
 ])(
   "testGetSumOptions %s %s %s %s",
   (

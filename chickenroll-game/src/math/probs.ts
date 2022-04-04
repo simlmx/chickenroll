@@ -10,6 +10,10 @@ export const cartesian = (...c) => c.reduce(_f);
 
 export const diceValues2sums = (diceValues: number[]): Set<number> => {
   const sums: Set<number> = new Set();
+  // We go through [i, j] in
+  // [0, 1] [0, 2], [0, 3]
+  // [1, 2] [1, 3],
+  // [2, 3]
   for (let i = 0; i < diceValues.length - 1; i++) {
     // This is where you'll capture that last value
     for (let j = i + 1; j < diceValues.length; j++) {
@@ -96,16 +100,6 @@ export function getAllowedColumns(
   const allowed = all.filter((s) => !blockedSumsSet.has(s));
   return allowed;
 }
-
-/* Roll a die */
-export const rollDie = (): number => Math.floor(Math.random() * 6) + 1;
-
-/* Roll n dice */
-export const rollDice = (n: number): number[] =>
-  Array(n).fill(null).map(rollDie);
-
-/* Randomly pick a color */
-export const pickColor = (): number => Math.floor(Math.random() * NUM_COLORS);
 
 let oddsCalculator;
 /* OddsCalculator Singleton */

@@ -5,9 +5,7 @@ type InGameIconsProps = {
 };
 
 const InGameIcons = (props: InGameIconsProps) => {
-  let {
-    historyOnClick,
-  } = props;
+  let { historyOnClick } = props;
 
   return (
     <div className="homeLinkWrap">

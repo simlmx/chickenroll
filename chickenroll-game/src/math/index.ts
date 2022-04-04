@@ -34,7 +34,7 @@ export type SumOption = {
  * This is basically the number of step left minus the number of people in the way, IF
  * in jump mode.
  */
-const getSpaceLeft = (
+export const getSpaceLeft = (
   currentPositions: { [key: string]: number },
   checkpointPositions: { [key: number]: { [key: number]: number } },
   mountainShape: MountainShape,

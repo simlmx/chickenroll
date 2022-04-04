@@ -21,7 +21,6 @@ export const ScoreBoard = ({
   currentPlayer,
   numColsToWin,
 }: ScoreBoardProps) => {
-
   if (numColsToWin === "auto") {
     throw new Error("invalid num cols to win");
   }

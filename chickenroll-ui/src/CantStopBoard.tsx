@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo, ReactNode } from "react";
 
 import { UserId } from "bgkit";
-import { useSelector, useDispatch, playSound, useUsername, useIsPlayer } from "bgkit-ui";
-
 import {
-  ChickenrollBoard,
-  PlayerInfo,
-  roll,
-  stop,
-} from "chickenroll-game";
+  useSelector,
+  useDispatch,
+  playSound,
+  useUsername,
+  useIsPlayer,
+} from "bgkit-ui";
+
+import { ChickenrollBoard, PlayerInfo, roll, stop } from "chickenroll-game";
 
 import "./index.scss";
 
@@ -313,7 +314,8 @@ export const Board = () => {
           // Use this player's color if there is a player otherwise use the current
           // player's color.
           playerColor:
-            playerInfos[userId == null || !isPlayer ? currentPlayer : userId].color,
+            playerInfos[userId == null || !isPlayer ? currentPlayer : userId]
+              .color,
           onRoll: () => {
             dispatch(roll());
             setShowInfo(false);

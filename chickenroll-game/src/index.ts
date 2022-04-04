@@ -13,11 +13,19 @@ import {
   itsYourTurn,
 } from "bgkit";
 
-import { getSumOptions, getNumStepsForSum, SumOption } from "./math";
+import {
+  getSumOptions,
+  getNumStepsForSum,
+  SumOption,
+  getSpaceLeft,
+  DICE_INDICES,
+} from "./math";
 
-import { getAllowedColumns, getOddsCalculator } from "./math/probs";
-export { OddsCalculator } from "./math/probs";
-export { DICE_INDICES } from "./math";
+import {
+  getAllowedColumns,
+  getOddsCalculator,
+  OddsCalculator,
+} from "./math/probs";
 
 import {
   DiceSum,
@@ -27,7 +35,8 @@ import {
   CurrentPositions,
   CheckpointPositions,
 } from "./types";
-export { NUM_STEPS } from "./constants";
+
+import { NUM_STEPS } from "./constants";
 
 // Imports that should also be exported.
 export {
@@ -37,6 +46,8 @@ export {
   SameSpace,
   SumOption,
   getNumStepsForSum,
+  DICE_INDICES,
+  NUM_STEPS,
 };
 
 interface Info {
@@ -70,7 +81,7 @@ export type ChickenrollBoard = {
   checkpointPositions: CheckpointPositions;
   diceSumOptions?: SumOption[];
   lastPickedDiceSumOption?: number[];
-  blockedSums: { [key: number]: string };
+  blockedSums: { [diceSum: number]: UserId };
   info?: Info;
   // Number of columns finished for each player.
   scores: { [userId: number]: number };
@@ -555,6 +566,79 @@ const initialBoard = ({
   };
 };
 
+// A list of criteria we are interested in when choosing an option.
+type OptionCriteria = {
+  // How many columns would we finish?
+  numFinish: number;
+  // Number of new climbers this option will add on the board.
+  climberCost: number;
+  // Prob of bust for next roll if we choose the option.
+  probBust: number;
+  // How much progress on the board would we make.
+  progress: number;
+  // Average (on the 1 or 2 numbers) of the probability to get those numbers. This is
+  // the same number we use to determine the height of the columns.
+  avgProbCols: number;
+};
+
+const scoreCriteria = (oc: OptionCriteria) => {
+  return (
+    oc.numFinish * 4 -
+    oc.climberCost * 4 -
+    oc.probBust * 3 +
+    oc.progress +
+    (oc.climberCost > 0 ? oc.avgProbCols * 3 : 0)
+  );
+};
+
+const sortOptions = (opt1: OptionCriteria, opt2: OptionCriteria): number => {
+  return -scoreCriteria(opt1) + scoreCriteria(opt2);
+};
+
+// How many columns would we finish if we chose the 2 columns `col`?
+const getFinishCols = ({
+  board,
+  cols,
+}: {
+  board: ChickenrollBoard;
+  cols: number[];
+}): number[] => {
+  // Case where the two numbers are the same.
+  if (cols.length === 2 && cols[0] === cols[1]) {
+    if (
+      getSpaceLeft(
+        board.currentPositions,
+        board.checkpointPositions,
+        board.mountainShape,
+        board.sameSpace,
+        cols[0],
+        board.currentPlayer
+      ) === 2
+    ) {
+      return cols;
+    } else {
+      return [];
+    }
+  }
+
+  const finishedCols = [];
+  for (const col of cols) {
+    if (
+      getSpaceLeft(
+        board.currentPositions,
+        board.checkpointPositions,
+        board.mountainShape,
+        board.sameSpace,
+        col,
+        board.currentPlayer
+      ) === 1
+    ) {
+      finishedCols.push(col);
+    }
+  }
+  return finishedCols;
+};
+
 const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   board,
   userId,
@@ -563,30 +647,168 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   // First roll ever.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
     return roll();
-  } else if (board.stage === "moving") {
+  }
+
+  const calculator = getOddsCalculator();
+
+  if (board.stage === "moving") {
     const options: {
       // arguments for the `pick()` move.
       diceSplitIndex: number;
-      choiceIndex;
+      choiceIndex: number;
       // data to do some math with
       cols: number[];
     }[] = [];
 
-    // board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
-    //   if (isSumOptionSplit
-    //   options.push({diceSplitIndex})
-    // })
-    // for (const sumOption of board.diceSumOptions) {
-    //   if (isSumOptionSplit(sumOption)) {
-    //   }
-    //   if (option.enabled) {
-    //     return pick({})
-    //   }
-    // }
+    board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
+      if (sumOption.split) {
+        for (const choiceIndex of [0, 1]) {
+          if (sumOption.enabled[choiceIndex]) {
+            options.push({
+              diceSplitIndex,
+              choiceIndex,
+              cols: [sumOption.diceSums[choiceIndex]],
+            });
+          }
+        }
+      } else {
+        if (sumOption.enabled[0]) {
+          options.push({
+            diceSplitIndex,
+            choiceIndex: 0,
+            cols: sumOption.diceSums,
+          });
+        }
+      }
+    });
 
-    // }
-    // Stop otherwise
-    // return stop();
+    // Gather some information for each option.
+    const optionCriterias: OptionCriteria[] = options.map(({ cols }) => {
+      // * Num of finished columns.
+
+      // Subset of `cols` that would be finished.
+      const finishedCols = getFinishCols({ board, cols });
+
+      const colSet = new Set(
+        Object.keys(board.currentPositions).map((col) => parseInt(col))
+      );
+      const numClimbersBefore = colSet.size;
+      cols.forEach((col) => colSet.add(col));
+
+      const climberCost = colSet.size - numClimbersBefore;
+
+      // To get the prob of busting if we choose this option, we need to know how many
+      // columns will be blocked after.
+
+      let allowed: Set<number>; // = new Set(colSet);
+      if (colSet.size === 3) {
+        allowed = new Set(colSet);
+      } else {
+        // In the case where we would still have runners left, only blocked columns are
+        // not allowed.
+        allowed = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      }
+
+      // Remove finished columns if this option is chosen.
+      for (const col of finishedCols) {
+        allowed.delete(col);
+      }
+
+      for (const col of Object.keys(board.blockedSums)) {
+        allowed.delete(parseInt(col));
+      }
+
+      const probBust = calculator.oddsBust(Array.from(allowed));
+
+      let progress = 0;
+      let avgProbCols = 0;
+      for (const col of cols) {
+        const endsAt = climbOneStep(
+          board.currentPositions,
+          board.checkpointPositions,
+          col,
+          userId,
+          board.sameSpace
+        );
+        const startsAt =
+          board.currentPositions[col] ||
+          board.checkpointPositions[userId][col] ||
+          0;
+        progress +=
+          (endsAt - startsAt) / getNumStepsForSum(col, board.mountainShape);
+
+        avgProbCols += 1 - calculator.oddsBust([col]);
+      }
+      avgProbCols /= cols.length;
+
+      return {
+        numFinish: finishedCols.length,
+        climberCost,
+        probBust,
+        progress,
+        avgProbCols,
+      };
+    });
+
+    // Now merge everything and sort.
+    const optionsWithCriteria = options.map((opt, i) => ({
+      ...opt,
+      ...optionCriterias[i],
+    }));
+
+    const bestOption = optionsWithCriteria.sort(sortOptions)[0];
+
+    return pick({
+      diceSplitIndex: bestOption.diceSplitIndex,
+      choiceIndex: bestOption.choiceIndex,
+    });
+  }
+
+  if (board.bustProb === 0) {
+    return roll();
+  }
+
+  if (!canStop(board)) {
+    return roll();
+  }
+
+  // Here we need to choose between stopping and rolling.
+  let progressSoFar = 0;
+  let numFinishedCol = 0;
+  Object.entries(board.currentPositions).forEach(([col, step]) => {
+    const colInt = parseInt(col);
+    const numSteps = getNumStepsForSum(colInt, board.mountainShape);
+    progressSoFar +=
+      (step - (board.checkpointPositions[userId][colInt] || 0)) / numSteps;
+
+    if (step === numSteps) {
+      numFinishedCol++;
+    }
+  });
+  const allowed = getAllowedColumns(
+    board.currentPositions,
+    board.blockedSums,
+    board.mountainShape
+  );
+
+  // What kind of progress do we expect for the next roll.
+  const nextRollExpectedProgress = 1 / 10;
+
+  const expected =
+    // Expected progress
+    nextRollExpectedProgress * (1 - board.bustProb) -
+    // Expected loss
+    progressSoFar * board.bustProb -
+    // A little something to incite finishing when columns are completed.
+    (numFinishedCol / 10) * board.bustProb -
+    // A little something so stop earlier in "must roll" mode.
+    // TODO Do something more intelligent.
+    (board.sameSpace === "nostop" ? progressSoFar * 0.1 * board.bustProb : 0);
+
+  if (expected > 0) {
+    return roll();
+  } else {
+    return stop();
   }
 };
 
@@ -617,5 +839,5 @@ export const game: GameDef<ChickenrollBoard> = {
   boardUpdates,
   gameOptions,
   gamePlayerOptions,
-  // autoMove,
+  autoMove,
 };

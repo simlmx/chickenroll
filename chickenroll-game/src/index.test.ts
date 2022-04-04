@@ -284,3 +284,27 @@ test("when only one step left because of jump, option is split - already climbin
     { diceSums: [3, 3], enabled: [true, true], split: true },
   ]);
 });
+
+const botTestConfigs = [];
+
+for (const numBots of [2, 3, 4, 5]) {
+  for (const mountainShape of ["debug"]) {
+    for (const sameSpace of ["share", "jump", "nostop"]) {
+      for (const showProbs of ["before", "after", "never"]) {
+        botTestConfigs.push([numBots, { mountainShape, sameSpace, showProbs }]);
+      }
+    }
+  }
+}
+
+test.each(botTestConfigs)("bot games %s %s", async (numBots, matchOptions) => {
+  const match = new MatchTester<ChickenrollBoard>({
+    gameDef: game,
+    numPlayers: 0,
+    numBots,
+    matchOptions,
+  });
+
+  await match.waitUntilEnd();
+  expect(match.matchHasEnded).toBe(true);
+});
