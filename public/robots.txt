@@ -1,7 +1,0 @@
-# https://www.robotstxt.org/robotstxt.html
-User-agent: *
-Disallow: /match
-Disallow: /2
-Disallow: /3
-Disallow: /4
-Disallow: /5
