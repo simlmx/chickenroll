@@ -6,10 +6,10 @@
   "meta": {
     "relatedGames": {
       "how": "inspired",
-      "game": "Can't Stop",
+      "games": ["Can't Stop"],
       "link": "https://boardgamegeek.com/boardgame/41/cant-stop"
     },
-    "tagline": "A push-your-luck dice game.",
+    "tagline": "A push-your-luck dice game",
     "description": "Roll your dice to make progress on the board, but don't push your luck too far: you might lose everything! A game where there is a fine line between strategy and luck."
   }
 }
