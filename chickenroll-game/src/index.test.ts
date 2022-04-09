@@ -5,7 +5,7 @@ import {
   game,
   ChickenrollBoard,
   climbOneStep,
-  isCurrentPlayerOverlapping,
+  numCurrentPlayerOverlap,
   roll,
   pick,
   stop,
@@ -38,19 +38,21 @@ test.each([
 );
 
 test.each([
-  [{}, {}, false],
-  [{ 2: 4 }, { 1: { 2: 4 } }, true],
-  [{ 2: 4, 3: 5 }, { 1: { 2: 5 }, 2: { 3: 5 } }, true],
-  [{ 2: 4, 3: 5 }, { 1: { 2: 3 }, 2: { 4: 5 } }, false],
+  [{}, {}, 0],
+  [{ 2: 4 }, { 1: { 2: 4 } }, 1],
+  [{ 2: 4, 3: 5 }, { 1: { 2: 5 }, 2: { 3: 5 } }, 1],
+  [{ 2: 4, 3: 5, 4: 5 }, { 1: { 2: 5 }, 2: { 3: 5, 4: 5 } }, 2],
+  [{ 2: 4, 3: 5, 4: 5 }, { 1: { 2: 5 }, 2: { 3: 5, 4: 5 }, 3: { 3: 5 } }, 2],
+  [{ 2: 4, 3: 5 }, { 1: { 2: 3 }, 2: { 4: 5 } }, 0],
 ])(
-  "test isCurrentPlayerOverlapping %s %s %s",
+  "test numCurrentPlayerOverlap %s %s %s",
   (
     currentPositions: CurrentPositions,
     checkpointPositions: CheckpointPositions,
-    expected: boolean
+    expected: number
   ) => {
     expect(
-      isCurrentPlayerOverlapping(currentPositions, checkpointPositions)
+      numCurrentPlayerOverlap(currentPositions, checkpointPositions)
     ).toEqual(expected);
   }
 );

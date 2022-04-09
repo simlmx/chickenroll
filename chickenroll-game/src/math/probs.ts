@@ -26,7 +26,8 @@ export const diceValues2sums = (diceValues: number[]): Set<number> => {
 export class OddsCalculator {
   numDice: number;
   numSides: number;
-  dice2sums: Dice2sums;
+  // FIXME rename?
+  dice2sums: Set<number>[];
 
   constructor(numDice: number = 4, numSides: number = 6) {
     this.numDice = numDice;
@@ -34,7 +35,7 @@ export class OddsCalculator {
     this.dice2sums = this.buildDice2sums();
   }
 
-  buildDice2sums(): Dice2sums {
+  buildDice2sums(): Set<number>[] {
     const diceSides: number[] = Array(this.numSides)
       .fill(null)
       .map((_, i) => i + 1);
@@ -42,21 +43,18 @@ export class OddsCalculator {
     // All the possibilities of N dice.
     const allDiceValues = cartesian(...Array(this.numDice).fill(diceSides));
 
-    const dice2sums: Dice2sums = {};
-
-    // For each possibilty, we'll find the set of sums of 2 dice that can be made with those dice.
-    allDiceValues.forEach((diceValues) => {
-      dice2sums[diceValues] = diceValues2sums(diceValues);
-    });
-
-    return dice2sums;
+    return allDiceValues.map((diceValues) => diceValues2sums(diceValues));
   }
 
   oddsBust(allowedSums: number[]): number {
+    return 1 - this.oddsNoBust(allowedSums);
+  }
+
+  oddsNoBust(allowedSums: number[]): number {
     const allowedSumsSet = new Set(allowedSums);
 
     let numSuccess = 0;
-    Object.values(this.dice2sums).forEach((sums) => {
+    this.dice2sums.forEach((sums) => {
       for (let sum of sums) {
         if (allowedSumsSet.has(sum)) {
           numSuccess += 1;
@@ -64,7 +62,37 @@ export class OddsCalculator {
         }
       }
     });
-    return 1 - numSuccess / Math.pow(this.numSides, this.numDice);
+    return numSuccess / this.dice2sums.length;
+  }
+
+  /*
+   * Same as `oddsBust` but also provide a list of columns that are forbidden. If a set
+   * of dice lets us move on a forbidden column, that ones counts as a bust.
+   */
+  oddsNeedsForbidden(
+    allowed: number,
+    forbidden: Set<number> = new Set()
+  ): number {
+    let numSuccess = 0;
+
+    this.dice2sums.forEach((sums) => {
+      let foundAllowed = false;
+      let foundForbidden = false;
+
+      for (let sum of sums) {
+        if (forbidden.has(sum)) {
+          foundForbidden = true;
+          break;
+        } else if (allowed === sum) {
+          foundAllowed = true;
+        }
+      }
+
+      if (foundAllowed && !foundForbidden) {
+        numSuccess++;
+      }
+    });
+    return numSuccess / this.dice2sums.length;
   }
 }
 

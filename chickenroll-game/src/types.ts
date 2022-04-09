@@ -2,7 +2,8 @@ export type DiceSum = number;
 
 export type PlayerInfo = {
   color: number;
-  ready: boolean;
+  // Used for bots.
+  strategy?: string;
 };
 
 export type MountainShape = "classic" | "tall" | "debug";

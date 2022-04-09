@@ -30,26 +30,26 @@ test.each([
   [
     2,
     2,
-    {
-      "1,1": new Set([2]),
-      "1,2": new Set([3]),
-      "2,1": new Set([3]),
-      "2,2": new Set([4]),
-    },
+    [
+      new Set([2]),
+      new Set([3]),
+      new Set([3]),
+      new Set([4]),
+    ],
   ],
   [
     3,
     2,
-    {
-      "1,1,1": new Set([2]),
-      "1,1,2": new Set([2, 3]),
-      "1,2,1": new Set([2, 3]),
-      "1,2,2": new Set([3, 4]),
-      "2,1,1": new Set([2, 3]),
-      "2,1,2": new Set([3, 4]),
-      "2,2,1": new Set([3, 4]),
-      "2,2,2": new Set([4]),
-    },
+    [
+      new Set([2]),
+      new Set([2, 3]),
+      new Set([2, 3]),
+      new Set([3, 4]),
+      new Set([2, 3]),
+      new Set([3, 4]),
+      new Set([3, 4]),
+      new Set([4]),
+    ],
   ],
 ])("buildDice2sums %s %s %s", (numDice, numSides, expected) => {
   const dice2sums = new OddsCalculator(numDice, numSides).buildDice2sums();
