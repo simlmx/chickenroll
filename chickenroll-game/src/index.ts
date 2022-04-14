@@ -511,6 +511,14 @@ const initialBoard = ({
 
   const playerOrder = random.shuffled(userIds);
 
+  const strategies: Record<SameSpace, string> = {
+    share:
+      "1.329/1.016/1.39/0.01/1.897/-0.009/9.748/0.145/0.006/0.224/0.481/2.436/2.351/0.062/0.14/0.123/0.225/0.189",
+    jump: "1.329/1.016/1.39/0.01/1.897/-0.009/9.748/0.145/0.006/0.224/0.481/2.436/2.351/0.062/0.14/0.123/0.225/0.189",
+    nostop:
+      "0.178/1.897/-0.409/0.693/2.424/-0.105/12.406/-0.001/0.008/0.279/0.453/3.407/3.153/0.016/0.091/0.02/-0.013/0.163",
+  };
+
   userIds.forEach((userId, i) => {
     scores[userId] = 0;
     checkpointPositions[userId] = {};
@@ -519,9 +527,7 @@ const initialBoard = ({
     const strategy = options?.strategy;
     playerInfos[userId] = {
       color: color === undefined ? i : parseInt(color),
-      strategy:
-        strategy ||
-        "0.83/1.147/3.949/0.03/1.263/0.501/8.803/0.187/0.23/0.383/0.36/4.716/2.851/0.216/0.074/0.091/0.23/2.528",
+      strategy: strategy || strategies[matchOptions.sameSpace],
     };
   });
 
