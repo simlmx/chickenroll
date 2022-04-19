@@ -513,10 +513,10 @@ const initialBoard = ({
 
   const strategies: Record<SameSpace, string> = {
     share:
-      "1.329/1.016/1.39/0.01/1.897/-0.009/9.748/0.145/0.006/0.224/0.481/2.436/2.351/0.062/0.14/0.123/0.225/0.189",
-    jump: "1.329/1.016/1.39/0.01/1.897/-0.009/9.748/0.145/0.006/0.224/0.481/2.436/2.351/0.062/0.14/0.123/0.225/0.189",
+      "17.769/0.03/11.849/0.009/0.837/0.024/11.441/0.011/0.002/0.122/0.244/4.895/2.687/0.732/0.001/0.155/0.003",
+    jump: "100.289/0.829/22.664/0.004/2.116/0.213/17.662/0.078/0.001/0.79/0.276/0.159/9.081/0.091/0.019/0.266/-0.075",
     nostop:
-      "0.178/1.897/-0.409/0.693/2.424/-0.105/12.406/-0.001/0.008/0.279/0.453/3.407/3.153/0.016/0.091/0.02/-0.013/0.163",
+      "24.613/2.384/33.085/0.026/5.329/0.01/45.865/0.001/-0.007/0.305/0.815/5.149/2.816/0.036/1.073/2.142/0.037",
   };
 
   userIds.forEach((userId, i) => {
@@ -914,12 +914,14 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   // and we add a cutoff on it.
 
   let progressSoFar = 0;
+  let progressInSteps = 0;
   let numFinishedCol = 0;
   Object.entries(board.currentPositions).forEach(([col, step]) => {
     const colInt = parseInt(col);
     const numSteps = getNumStepsForSum(colInt, board.mountainShape);
     progressSoFar +=
       (step - (board.checkpointPositions[userId][colInt] || 0)) / numSteps;
+    progressInSteps += step - (board.checkpointPositions[userId][colInt] || 0);
 
     if (step === numSteps) {
       numFinishedCol++;
@@ -990,11 +992,11 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   const linearComb =
     w[0] +
     // Expected progress : probBust * (what we stand to lose) + probNoBust * (what we stand to win)
-    -(w[1] * progressSoFar + w[2] * numFinishedCol) * board.bustProb +
+    -(w[1] * progressSoFar + w[2] * numFinishedCol + w[6] * progressInSteps) *
+      board.bustProb +
     w[3] * (1 - board.bustProb) +
     w[4] * probHasToOverlap2 +
     w[5] * probHasToOverlap3;
-
   if (linearComb > 0) {
     return roll();
   } else {
