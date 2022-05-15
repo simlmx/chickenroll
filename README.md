@@ -1,6 +1,6 @@
 # [Chicken Roll][lff]
 
-Open source web alternative to the classic board game [Can't Stop][wiki].
+Online game inspired from the classic board game [Can't Stop][wiki].
 
 Play it at [`lefun.fun`][lff].
 
