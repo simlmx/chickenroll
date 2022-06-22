@@ -9,7 +9,7 @@ import {
   GamePlayerOptions,
   PlayerOptionType,
   endMatch,
-  pointsToRank,
+  pointsToScores,
   itsYourTurn,
 } from "bgkit";
 
@@ -326,7 +326,7 @@ const moves: Moves<ChickenrollBoard> = {
     },
     *execute({ board }) {
       if (board.stage === "gameover") {
-        yield endMatch({ ranks: pointsToRank(board.scores) });
+        yield endMatch({ scores: pointsToScores(board.scores) });
       } else {
         yield itsYourTurn({ userIds: [board.currentPlayer] });
       }
