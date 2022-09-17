@@ -7,9 +7,24 @@ import { Climber, Mountain } from "./Mountain";
 
 import "./index.scss";
 
+const color = 0;
+
+// RENDU ICI on pourrait peut-etre commiter ce qu'on a 
+// Dans le changelog on pourrait mettre les dates plus petites et avoir juste une grosse table de changelog peut-etre
+// comme si cetait vraiment du continuous delivery
+
+const PossButton = ({sums}: {sums: number[]}) => {
+  return (
+    <button className={`btn btnAction btnPossibilities bgcolor${color}`}>
+      <div className="possNumber">{sums[0]}</div>
+      <div className="possNumberSeparator"></div>
+      <div className="possNumber">{sums[1]}</div>
+    </button>
+  );
+};
+
 const Rules = () => {
   const playerID = "0";
-  const color = 0;
 
   const makeDie = (value: number) => <Die {...{ value, color }} />;
   const dice = [1, 2, 3, 6].map((value) => makeDie(value));
@@ -199,15 +214,19 @@ const Rules = () => {
       <p>
         You can either {actionBtn("Roll")} or {actionBtn("Stop")}. When rolling,
         you try to make your <strong>black eggs</strong> ({runner}) progress.
-        When stopping, you end your turn but keep the progress you made this
-        turn using <strong>colored eggs</strong>{" "}
+        When stopping, you end your turn but keep the progress you made using{" "}
+        <strong>colored eggs</strong>{" "}
         <span style={{ display: "inlineBlock" }}>({token})</span>. You can{" "}
         {actionBtn("Roll")} as many times as you like until you either{" "}
         {actionBtn("Stop")} or {bust}.{" "}
       </p>
       <h3>Roll</h3>
       <p>
-        You roll the four dice {dice} and split them into two pairs of your
+    After rolling the four dice {dice}, you will be presented with different choices of columns to climb.
+    Those correspond to all the possible split in two pairs of dice.
+    <PossButton sums={[3, 9]} />
+
+        Rolling the four dice {dice} will result in different and split them into two pairs of your
         choice (one of {dice[0]}
         {dice[1]}|{dice[2]}
         {dice[3]} or {dice[0]}
