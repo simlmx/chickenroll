@@ -9,7 +9,6 @@ import {
   GamePlayerOptions,
   PlayerOptionType,
   endMatch,
-  pointsToScores,
   itsYourTurn,
 } from "bgkit";
 
@@ -326,7 +325,7 @@ const moves: Moves<ChickenrollBoard> = {
     },
     *execute({ board }) {
       if (board.stage === "gameover") {
-        yield endMatch({ scores: pointsToScores(board.scores) });
+        yield endMatch({ scores: board.scores });
       } else {
         yield itsYourTurn({ userIds: [board.currentPlayer] });
       }
@@ -1032,4 +1031,5 @@ export const game: GameDef<ChickenrollBoard> = {
   gameOptions,
   gamePlayerOptions,
   autoMove,
+  playerScoreType: "integer",
 };
