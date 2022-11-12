@@ -448,7 +448,7 @@ const gameOptions: GameOptions = [
     label: "Egg overlap",
     shortLabel: null,
     options: [
-      { value: "share", label: "Allow", shortLabel: null },
+      { value: "share", label: "Allow", shortLabel: null, default: true },
       { value: "jump", label: "Jump over", shortLabel: "Jump" },
       { value: "nostop", label: "Must roll" },
     ],
@@ -459,7 +459,7 @@ const gameOptions: GameOptions = [
     label: "Column height",
     shortLabel: null,
     options: [
-      { value: "tall", label: "Modern", shortLabel: null },
+      { value: "tall", label: "Modern", shortLabel: null, default: true },
       { value: "classic", label: "Classic" },
     ],
     help: "Height of the columns. Modern is taller and better calibrated than Classic.",
