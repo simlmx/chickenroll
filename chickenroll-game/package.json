@@ -19,7 +19,8 @@
   "author": "Simon Lemieux",
   "license": "ISC",
   "dependencies": {
-    "bgkit": "^1.0.0"
+    "bgkit": "^1.0.0",
+    "bgkit-game": "^1.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.1",

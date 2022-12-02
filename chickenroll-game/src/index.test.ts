@@ -1,4 +1,5 @@
-import { MatchTester, RandomMock, UserId } from "bgkit";
+import { UserId } from "bgkit";
+import { MatchTester, RandomMock } from "bgkit-game";
 
 import { CurrentPositions, CheckpointPositions } from "./types";
 import {

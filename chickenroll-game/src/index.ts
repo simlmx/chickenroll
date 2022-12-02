@@ -1,16 +1,19 @@
 import {
-  createMove,
-  createBoardUpdate,
-  Moves,
-  BoardUpdates,
   GameOptions,
-  GameDef,
   UserId,
   GamePlayerOptions,
   PlayerOptionType,
   endMatch,
   itsYourTurn,
 } from "bgkit";
+
+import {
+  createMove,
+  createBoardUpdate,
+  Moves,
+  BoardUpdates,
+  GameDef,
+} from "bgkit-game";
 
 import {
   getSumOptions,

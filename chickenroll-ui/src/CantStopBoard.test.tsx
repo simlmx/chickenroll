@@ -1,4 +1,5 @@
-import { MatchTester as MatchTesterOrig, UserId } from "bgkit";
+import type { UserId } from "bgkit";
+import { MatchTester as MatchTesterOrig } from "bgkit-game";
 import { render } from "bgkit-ui-testing";
 
 import { game, ChickenrollBoard } from "chickenroll-game";

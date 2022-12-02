@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "bgkit": "^1.0.0",
+    "bgkit-game": "^1.0.0",
     "bgkit-ui": "^1.0.0",
     "bgkit-ui-testing": "^1.0.0",
     "bootstrap": "^4.5.3",
