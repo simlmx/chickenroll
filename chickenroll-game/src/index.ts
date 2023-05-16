@@ -39,7 +39,7 @@ import {
   Stage,
 } from "./types";
 
-import { Action, computeFeatures, OptionCriteria, scoreCriteria } from "./bots";
+import { Action, computeFeatures, Features, scoreFeatures } from "./bots";
 
 import { NUM_STEPS } from "./constants";
 
@@ -493,24 +493,23 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
     });
 
     // Gather some information for each option.
-    const optionCriterias: OptionCriteria[] = actions.map((action) =>
+    const features: Features[] = actions.map((action) =>
       computeFeatures({ board, userId, action, calculator })
     );
 
-    // Now merge everything and sort.
-    const optionsWithCriteria = actions.map((action, i) => ({
-      ...action,
-      // ...optionCriterias[i],
-      score: scoreCriteria(weightsMoving, optionCriterias[i]),
-    }));
-
-    // console.log(optionsWithCriteria);
-
-    const bestOption = optionsWithCriteria.sort((a, b) => b.score - a.score)[0];
+    let bestAction: Action;
+    let bestScore = -Infinity;
+    features.forEach((f, i) => {
+      const score = scoreFeatures(weightsMoving, f);
+      if (score > bestScore) {
+        bestScore = score;
+        bestAction = actions[i];
+      }
+    });
 
     return pick({
-      diceSplitIndex: bestOption.diceSplitIndex,
-      choiceIndex: bestOption.choiceIndex,
+      diceSplitIndex: bestAction.diceSplitIndex,
+      choiceIndex: bestAction.choiceIndex,
     });
   }
 

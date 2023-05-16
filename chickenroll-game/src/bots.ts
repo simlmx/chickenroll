@@ -11,8 +11,8 @@ import { ALL_COLS } from "./constants";
 
 // FIXME ajouter un feature qui est juste un 1.0!
 
-// A list of criteria we are interested in when choosing an option.
-export type OptionCriteria = {
+// A list of features we are interested in when choosing an action.
+export type Features = {
   // How many columns would we finish?
   numFinish: number;
   // Number of new climbers this option will add on the board.
@@ -44,7 +44,7 @@ export type OptionCriteria = {
   even: number;
 };
 
-export const scoreCriteria = (weights: number[], oc: OptionCriteria) => {
+export const scoreFeatures = (weights: number[], oc: Features) => {
   return (
     oc.numFinish * weights[0] -
     oc.climberCost * weights[1] -
@@ -197,7 +197,7 @@ export const computeFeatures = ({
   userId: UserId;
   action: Action;
   calculator: OddsCalculator;
-}): OptionCriteria => {
+}): Features => {
   const { cols } = action;
 
   // * Num of finished columns.
