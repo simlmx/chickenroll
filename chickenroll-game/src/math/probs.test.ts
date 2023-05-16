@@ -27,16 +27,7 @@ test.each([
 });
 
 test.each([
-  [
-    2,
-    2,
-    [
-      new Set([2]),
-      new Set([3]),
-      new Set([3]),
-      new Set([4]),
-    ],
-  ],
+  [2, 2, [new Set([2]), new Set([3]), new Set([3]), new Set([4])]],
   [
     3,
     2,
