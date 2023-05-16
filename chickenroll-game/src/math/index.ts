@@ -1,5 +1,12 @@
 import { UserId } from "bgkit";
-import { DiceSum, MountainShape, SameSpace } from "../types";
+import {
+  DiceSum,
+  MountainShape,
+  SameSpace,
+  SumOption,
+  CurrentPositions,
+  CheckpointPositions,
+} from "../types";
 import { NUM_STEPS } from "../constants";
 
 export const DICE_INDICES = [
@@ -16,16 +23,6 @@ export const DICE_INDICES = [
     [1, 2],
   ],
 ];
-
-// For one split of dices.
-export type SumOption = {
-  // The 2 sums that correspond to the two columns
-  diceSums: [number, number];
-  // Split-case: can we select each of the sum.
-  enabled: [boolean, boolean];
-  // Is it two different options?
-  split: boolean;
-};
 
 /*
  * Given the state of the game, how many spaces are left for player `playerID` on column
@@ -215,3 +212,78 @@ export function getNumStepsForSum(
   }
   return NUM_STEPS[mountainShape][sum];
 }
+
+/*
+ * Compare the current positions with the checkpoint positions to see if anything
+ * overlaps. Useful for the "nostop" mode.
+ */
+export const numCurrentPlayerOverlap = (
+  currentPositions: CurrentPositions,
+  checkpointPositions: CheckpointPositions
+): number => {
+  let numOverlap = 0;
+  for (let [col, step] of Object.entries(currentPositions)) {
+    for (let positions2 of Object.values(checkpointPositions)) {
+      if (positions2[col] === step) {
+        numOverlap++;
+        break;
+      }
+    }
+  }
+  return numOverlap;
+};
+
+/*
+ * When a player climbs a column of 1 step, this function determines where he will land.
+ * This is trivial in "share" mode but not in "jump" mode.
+ */
+export const climbOneStep = (
+  currentPositions: CurrentPositions,
+  checkpointPositions: CheckpointPositions,
+  column: number,
+  userId: UserId,
+  sameSpace: SameSpace
+): number => {
+  let newStep;
+
+  if (currentPositions.hasOwnProperty(column)) {
+    newStep = currentPositions[column] + 1;
+  } else {
+    const playerCheckpoint = checkpointPositions[userId];
+    const checkpoint =
+      playerCheckpoint == null ? 0 : playerCheckpoint[column] || 0;
+    newStep = checkpoint + 1;
+  }
+
+  if (sameSpace === "share" || sameSpace === "nostop") {
+    return newStep;
+  } else if (sameSpace === "jump") {
+    let weJumped = true;
+
+    while (weJumped) {
+      // In jump mode we need to check if another player is at that spot.
+      const newStep2 = newStep;
+      weJumped = Object.entries(checkpointPositions).some(
+        ([otherUserId, playerCheckpointPositions]) => {
+          // Ignore the current player.
+          if (otherUserId === userId) {
+            return false;
+          }
+          // If the step is the same, then we increment the current player's
+          // position.
+          const step = playerCheckpointPositions[column];
+          if (step != null && step === newStep2) {
+            return true;
+          }
+          return false;
+        }
+      );
+      if (weJumped) {
+        newStep++;
+      }
+    }
+    return newStep;
+  } else {
+    throw new Error(`unexpected value for sameSpace: "${sameSpace}"`);
+  }
+};

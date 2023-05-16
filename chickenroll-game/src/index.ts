@@ -18,16 +18,13 @@ import {
 import {
   getSumOptions,
   getNumStepsForSum,
-  SumOption,
   getSpaceLeft,
   DICE_INDICES,
+  numCurrentPlayerOverlap,
+  climbOneStep,
 } from "./math";
 
-import {
-  getAllowedColumns,
-  getOddsCalculator,
-  OddsCalculator,
-} from "./math/probs";
+import { getAllowedColumns, getOddsCalculator } from "./math/probs";
 
 import {
   DiceSum,
@@ -36,7 +33,13 @@ import {
   CurrentPositions,
   CheckpointPositions,
   PlayerInfo,
+  ChickenrollBoard,
+  SumOption,
+  Move,
+  Stage,
 } from "./types";
+
+import { Action, computeFeatures, OptionCriteria, scoreCriteria } from "./bots";
 
 import { NUM_STEPS } from "./constants";
 
@@ -50,78 +53,7 @@ export {
   SameSpace,
   MountainShape,
   PlayerInfo,
-};
-
-const ALL_COLS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-interface Info {
-  // Player that is referred by the message.
-  userId?: UserId;
-  // Here "start" means we'll only write 'it's your turn' to the starting player.
-  code: "bust" | "stop" | "win" | "start";
-  // Timestamp at which we got the info. This is treated as an ID to compare two info.
-  ts: number;
-}
-
-export type Move = {
-  // Values of the 4 dice.
-  diceValues?: number[];
-  //0=horzontal, 1=vertical, 2=diagonal
-  diceSplitIndex?: number;
-  // [0] for the first 2, [1] for the last 2 and [0, 1] for all 4.
-  diceUsed?: number[];
-  // Did we bust on that move?
-  bust?: boolean;
-  // Player who made the move.
-  userId: string;
-};
-
-export type ShowProbsType = "before" | "after" | "never";
-type Stage = "moving" | "rolling" | "gameover";
-
-export type ChickenrollBoard = {
-  diceValues: number[];
-  currentPositions: CurrentPositions;
-  checkpointPositions: CheckpointPositions;
-  diceSumOptions?: SumOption[];
-  lastPickedDiceSumOption?: number[];
-  blockedSums: { [diceSum: number]: UserId };
-  info?: Info;
-  // Number of columns finished for each player.
-  scores: { [userId: number]: number };
-  // By default we'll set the game to the *maximum* number of players, but maybe less
-  // people will join.
-  numPlayers: number;
-  // Number of victories for the current match.
-  currentPlayerHasStarted: boolean;
-  // UserId -> color, etc.
-  playerInfos: Record<UserId, PlayerInfo>;
-  // Number of columns to complete to win.
-  // 2 players: 4
-  // 3 players: 3
-  // 4 players: 3
-  // 5 players: 2
-  numColsToWin: number;
-  // History of all the moves.
-  moveHistory: Move[];
-  showProbs: ShowProbsType;
-  // Probability of busting.
-  bustProb: number;
-  // Probability of busting at the end of the last turn. This is for the 'after' mode of
-  // showing the probabilities.
-  endOfTurnBustProb: number;
-  mountainShape: MountainShape;
-  // What happens when tokens occupy the same spot.
-  sameSpace: SameSpace;
-  // Id of the previous player;
-  previousPlayer?: UserId;
-  // How did the last player finish;
-  lastOutcome: "stop" | "bust";
-
-  stage: Stage;
-  currentPlayer: UserId;
-  currentPlayerIndex: number;
-  playerOrder: UserId[];
+  ChickenrollBoard,
 };
 
 /*
@@ -149,61 +81,6 @@ const updateBustProb = (board: ChickenrollBoard, endOfTurn: boolean): void => {
     board.mountainShape
   );
   board.bustProb = getOddsCalculator().oddsBust(allowedColumns);
-};
-
-/*
- * When a player climbs a column of 1 step, this function determines where he will land.
- * This is trivial in "share" mode but not in "jump" mode.
- */
-export const climbOneStep = (
-  currentPositions: CurrentPositions,
-  checkpointPositions: CheckpointPositions,
-  column: number,
-  userId: UserId,
-  sameSpace: SameSpace
-): number => {
-  let newStep;
-
-  if (currentPositions.hasOwnProperty(column)) {
-    newStep = currentPositions[column] + 1;
-  } else {
-    const playerCheckpoint = checkpointPositions[userId];
-    const checkpoint =
-      playerCheckpoint == null ? 0 : playerCheckpoint[column] || 0;
-    newStep = checkpoint + 1;
-  }
-
-  if (sameSpace === "share" || sameSpace === "nostop") {
-    return newStep;
-  } else if (sameSpace === "jump") {
-    let weJumped = true;
-
-    while (weJumped) {
-      // In jump mode we need to check if another player is at that spot.
-      const newStep2 = newStep;
-      weJumped = Object.entries(checkpointPositions).some(
-        ([otherUserId, playerCheckpointPositions]) => {
-          // Ignore the current player.
-          if (otherUserId === userId) {
-            return false;
-          }
-          // If the step is the same, then we increment the current player's
-          // position.
-          const step = playerCheckpointPositions[column];
-          if (step != null && step === newStep2) {
-            return true;
-          }
-          return false;
-        }
-      );
-      if (weJumped) {
-        newStep++;
-      }
-    }
-    return newStep;
-  } else {
-    throw new Error(`unexpected value for sameSpace: "${sameSpace}"`);
-  }
 };
 
 const endTurn = (board: ChickenrollBoard, outcome: "bust" | "stop"): void => {
@@ -241,24 +118,6 @@ type RolledPayload = {
 export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
 export const [PICKED, picked] = createBoardUpdate("picked");
 export const [STOPPED, stopped] = createBoardUpdate("stopped");
-
-// Compare the current positions with the checkpoint positions to see if anything
-// overlaps. Useful for the "nostop" mode.
-export const numCurrentPlayerOverlap = (
-  currentPositions: CurrentPositions,
-  checkpointPositions: CheckpointPositions
-): number => {
-  let numOverlap = 0;
-  for (let [col, step] of Object.entries(currentPositions)) {
-    for (let positions2 of Object.values(checkpointPositions)) {
-      if (positions2[col] === step) {
-        numOverlap++;
-        break;
-      }
-    }
-  }
-  return numOverlap;
-};
 
 /* Can the current player hit the "Stop" button?
  */
@@ -584,148 +443,21 @@ const initialBoard = ({
   };
 };
 
-// A list of criteria we are interested in when choosing an option.
-type OptionCriteria = {
-  // How many columns would we finish?
-  numFinish: number;
-  // Number of new climbers this option will add on the board.
-  climberCost: number;
-  // Prob of bust for next roll if we choose the option.
-  probBust: number;
-  // How much progress on the board would we make.
-  progress: number;
-  // Average (on the 1 or 2 numbers) of the probability to get those numbers. This is
-  // the same number we use to determine the height of the columns.
-  avgProbCols: number;
-  // Expected final prob if we have climbers if 1 climber left else 0.
-  expectedFinalProb: number;
-
-  // progress times (relative) steps - this means steps higher up are worth more.
-  progressTimesStep: number;
-
-  // number of players over if we choose this option.
-  // This should always be 0 for jump but very useful for must-roll!
-  numOverlap: number;
-  // Number of players ahead of us in the columns for that choice
-  numAhead: number;
-
-  // New columns are even
-  // 0 if not adding any columns
-  // 1 if adding even columns
-  // 0 if adding odd columns
-  // 0.5 if both
-  even: number;
-};
-
-const scoreCriteria = (weights: number[]) => (oc: OptionCriteria) => {
-  return (
-    oc.numFinish * weights[0] -
-    oc.climberCost * weights[1] -
-    oc.probBust * weights[2] +
-    oc.progress * weights[3] +
-    oc.avgProbCols * weights[4] -
-    oc.expectedFinalProb * weights[5] +
-    oc.progressTimesStep * weights[6] +
-    oc.numAhead * weights[7] +
-    oc.numOverlap * weights[8] +
-    oc.even * weights[9]
-  );
-};
-
-// How many columns would we finish if we chose the 2 columns `col`?
-const getFinishCols = ({
-  board,
-  cols,
-}: {
-  board: ChickenrollBoard;
-  cols: number[];
-}): number[] => {
-  // Case where the two numbers are the same.
-  if (cols.length === 2 && cols[0] === cols[1]) {
-    if (
-      getSpaceLeft(
-        board.currentPositions,
-        board.checkpointPositions,
-        board.mountainShape,
-        board.sameSpace,
-        cols[0],
-        board.currentPlayer
-      ) === 2
-    ) {
-      return cols;
-    } else {
-      return [];
-    }
-  }
-
-  const finishedCols = [];
-  for (const col of cols) {
-    if (
-      getSpaceLeft(
-        board.currentPositions,
-        board.checkpointPositions,
-        board.mountainShape,
-        board.sameSpace,
-        col,
-        board.currentPlayer
-      ) === 1
-    ) {
-      finishedCols.push(col);
-    }
-  }
-  return finishedCols;
-};
-
-const getExpectedFinalProb = ({
-  cols,
-  calculator,
-  blockedSums,
-}: {
-  cols: number[];
-  calculator: OddsCalculator;
-  blockedSums: Record<string, string>;
-}) => {
-  // We assume we have 2 number in `cols`.
-  const [a, b] = cols;
-
-  // For each potential 3rd column, compute the probability of busting after we choose
-  // that column.
-  // Then sort in increasing order of bust probability.
-  const thirdColInfo: { col: number; probBust: number }[] = ALL_COLS.filter(
-    (col) => col !== a && col !== b
-  )
-    .filter((col) => !blockedSums[col])
-    .map((col) => ({
-      col,
-      probBust: calculator.oddsBust([a, b, col]),
-    }))
-    .sort((a, b) => a.probBust - b.probBust);
-
-  // We assume that we would choose the 3rd column that gives us the best odds for the
-  // subsequent rolls.
-  // This means that the odds or taking the first "thirdColInfo" are the odds of getting
-  // that value. The odds of taking the second are the odds of being able to take this
-  // one *and not the previous one*, etc.
-  let expectation = 0;
-  const forbidden = new Set<number>();
-  for (const info of thirdColInfo) {
-    const probBest = calculator.oddsNeedsForbidden(info.col, forbidden);
-    expectation += probBest * info.probBust;
-    forbidden.add(info.col);
-  }
-
-  return expectation;
-};
-
 const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   board,
   userId,
   random,
 }) => {
-  // First roll ever.
+  // First roll.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
     return roll();
   }
+
+  // FIXME when everything works then split it in 2
+  // if (board.stage !== "moving") {
+  // We always roll/stop right after we move, so we should only get autoMove for stage="moving".
+  //   throw Error('autoMove should always be calling for stage="moving"');
+  // }
 
   const strategy = board.playerInfos[userId].strategy;
   const weights = strategy.split("/").map((x) => parseFloat(x));
@@ -736,19 +468,13 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   const calculator = getOddsCalculator();
 
   if (board.stage === "moving") {
-    const options: {
-      // arguments for the `pick()` move.
-      diceSplitIndex: number;
-      choiceIndex: number;
-      // data to do some math with
-      cols: number[];
-    }[] = [];
+    const actions: Action[] = [];
 
     board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
       if (sumOption.split) {
         for (const choiceIndex of [0, 1]) {
           if (sumOption.enabled[choiceIndex]) {
-            options.push({
+            actions.push({
               diceSplitIndex,
               choiceIndex,
               cols: [sumOption.diceSums[choiceIndex]],
@@ -757,7 +483,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
         }
       } else {
         if (sumOption.enabled[0]) {
-          options.push({
+          actions.push({
             diceSplitIndex,
             choiceIndex: 0,
             cols: sumOption.diceSums,
@@ -767,130 +493,15 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
     });
 
     // Gather some information for each option.
-    const optionCriterias: OptionCriteria[] = options.map(({ cols }) => {
-      // * Num of finished columns.
-
-      // Subset of `cols` that would be finished.
-      const finishedCols = getFinishCols({ board, cols });
-
-      // console.log("old colset", Object.keys(board.currentPositions));
-      // Build the final set of columns.
-      const colSet = new Set(
-        Object.keys(board.currentPositions).map((col) => parseInt(col))
-      );
-      const newCols = new Set<number>();
-      const numClimbersBefore = colSet.size;
-
-      cols.forEach((col) => {
-        if (!colSet.has(col)) {
-          newCols.add(col);
-          colSet.add(col);
-        }
-      });
-
-      // console.log("added col", newCols);
-      // console.log("final col", colSet);
-
-      let even = 0;
-      let avgProbCols = 0;
-      for (const col of newCols) {
-        if (col % 2 === 0) {
-          even += 1 / newCols.size;
-        }
-        avgProbCols += (1 - calculator.oddsBust([col])) / newCols.size;
-      }
-
-      const climberCost = colSet.size - numClimbersBefore;
-
-      // To get the prob of busting if we choose this option, we need to know how many
-      // columns will be blocked after.
-
-      let allowed: Set<number>; // = new Set(colSet);
-      if (colSet.size === 3) {
-        allowed = new Set(colSet);
-      } else {
-        // In the case where we would still have runners left, only blocked columns are
-        // not allowed.
-        allowed = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-      }
-
-      // Remove finished columns if this option is chosen.
-      for (const col of finishedCols) {
-        allowed.delete(col);
-      }
-
-      for (const col of Object.keys(board.blockedSums)) {
-        allowed.delete(parseInt(col));
-      }
-
-      const probBust = calculator.oddsBust(Array.from(allowed));
-
-      let progress = 0;
-      let progressTimesStep = 0;
-      let numAhead = 0;
-      // Use the current overlap number as the baseline
-      let numOverlap = numCurrentPlayerOverlap(
-        board.currentPositions,
-        board.checkpointPositions
-      );
-      for (const col of cols) {
-        const endsAt = climbOneStep(
-          board.currentPositions,
-          board.checkpointPositions,
-          col,
-          userId,
-          board.sameSpace
-        );
-        const startsAt =
-          board.currentPositions[col] ||
-          board.checkpointPositions[userId][col] ||
-          0;
-
-        const numSteps = getNumStepsForSum(col, board.mountainShape);
-        const colProgress = (endsAt - startsAt) / numSteps;
-
-        progress += colProgress;
-
-        progressTimesStep += (colProgress * endsAt) / numSteps;
-
-        // Check the people ahead
-        for (const checkpoint of Object.values(board.checkpointPositions)) {
-          const step = checkpoint[col] || 0;
-          if (step === endsAt) {
-            numOverlap++;
-          } else if (step > endsAt) {
-            numAhead++;
-          }
-        }
-      }
-      const expectedFinalProb =
-        colSet.size === 2
-          ? getExpectedFinalProb({
-              cols: Array.from(colSet),
-              calculator,
-              blockedSums: board.blockedSums,
-            })
-          : 0;
-
-      return {
-        numFinish: finishedCols.length,
-        climberCost,
-        probBust,
-        progress,
-        avgProbCols,
-        expectedFinalProb,
-        progressTimesStep,
-        numOverlap,
-        numAhead,
-        even,
-      };
-    });
+    const optionCriterias: OptionCriteria[] = actions.map((action) =>
+      computeFeatures({ board, userId, action, calculator })
+    );
 
     // Now merge everything and sort.
-    const optionsWithCriteria = options.map((opt, i) => ({
-      ...opt,
-      ...optionCriterias[i],
-      score: scoreCriteria(weightsMoving)(optionCriterias[i]),
+    const optionsWithCriteria = actions.map((action, i) => ({
+      ...action,
+      // ...optionCriterias[i],
+      score: scoreCriteria(weightsMoving, optionCriterias[i]),
     }));
 
     // console.log(optionsWithCriteria);
@@ -904,10 +515,12 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   }
 
   if (board.bustProb === 0) {
+    // console.error('roll 2')
     return roll();
   }
 
   if (!canStop(board)) {
+    // console.error('roll 3')
     return roll();
   }
 
@@ -938,6 +551,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
 
   // Special case: if we can win by stopping we stop.
   if (numFinishedCol + board.scores[userId] >= board.numColsToWin) {
+    // console.error('stop 4 ')
     return stop();
   }
 
@@ -1000,8 +614,10 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
     w[4] * probHasToOverlap2 +
     w[5] * probHasToOverlap3;
   if (linearComb > 0) {
+    // console.error('roll 5')
     return roll();
   } else {
+    // console.error('stop')
     return stop();
   }
 };
