@@ -1,13 +1,19 @@
 import { UserId } from "bgkit";
-import { ChickenrollBoard } from "./types";
+import { Move as BgkitMove } from "bgkit-game";
+import { ChickenrollBoard, pick, roll, stop } from "./types";
 import {
   getSpaceLeft,
   numCurrentPlayerOverlap,
   climbOneStep,
   getNumStepsForSum,
 } from "./math";
-import { OddsCalculator } from "./math/probs";
+import {
+  OddsCalculator,
+  getOddsCalculator,
+  getAllowedColumns,
+} from "./math/probs";
 import { ALL_COLS } from "./constants";
+import { canStop } from "./utils";
 
 // FIXME ajouter un feature qui est juste un 1.0!
 
@@ -145,9 +151,34 @@ const getExpectedFinalProb = ({
 };
 
 // RENDU ICI
-// idealement faudrait extraire le code qui fait (s,a) => feature_vector du afterstate
-// Ensuite notre job va etre d'apprendre w tel que q(s,a) ~= w * feature_vector
-// autrement dit le value function du afterstate.
+// q(s, a) == v * w (v=features of after state, w=learned weights)
+//
+// 0. on commence avec une policy parametrizee par w0
+// 1. on a un state donne: s
+// 2. on trouve a optimal en trouvant max_a q(s, a)
+// 3. on note ca mais on prend l'action selon e-greedy
+// 4. on note l'action prise (si differente?) et q(s, a)
+// 5. ca nous donne une serie de s0, a0_opt, a0, R0, s1, a1_opt, a1, R1, ...
+// 6. ou plutot
+//    v0_0, (v0_1), ...,v0_n; (parenth'eses = celui choisi)
+//    R0;
+//    v1_0, v1_1, ... (v1_j)...v1_n;
+//    R1;
+//    ...
+//
+//    i.e. * la liste de tous les (after)states possibles des actions (qu'on a besoin pour faire le max)
+//         * celui qui a ete choisi a ce moment-là
+//         * le Reward qu'on a recu
+//
+//    Notre memory replay devient:
+//    v0_1, R0, (v1_0, v1_1, ... v1_n)
+//    v1_j, R1, (v2_0, ..., v2_n)
+//
+//    pour le premier:
+//    Cost = (R0 * max_i(w * v_i_0) - w * v0_1) **2
+//    Et le truc de DQN c'est d'avoir 2 w differents, et le premier on l'update juste une fois de temps en temps
+//    Et meme chose pour le w de notre policy qui joue, on l'update de temps en temps.
+//
 //
 // en d'autres mots
 // 1. func (s, a) => feature_vector
@@ -317,3 +348,176 @@ export const computeFeatures = ({
     even,
   };
 };
+
+export const legacyBot = ({
+  board,
+  userId,
+}: {
+  board: ChickenrollBoard;
+  userId: UserId;
+}): BgkitMove => {
+  const strategy = board.playerInfos[userId].strategy;
+  const weights = strategy.split("/").map((x) => parseFloat(x));
+  const weightsMoving = weights.splice(0, 10);
+  const weightsRolling = weights;
+  // console.log("weights", weightsMoving, weightsRolling);
+
+  const calculator = getOddsCalculator();
+
+  if (board.stage === "moving") {
+    const actions: Action[] = [];
+
+    board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
+      if (sumOption.split) {
+        for (const choiceIndex of [0, 1]) {
+          if (sumOption.enabled[choiceIndex]) {
+            actions.push({
+              diceSplitIndex,
+              choiceIndex,
+              cols: [sumOption.diceSums[choiceIndex]],
+            });
+          }
+        }
+      } else {
+        if (sumOption.enabled[0]) {
+          actions.push({
+            diceSplitIndex,
+            choiceIndex: 0,
+            cols: sumOption.diceSums,
+          });
+        }
+      }
+    });
+
+    // Gather some information for each option.
+    const features: Features[] = actions.map((action) =>
+      computeFeatures({ board, userId, action, calculator })
+    );
+
+    let bestAction: Action;
+    let bestScore = -Infinity;
+    features.forEach((f, i) => {
+      const score = scoreFeatures(weightsMoving, f);
+      if (score > bestScore) {
+        bestScore = score;
+        bestAction = actions[i];
+      }
+    });
+
+    return pick({
+      diceSplitIndex: bestAction.diceSplitIndex,
+      choiceIndex: bestAction.choiceIndex,
+    });
+  }
+
+  if (board.bustProb === 0) {
+    // console.error('roll 2')
+    return roll();
+  }
+
+  if (!canStop(board)) {
+    // console.error('roll 3')
+    return roll();
+  }
+
+  // Here we need to choose between stopping and rolling.
+  // We'll have the same approach where we do a linear combination of some parameters
+  // and we add a cutoff on it.
+
+  let progressSoFar = 0;
+  let progressInSteps = 0;
+  let numFinishedCol = 0;
+  Object.entries(board.currentPositions).forEach(([col, step]) => {
+    const colInt = parseInt(col);
+    const numSteps = getNumStepsForSum(colInt, board.mountainShape);
+    progressSoFar +=
+      (step - (board.checkpointPositions[userId][colInt] || 0)) / numSteps;
+    progressInSteps += step - (board.checkpointPositions[userId][colInt] || 0);
+
+    if (step === numSteps) {
+      numFinishedCol++;
+    }
+  });
+
+  const allowed = getAllowedColumns(
+    board.currentPositions,
+    board.blockedSums,
+    board.mountainShape
+  );
+
+  // Special case: if we can win by stopping we stop.
+  if (numFinishedCol + board.scores[userId] >= board.numColsToWin) {
+    // console.error('stop 4 ')
+    return stop();
+  }
+
+  // Compute the probabily of getting a number that can make us stuck - this is a proxy
+  // to the probability of getting stuck. We do it twice, once if we have 3 climbers and
+  // once if we have 2 climbers (0 otherwise).
+  let probHasToOverlap2 = 0;
+  let probHasToOverlap3 = 0;
+  const numClimbers = Object.keys(board.currentPositions).length;
+  const cols = Object.keys(Object.entries(board.currentPositions)).map((x) =>
+    parseInt(x)
+  );
+  if (numClimbers === 3) {
+    const colsCouldStuck = new Set();
+    for (const [colStr, ourStep] of Object.entries(board.currentPositions)) {
+      const col = parseInt(colStr);
+      // Check if there is someone on the next step.
+      for (const checkpoint of Object.values(board.checkpointPositions)) {
+        if ((checkpoint[colStr] || 0) === ourStep + 1) {
+          colsCouldStuck.add(col);
+          // We found someone, we don't want another one.
+          break;
+        }
+      }
+    }
+    probHasToOverlap3 = calculator.oddsNoBust(colsCouldStuck);
+  } else if (numClimbers === 2) {
+    // Check for all the starting position ones.
+    const colsAtStepOne = new Set<number>();
+    for (const checkpoint of Object.values(board.checkpointPositions)) {
+      for (const [colStr, step] of Object.entries(checkpoint)) {
+        const col = parseInt(colStr);
+        if (
+          // !board.currentPositions[colStr] &&
+          step ===
+          (board.checkpointPositions[userId][colStr] || 0) + 1
+        ) {
+          colsAtStepOne.add(col);
+        }
+      }
+    }
+    probHasToOverlap2 = calculator.oddsNoBust(colsAtStepOne);
+  }
+
+  // console.log("should we roll");
+  // console.log("progressSoFar * board.bustProb", progressSoFar * board.bustProb);
+  // console.log("numFinished * prob", numFinishedCol * board.bustProb);
+  // console.log("probHasToOverlap2", probHasToOverlap2);
+  // console.log("probHasToOverlap3", probHasToOverlap3);
+
+  // Note that we combine progressSoFar with board.probBust, as a measure of "how much
+  // do we stand to lose".
+  const w = weightsRolling;
+  const linearComb =
+    w[0] +
+    // Expected progress : probBust * (what we stand to lose) + probNoBust * (what we stand to win)
+    -(w[1] * progressSoFar + w[2] * numFinishedCol + w[6] * progressInSteps) *
+      board.bustProb +
+    w[3] * (1 - board.bustProb) +
+    w[4] * probHasToOverlap2 +
+    w[5] * probHasToOverlap3;
+  if (linearComb > 0) {
+    // console.error('roll 5')
+    return roll();
+  } else {
+    // console.error('stop')
+    return stop();
+  }
+};
+
+// RENDU ICI
+// faire une fonction newBot qui remplace legacyBot
+// le but c'est de comparer le nouveau truc avec l'ancien!

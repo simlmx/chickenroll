@@ -1,4 +1,7 @@
 import { UserId } from "bgkit";
+
+import { createMove, createBoardUpdate, GameDef } from "bgkit-game";
+
 export type DiceSum = number;
 
 export type PlayerInfo = {
@@ -97,3 +100,34 @@ export type ChickenrollBoard = {
   currentPlayerIndex: number;
   playerOrder: UserId[];
 };
+
+/*
+ * Moves
+ */
+
+export const [ROLL, roll] = createMove("roll");
+export const [STOP, stop] = createMove("stop");
+
+type PickPayload = {
+  diceSplitIndex: number;
+  choiceIndex: number;
+};
+export const [PICK, pick] = createMove<PickPayload>("pick");
+
+export type RolledPayload = {
+  // Dice values we rolled.
+  diceValues: number[];
+  // diceSumOptions after this roll (if any!)
+  diceSumOptions: SumOption[];
+  // The move to add to the history.
+  move: Move;
+  // This we bust on that roll or not.
+  busted: boolean;
+};
+
+/*
+ * Updates
+ */
+export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
+export const [PICKED, picked] = createBoardUpdate("picked");
+export const [STOPPED, stopped] = createBoardUpdate("stopped");
