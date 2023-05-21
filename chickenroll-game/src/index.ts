@@ -37,22 +37,21 @@ import {
   roll,
   rolled,
   STOP,
+  stop,
   STOPPED,
   stopped,
+  pick,
   PICK,
   PICKED,
   picked,
   ROLLED,
   RolledPayload,
+  ShowProbsType,
 } from "./types";
 
-import {
-  Action,
-  computeFeatures,
-  Features,
-  scoreFeatures,
-  legacyBot,
-} from "./bots";
+import { botMove } from "./bots";
+
+import { botMove as newBotMove } from "./bots2";
 
 import { NUM_STEPS } from "./constants";
 
@@ -67,6 +66,13 @@ export {
   MountainShape,
   PlayerInfo,
   ChickenrollBoard,
+  canStop,
+  Move,
+  climbOneStep,
+  roll,
+  stop,
+  pick,
+  ShowProbsType,
 };
 
 /*
@@ -414,19 +420,22 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   board,
   userId,
   random,
-}): BgkitMove => {
+}): BgkitMove | BgkitMove[] => {
   // First roll.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
     return roll();
   }
 
-  return legacyBot({ board, userId });
+  const strategy = board.playerInfos[userId].strategy;
+  if (strategy.startsWith("new:")) {
+    const policy = strategy
+      .substring(4)
+      .split("/")
+      .map((x) => parseFloat(x));
+    return newBotMove({ board, userId, policy });
+  }
 
-  // FIXME when everything works then split it in 2
-  // if (board.stage !== "moving") {
-  // We always roll/stop right after we move, so we should only get autoMove for stage="moving".
-  //   throw Error('autoMove should always be calling for stage="moving"');
-  // }
+  return botMove({ board, userId });
 };
 
 const gamePlayerOptions: GamePlayerOptions = {

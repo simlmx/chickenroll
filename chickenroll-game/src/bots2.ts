@@ -15,56 +15,17 @@ import {
 import { ALL_COLS } from "./constants";
 import { canStop } from "./utils";
 
-// A list of features we are interested in when choosing an action.
-export type Features = {
-  // How many columns would we finish?
-  numFinish: number;
-  // Number of new climbers this option will add on the board.
-  climberCost: number;
-  // Prob of bust for next roll if we choose the option.
-  probBust: number;
-  // How much progress on the board would we make.
-  progress: number;
-  // Average (on the 1 or 2 numbers) of the probability to get those numbers. This is
-  // the same number we use to determine the height of the columns.
-  avgProbCols: number;
-  // Expected final prob if we have climbers if 1 climber left else 0.
-  expectedFinalProb: number;
-
-  // progress times (relative) steps - this means steps higher up are worth more.
-  progressTimesStep: number;
-
-  // number of players over if we choose this option.
-  // This should always be 0 for jump but very useful for must-roll!
-  numOverlap: number;
-  // Number of players ahead of us in the columns for that choice
-  numAhead: number;
-
-  // New columns are even
-  // 0 if not adding any columns
-  // 1 if adding even columns
-  // 0 if adding odd columns
-  // 0.5 if both
-  even: number;
-};
-
-export const scoreFeatures = (weights: number[], oc: Features) => {
-  return (
-    oc.numFinish * weights[0] -
-    oc.climberCost * weights[1] -
-    oc.probBust * weights[2] +
-    oc.progress * weights[3] +
-    oc.avgProbCols * weights[4] -
-    oc.expectedFinalProb * weights[5] +
-    oc.progressTimesStep * weights[6] +
-    oc.numAhead * weights[7] +
-    oc.numOverlap * weights[8] +
-    oc.even * weights[9]
-  );
+const dot = (a: number[], b: number[]): number => {
+  if (a.length !== b.length) {
+    throw new Error(
+      `arrays must have same length (${a.length} != ${b.length})`
+    );
+  }
+  return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
 };
 
 // How many columns would we finish if we choose the 2 columns `col`?
-const getFinishCols = ({
+const _getFinishCols = ({
   board,
   cols,
 }: {
@@ -208,7 +169,7 @@ const getExpectedFinalProb = ({
 //
 //
 
-export type Action = {
+type _PickAction = {
   // arguments for the `pick()` move.
   diceSplitIndex: number;
   choiceIndex: number;
@@ -216,7 +177,105 @@ export type Action = {
   cols: number[];
 };
 
-export const computeFeatures = ({
+type _RollOrStopAction = {
+  roll: boolean;
+};
+/*
+ * Here an action is defined as picking an option + rolling or stopping.
+ */
+export type Action = _PickAction & _RollOrStopAction;
+
+/*
+ * Return the possible actions for the current player.
+ */
+const _getPickActions = (board: ChickenrollBoard): _PickAction[] => {
+  const actions: _PickAction[] = [];
+
+  board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
+    if (sumOption.split) {
+      for (const choiceIndex of [0, 1]) {
+        if (sumOption.enabled[choiceIndex]) {
+          actions.push({
+            diceSplitIndex,
+            choiceIndex,
+            cols: [sumOption.diceSums[choiceIndex]],
+          });
+        }
+      }
+    } else {
+      if (sumOption.enabled[0]) {
+        actions.push({
+          diceSplitIndex,
+          choiceIndex: 0,
+          cols: sumOption.diceSums,
+        });
+      }
+    }
+  });
+
+  return actions;
+};
+
+const getActions = (board: ChickenrollBoard): Action[] => {
+  const pickActions = _getPickActions(board);
+  const actions: Action[] = [];
+  for (const pickAction of pickActions) {
+    // We can always keep rolling.
+    actions.push({ ...pickAction, roll: true });
+    // But can we also stop!
+    if (canStopAfterPick({ board, pickAction })) {
+      actions.push({ ...pickAction, roll: false });
+    }
+  }
+  return actions;
+};
+
+/*
+ * Willl we be able to stop after a given "pick" action.
+ */
+const canStopAfterPick = ({
+  board,
+  pickAction,
+}: {
+  board: ChickenrollBoard;
+  pickAction: _PickAction;
+}): boolean => {
+  const { cols } = pickAction;
+  const currentPositions = _getNewCurrentPositions({ board, cols });
+
+  return (
+    board.sameSpace !== "nostop" ||
+    numCurrentPlayerOverlap(currentPositions, board.checkpointPositions) == 0
+  );
+};
+
+/*
+ * What will be the new CurrentPosition if the current player climbs on the 2 columns in `col`.
+ */
+const _getNewCurrentPositions = ({
+  board,
+  cols,
+}: {
+  board: ChickenrollBoard;
+  cols: number[];
+}): CurrentPositions => {
+  const userId = board.currentPlayer;
+
+  const out: CurrentPositions = Object.assign({}, board.currentPositions);
+  for (const col of cols) {
+    out[col] = climbOneStep(
+      board.currentPositions,
+      board.checkpointPositions,
+      col,
+      userId,
+      board.sameSpace
+    );
+  }
+
+  return out;
+};
+
+const computeFeatures = ({
   board,
   userId,
   action,
@@ -226,13 +285,13 @@ export const computeFeatures = ({
   userId: UserId;
   action: Action;
   calculator: OddsCalculator;
-}): Features => {
+}): number[] => {
   const { cols } = action;
 
   // * Num of finished columns.
 
   // Subset of `cols` that would be finished.
-  const finishedCols = getFinishCols({ board, cols });
+  const finishedCols = _getFinishCols({ board, cols });
 
   // console.log("old colset", Object.keys(board.currentPositions));
   // Build the final set of columns.
@@ -272,7 +331,7 @@ export const computeFeatures = ({
   } else {
     // In the case where we would still have runners left, only blocked columns are
     // not allowed.
-    allowed = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    allowed = new Set(ALL_COLS);
   }
 
   // Remove finished columns if this option is chosen.
@@ -294,6 +353,7 @@ export const computeFeatures = ({
     board.currentPositions,
     board.checkpointPositions
   );
+
   for (const col of cols) {
     const endsAt = climbOneStep(
       board.currentPositions,
@@ -324,6 +384,7 @@ export const computeFeatures = ({
       }
     }
   }
+
   const expectedFinalProb =
     colSet.size === 2
       ? getExpectedFinalProb({
@@ -333,117 +394,18 @@ export const computeFeatures = ({
         })
       : 0;
 
-  return {
-    numFinish: finishedCols.length,
-    climberCost,
-    probBust,
-    progress,
-    avgProbCols,
-    expectedFinalProb,
-    progressTimesStep,
-    numOverlap,
-    numAhead,
-    even,
-  };
-};
-
-export const botMove = ({
-  board,
-  userId,
-}: {
-  board: ChickenrollBoard;
-  userId: UserId;
-}): BgkitMove => {
-  const strategy = board.playerInfos[userId].strategy;
-  const weights = strategy.split("/").map((x) => parseFloat(x));
-  const weightsMoving = weights.splice(0, 10);
-  const weightsRolling = weights;
-  // console.log("weights", weightsMoving, weightsRolling);
-
-  const calculator = getOddsCalculator();
-
-  if (board.stage === "moving") {
-    const actions = getActions(board);
-
-    // Gather some information for each option.
-    const features: Features[] = actions.map((action) =>
-      computeFeatures({ board, userId, action, calculator })
-    );
-
-    // console.log(features)
-    // console.log(weightsMoving);
-
-    let bestAction: Action;
-    let bestScore = -Infinity;
-    features.forEach((f, i) => {
-      const score = scoreFeatures(weightsMoving, f);
-      if (score > bestScore) {
-        bestScore = score;
-        bestAction = actions[i];
-      }
-    });
-
-    // console.log(bestAction);
-
-    return pick({
-      diceSplitIndex: bestAction.diceSplitIndex,
-      choiceIndex: bestAction.choiceIndex,
-    });
-  }
-
-  if (board.bustProb === 0) {
-    // console.error('roll 2')
-    return roll();
-  }
-
-  if (!canStop(board)) {
-    // console.error('roll 3')
-    return roll();
-  }
-
-  // Here we need to choose between stopping and rolling.
-  // We'll have the same approach where we do a linear combination of some parameters
-  // and we add a cutoff on it.
-
-  let progressSoFar = 0;
-  let progressInSteps = 0;
-  let numFinishedCol = 0;
-  Object.entries(board.currentPositions).forEach(([col, step]) => {
-    const colInt = parseInt(col);
-    const numSteps = getNumStepsForSum(colInt, board.mountainShape);
-    progressSoFar +=
-      (step - (board.checkpointPositions[userId][colInt] || 0)) / numSteps;
-    progressInSteps += step - (board.checkpointPositions[userId][colInt] || 0);
-
-    if (step === numSteps) {
-      numFinishedCol++;
-    }
+  // Added because it was in the features for the roll/stop in the legacy version.
+  const newClimberPositions: CurrentPositions = _getNewCurrentPositions({
+    board,
+    cols,
   });
 
-  const allowed = getAllowedColumns(
-    board.currentPositions,
-    board.blockedSums,
-    board.mountainShape
-  );
-
-  // Special case: if we can win by stopping we stop.
-  if (numFinishedCol + board.scores[userId] >= board.numColsToWin) {
-    // console.error('stop 4 ')
-    return stop();
-  }
-
-  // Compute the probabily of getting a number that can make us stuck - this is a proxy
-  // to the probability of getting stuck. We do it twice, once if we have 3 climbers and
-  // once if we have 2 climbers (0 otherwise).
   let probHasToOverlap2 = 0;
   let probHasToOverlap3 = 0;
-  const numClimbers = Object.keys(board.currentPositions).length;
-  const cols = Object.keys(Object.entries(board.currentPositions)).map((x) =>
-    parseInt(x)
-  );
+  const numClimbers = Object.keys(newClimberPositions).length;
   if (numClimbers === 3) {
-    const colsCouldStuck = new Set();
-    for (const [colStr, ourStep] of Object.entries(board.currentPositions)) {
+    const colsCouldStuck = new Set<number>();
+    for (const [colStr, ourStep] of Object.entries(newClimberPositions)) {
       const col = parseInt(colStr);
       // Check if there is someone on the next step.
       for (const checkpoint of Object.values(board.checkpointPositions)) {
@@ -454,11 +416,11 @@ export const botMove = ({
         }
       }
     }
-    probHasToOverlap3 = calculator.oddsNoBust(colsCouldStuck);
+    probHasToOverlap3 = calculator.oddsNoBust(Array.from(colsCouldStuck));
   } else if (numClimbers === 2) {
     // Check for all the starting position ones.
     const colsAtStepOne = new Set<number>();
-    for (const checkpoint of Object.values(board.checkpointPositions)) {
+    for (const checkpoint of Object.values(newClimberPositions)) {
       for (const [colStr, step] of Object.entries(checkpoint)) {
         const col = parseInt(colStr);
         if (
@@ -470,62 +432,79 @@ export const botMove = ({
         }
       }
     }
-    probHasToOverlap2 = calculator.oddsNoBust(colsAtStepOne);
-  }
-
-  // console.log("should we roll");
-  // console.log("progressSoFar * board.bustProb", progressSoFar * board.bustProb);
-  // console.log("numFinished * prob", numFinishedCol * board.bustProb);
-  // console.log("probHasToOverlap2", probHasToOverlap2);
-  // console.log("probHasToOverlap3", probHasToOverlap3);
-
-  // Note that we combine progressSoFar with board.probBust, as a measure of "how much
-  // do we stand to lose".
-  const w = weightsRolling;
-  const linearComb =
-    w[0] +
-    // Expected progress : probBust * (what we stand to lose) + probNoBust * (what we stand to win)
-    -(w[1] * progressSoFar + w[2] * numFinishedCol + w[6] * progressInSteps) *
-      board.bustProb +
-    w[3] * (1 - board.bustProb) +
-    w[4] * probHasToOverlap2 +
-    w[5] * probHasToOverlap3;
-  if (linearComb > 0) {
-    // console.error('roll 5')
-    return roll();
+    probHasToOverlap2 = calculator.oddsNoBust(Array.from(colsAtStepOne));
   } else {
-    // console.error('stop')
-    return stop();
+    if (numClimbers != 1) {
+      throw Error(`wrong num climbers ${numClimbers}1`);
+    }
   }
+
+  return [
+    finishedCols.length,
+    climberCost,
+    probBust,
+    progress,
+    avgProbCols,
+    expectedFinalProb,
+    progressTimesStep,
+    numOverlap,
+    numAhead,
+    even,
+    probHasToOverlap2,
+    probHasToOverlap3,
+  ];
 };
 
-/*
- * Return the possible actions for the current player.
- */
-const getActions = (board: ChickenrollBoard) => {
-  const actions: Action[] = [];
-
-  board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
-    if (sumOption.split) {
-      for (const choiceIndex of [0, 1]) {
-        if (sumOption.enabled[choiceIndex]) {
-          actions.push({
-            diceSplitIndex,
-            choiceIndex,
-            cols: [sumOption.diceSums[choiceIndex]],
-          });
-        }
-      }
-    } else {
-      if (sumOption.enabled[0]) {
-        actions.push({
-          diceSplitIndex,
-          choiceIndex: 0,
-          cols: sumOption.diceSums,
-        });
-      }
+const findBestFeatures = (features: number[][], weights: number[]): number => {
+  let bestFeatureIdx: number;
+  let bestScore = -Infinity;
+  features.forEach((f, i) => {
+    const score = dot(weights, f);
+    if (score > bestScore) {
+      bestScore = score;
+      bestFeatureIdx = i;
     }
   });
+  return bestFeatureIdx;
+};
 
-  return actions;
+export const botMove = ({
+  board,
+  userId,
+  policy,
+}: {
+  board: ChickenrollBoard;
+  userId: UserId;
+  policy: number[];
+}): BgkitMove | BgkitMove[] => {
+  // console.log('moving')
+  // console.log(board);
+  if (board.stage !== "moving") {
+    // console.log('return roll')
+    return roll();
+    // We always roll/stop right after we move, so we should only get autoMove for stage="moving".
+    // throw Error('autoMove should always be calling for stage="moving"');
+  }
+
+  const calculator = getOddsCalculator();
+
+  const actions = getActions(board);
+
+  // Gather some information for each option.
+  const features = actions.map((action) =>
+    computeFeatures({ board, userId, action, calculator })
+  );
+
+  const bestActionIdx = findBestFeatures(features, policy);
+  // console.log(bestActionIdx);
+  const bestAction = actions[bestActionIdx];
+
+  const out = [
+    pick({
+      diceSplitIndex: bestAction.diceSplitIndex,
+      choiceIndex: bestAction.choiceIndex,
+    }),
+    bestAction.roll ? roll() : stop(),
+  ];
+  return out;
 };
