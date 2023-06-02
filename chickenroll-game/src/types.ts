@@ -69,7 +69,7 @@ export type ChickenrollBoard = {
   // By default we'll set the game to the *maximum* number of players, but maybe less
   // people will join.
   numPlayers: number;
-  // Number of victories for the current match.
+  
   currentPlayerHasStarted: boolean;
   // UserId -> color, etc.
   playerInfos: Record<UserId, PlayerInfo>;
@@ -99,6 +99,9 @@ export type ChickenrollBoard = {
   currentPlayer: UserId;
   currentPlayerIndex: number;
   playerOrder: UserId[];
+
+  // Number of rolls per turn.
+  numRollsThisTurn: number;
 };
 
 /*
@@ -131,3 +134,17 @@ export type RolledPayload = {
 export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
 export const [PICKED, picked] = createBoardUpdate("picked");
 export const [STOPPED, stopped] = createBoardUpdate("stopped");
+
+/*
+ * Bot training
+ */
+
+export type MoveInfo = {
+  // Who does the action.
+  userId: UserId;
+  // All the vectors for all their possible actions.
+  actionFeatures: number[][];
+  // The action they chose.
+  chosenAction: number;
+}
+

@@ -1,6 +1,14 @@
 import { UserId } from "bgkit";
 import { Move as BgkitMove } from "bgkit-game";
-import { ChickenrollBoard, pick, roll, stop, CurrentPositions } from "./types";
+import {
+  ChickenrollBoard,
+  pick,
+  roll,
+  stop,
+  CurrentPositions,
+  MoveInfo,
+} from "./types";
+
 import {
   getSpaceLeft,
   numCurrentPlayerOverlap,
@@ -21,7 +29,7 @@ const dot = (a: number[], b: number[]): number => {
       `arrays must have same length (${a.length} != ${b.length})`
     );
   }
-  return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
+  return a.map((_, i) => a[i] * b[i]).reduce((m, n) => m + n);
 };
 
 // How many columns would we finish if we choose the 2 columns `col`?
@@ -245,7 +253,7 @@ const canStopAfterPick = ({
 
   return (
     board.sameSpace !== "nostop" ||
-    numCurrentPlayerOverlap(currentPositions, board.checkpointPositions) == 0
+    numCurrentPlayerOverlap(currentPositions, board.checkpointPositions) === 0
   );
 };
 
@@ -264,7 +272,7 @@ const _getNewCurrentPositions = ({
   const out: CurrentPositions = Object.assign({}, board.currentPositions);
   for (const col of cols) {
     out[col] = climbOneStep(
-      board.currentPositions,
+      out,
       board.checkpointPositions,
       col,
       userId,
@@ -286,14 +294,15 @@ const computeFeatures = ({
   action: Action;
   calculator: OddsCalculator;
 }): number[] => {
-  const { cols } = action;
+  // console.log('compute feature for')
+  // console.log(action);
+  const { cols, roll } = action;
 
   // * Num of finished columns.
 
   // Subset of `cols` that would be finished.
   const finishedCols = _getFinishCols({ board, cols });
 
-  // console.log("old colset", Object.keys(board.currentPositions));
   // Build the final set of columns.
   const colSet = new Set(
     Object.keys(board.currentPositions).map((col) => parseInt(col))
@@ -307,9 +316,6 @@ const computeFeatures = ({
       colSet.add(col);
     }
   });
-
-  // console.log("added col", newCols);
-  // console.log("final col", colSet);
 
   let even = 0;
   let avgProbCols = 0;
@@ -435,11 +441,13 @@ const computeFeatures = ({
     probHasToOverlap2 = calculator.oddsNoBust(Array.from(colsAtStepOne));
   } else {
     if (numClimbers != 1) {
-      throw Error(`wrong num climbers ${numClimbers}1`);
+      throw Error(`wrong num climbers ${numClimbers}`);
     }
   }
 
-  return [
+  const oneIfRoll = roll ? 1 : 0;
+  const oneIfStop = 1 - oneIfRoll;
+  const out = [
     finishedCols.length,
     climberCost,
     probBust,
@@ -450,61 +458,217 @@ const computeFeatures = ({
     numOverlap,
     numAhead,
     even,
-    probHasToOverlap2,
-    probHasToOverlap3,
+    oneIfRoll,
+    // Some features to be able to recreate the previous bots when choosing roll/stop.
+    oneIfStop * finishedCols.length,
+    oneIfStop * progress * probBust,
+    oneIfStop * finishedCols.length * probBust,
+    oneIfStop * progressTimesStep * probBust,
+    oneIfStop * probHasToOverlap2,
+    oneIfStop * probHasToOverlap3,
   ];
+
+  /*
+  {
+    const featureNames = [
+      "num finishedCols",
+      "climberCost",
+      "probBust",
+      "progress",
+      "avProbCols",
+      "expectedFinalPRob",
+      "progressTimeStep",
+      "numOverlap",
+      "numAhead",
+      "even",
+      "oneIfRoll",
+      "stop num finished",
+      "stop progress * prob_bust",
+      "stop num finished * prob_bust",
+      "stop progress_time_Step * prob_bust",
+      "stop probHasToOverlap2",
+      "stop probHasToOverlap3",
+    ];
+
+    if (featureNames.length != out.length) {
+      throw new Error("length feature names does not match");
+    }
+    for (let i = 0; i < featureNames.length; ++i) {
+      console.log(`${featureNames[i]}   : ${out[i]}`);
+    }
+  }
+  */
+
+  return out;
+
+  // return [
+  //   finishedCols.length,
+  //   climberCost,
+  //   probBust,
+  //   progress,
+  //   avgProbCols,
+  //   expectedFinalProb,
+  //   progressTimesStep,
+  //   numOverlap,
+  //   numAhead,
+  //   even,
+  //   probHasToOverlap2,
+  //   probHasToOverlap3,
+  //   roll ? 1 : 0,
+  // Some features to be able to recreate the previous bots when choosing roll/stop.
+  //   progress * probBust,
+  //   finishedCols.length * probBust,
+  //   progressTimesStep * probBust,
+  // ];
 };
 
-const findBestFeatures = (features: number[][], weights: number[]): number => {
-  let bestFeatureIdx: number;
-  let bestScore = -Infinity;
-  features.forEach((f, i) => {
-    const score = dot(weights, f);
-    if (score > bestScore) {
-      bestScore = score;
-      bestFeatureIdx = i;
+const argMax = (arr: number[]): number => {
+  // FIXME
+  let idx = 0;
+  let max = -Infinity;
+  for (let i=0; i < arr.length; ++i) {
+    const value = arr[i];
+    if (value > max) {
+      max = value;
+      idx = i;
     }
-  });
-  return bestFeatureIdx;
+  }
+
+  return idx;
+}
+
+// https://stackoverflow.com/a/28933315/1067132
+const getRandomIndex = (weights: number[]): number => {
+  const num = Math.random();
+  let s = 0;
+  const lastIndex = weights.length - 1;
+
+  for (let i = 0; i < lastIndex; ++i) {
+    s += weights[i];
+    if (num < s) {
+      return i;
+    }
+  }
+
+  if (s > 1) {
+    throw new Error("weights sum to greater than 1");
+  }
+
+  return lastIndex;
+};
+
+const getProbs = (features: number[][], weights: number[]): number[] => {
+  const exps: number[] = [];
+  for (let i = 0; i < features.length; ++i) {
+    let dotp = 0;
+    for (let j = 0; j < weights.length; ++j) {
+      dotp += features[i][j] * weights[j];
+    }
+    exps.push(Math.exp(dotp));
+  }
+
+  const sum_ = exps.reduce((a, b) => a + b);
+
+  return exps.map((x) => x / sum_);
+};
+
+// const findBestFeatures = (features: number[][], weights: number[]): number => {
+//   let bestFeatureIdx: number;
+//   let bestScore = -Infinity;
+// console.log('weights')
+// console.log(weights)
+//   features.forEach((f, i) => {
+// console.log('feature', i)
+//     const score = dot(weights, f);
+// console.log(f)
+//     if (score > bestScore) {
+//       console.log("best score", score);
+//       console.log("at", i);
+//       bestScore = score;
+//       bestFeatureIdx = i;
+//     }
+//   });
+//   return bestFeatureIdx;
+// };
+
+const argSample = <T>(arr: T[]): number => {
+  const len = arr == null ? 0 : arr.length;
+  return len ? Math.floor(Math.random() * len) : undefined;
 };
 
 export const botMove = ({
   board,
   userId,
   policy,
+  stochastic,
 }: {
   board: ChickenrollBoard;
   userId: UserId;
   policy: number[];
-}): BgkitMove | BgkitMove[] => {
-  // console.log('moving')
-  // console.log(board);
+  stochastic: boolean;
+}): { moves: BgkitMove[]; moveInfo: MoveInfo | null } => {
   if (board.stage !== "moving") {
-    // console.log('return roll')
-    return roll();
+    return { moves: [roll()], moveInfo: null };
     // We always roll/stop right after we move, so we should only get autoMove for stage="moving".
     // throw Error('autoMove should always be calling for stage="moving"');
   }
 
+  // The first element of `policy` is the epsilon for the epsilon-greedy algorithm.
+  // let epsilon: number;
+  // [epsilon, ...policy] = policy;
+
+  // if (epsilon > 1.0 || epsilon < 0.0) {
+  //   throw new Error(`weird epsilon ${epsilon}`);
+  // }
+
   const calculator = getOddsCalculator();
 
   const actions = getActions(board);
+  // console.log("possibl actions");
+  // console.log(actions);
 
   // Gather some information for each option.
   const features = actions.map((action) =>
     computeFeatures({ board, userId, action, calculator })
   );
 
-  const bestActionIdx = findBestFeatures(features, policy);
-  // console.log(bestActionIdx);
-  const bestAction = actions[bestActionIdx];
+  // console.log("features");
+  // console.log(features);
 
-  const out = [
-    pick({
-      diceSplitIndex: bestAction.diceSplitIndex,
-      choiceIndex: bestAction.choiceIndex,
-    }),
-    bestAction.roll ? roll() : stop(),
-  ];
-  return out;
+  // console.log('policy')
+  // console.log(policy)
+
+  let bestActionIdx: number;
+
+  // if (epsilon > 0 && Math.random() < epsilon) {
+  //   bestActionIdx = argSample(actions);
+  // } else {
+  // bestActionIdx = findBestFeatures(features, policy);
+  const probs = getProbs(features, policy);
+  // console.log('probs', probs)
+  if (stochastic) {
+    bestActionIdx = getRandomIndex(probs);
+  } else {
+    bestActionIdx = argMax(probs);
+  }
+  // console.log("bestaction", bestActionIdx);
+  // }
+
+  // FIXME FIXME
+  const bestAction = actions[bestActionIdx] || actions[0];
+
+  return {
+    moves: [
+      pick({
+        diceSplitIndex: bestAction.diceSplitIndex,
+        choiceIndex: bestAction.choiceIndex,
+      }),
+      bestAction.roll ? roll() : stop(),
+    ],
+    moveInfo: {
+      userId,
+      actionFeatures: features,
+      chosenAction: bestActionIdx,
+    },
+  };
 };

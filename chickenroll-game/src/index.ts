@@ -47,13 +47,14 @@ import {
   ROLLED,
   RolledPayload,
   ShowProbsType,
+  MoveInfo,
 } from "./types";
 
 import { botMove } from "./bots";
 
 import { botMove as newBotMove } from "./bots2";
 
-import { NUM_STEPS } from "./constants";
+import { NUM_STEPS, ALL_COLS } from "./constants";
 
 // Imports that should also be exported.
 export {
@@ -74,6 +75,11 @@ export {
   pick,
   ShowProbsType,
 };
+
+// const STEP_REWARD = 0.0;
+// const COL_REWARD = 1.0;
+// const NO_COL_REWARD = -0.1;
+const WIN_REWARD = 1.0;
 
 /*
  * Return the last move in the history of moves.
@@ -162,6 +168,7 @@ const moves: Moves<ChickenrollBoard> = {
       if (board.stage === "gameover") {
         yield endMatch({ scores: board.scores });
       } else {
+        // The `stopped()` update has changed the currentPlayer.
         yield itsYourTurn({ userIds: [board.currentPlayer] });
       }
     },
@@ -171,9 +178,10 @@ const moves: Moves<ChickenrollBoard> = {
       // FIXME Also check that we can choose *that* move option
       return board.currentPlayer === userId && board.stage === "moving";
     },
-    *executeNow({ payload }) {
+    *executeNow({ payload, userId }) {
       // Simply forward the payload from the move.
       yield picked(payload);
+      console.log(JSON.stringify({ userId, reward: 0, isFinal: false }));
     },
   },
 };
@@ -186,10 +194,17 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
     board.lastPickedDiceSumOption = undefined;
     board.diceSumOptions = diceSumOptions;
 
+    if (!board.currentPlayerHasStarted) {
+      board.numRollsThisTurn = 1;
+    } else {
+      board.numRollsThisTurn++;
+    }
+
     if (busted) {
+      const userId = board.currentPlayer;
       board.info = {
         code: "bust",
-        userId: board.currentPlayer,
+        userId,
         ts: new Date().getTime(),
       };
       endTurn(board, "bust");
@@ -199,43 +214,81 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
       gotoStage(board, "moving");
     }
 
+
     board.moveHistory.push(move);
   },
   [STOPPED]: (board) => {
+    const userId = board.currentPlayer;
     board.lastPickedDiceSumOption = undefined;
     board.diceSumOptions = undefined;
+    // let reward = 0;
+    let isFinal = false;
     // Save current positions as checkpoints.
     Object.entries(board.currentPositions).forEach(([diceSumStr, step]) => {
       const diceSum = parseInt(diceSumStr);
-      board.checkpointPositions[board.currentPlayer][diceSum] = step;
+
+      // Compute reward for steps in col.
+      // {
+      //   const diff = step - (board.checkpointPositions[userId][diceSum] || 0);
+      //   reward +=
+      //     (diff / getNumStepsForSum(diceSum, board.mountainShape)) *
+      //     STEP_REWARD;
+      // }
+
+      board.checkpointPositions[userId][diceSum] = step;
       if (step === getNumStepsForSum(diceSum, board.mountainShape)) {
-        board.blockedSums[diceSum] = board.currentPlayer;
-        board.scores[board.currentPlayer] += 1;
+        board.blockedSums[diceSum] = userId;
+        board.scores[userId] += 1;
         // Remove all the checkpoints for that one
         for (const userId of Object.keys(board.playerInfos)) {
           delete board.checkpointPositions[userId][diceSum];
         }
+
+        // reward += COL_REWARD;
       }
     });
 
+    // if (reward === 0) {
+    // reward = NO_COL_REWARD;
+    // }
+
     // Check if we should end the game,
-    if (board.scores[board.currentPlayer] >= board.numColsToWin) {
+    if (board.scores[userId] >= board.numColsToWin) {
       // Clean the board a bit.
       board.currentPositions = {};
       board.info = {
         code: "win",
-        userId: board.currentPlayer,
+        userId,
         ts: new Date().getTime(),
       };
+
+      // reward += WIN_REWARD;
+      isFinal = true;
+
       gotoStage(board, "gameover");
     } else {
       board.info = {
         code: "stop",
-        userId: board.currentPlayer,
+        userId,
         ts: new Date().getTime(),
       };
-
       endTurn(board, "stop");
+    }
+
+    if (isFinal) {
+      console.log(JSON.stringify({ userId, reward: WIN_REWARD, isFinal }));
+      for (const otherUser of board.playerOrder) {
+        if (otherUser === userId) {
+          continue;
+        }
+        console.log(
+          JSON.stringify({
+            userId: otherUser,
+            reward: -WIN_REWARD,
+            isFinal: true,
+          })
+        );
+      }
     }
   },
   [PICKED]: (board, payload) => {
@@ -350,7 +403,8 @@ const initialBoard = ({
       "17.769/0.03/11.849/0.009/0.837/0.024/11.441/0.011/0.002/0.122/0.22/4.895/2.687/0.732/0.001/0.155/0.003",
     jump: "100.289/0.829/22.664/0.004/2.116/0.213/17.662/0.078/0.001/0.79/0.23/0.159/9.081/0.091/0.019/0.266/-0.075",
     nostop:
-      "24.613/2.384/33.085/0.026/5.329/0.01/45.865/0.001/-0.007/0.305/0.805/5.149/2.816/0.036/1.073/2.142/0.037",
+      // "24.613/2.384/33.085/0.026/5.329/0.01/45.865/0.001/-0.007/0.305/0.805/5.149/2.816/0.036/1.073/2.142/0.037",
+      "new2:-1.0845624067750548/-3.0138014748575697/-2.047797052250959/1.8464962600304207/1.2230326518001258/0.3920512967119147/2.397562853027784/0.045666174067959364/-0.27233397161434875/5.908527821833382/2.8817755106405154/7.529325231982538/1.175456200168667/2.076535768072077/0.716574522741395/0.0/0.123049123102464340.661689305305481",
   };
 
   userIds.forEach((userId, i) => {
@@ -413,6 +467,7 @@ const initialBoard = ({
     currentPlayer: playerOrder[0],
     stage: "rolling",
     playerOrder,
+    numRollsThisTurn: 0,
   };
 };
 
@@ -420,22 +475,29 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   board,
   userId,
   random,
-}): BgkitMove | BgkitMove[] => {
+}): { moves: BgkitMove | BgkitMove[]; moveInfo: MoveInfo | null } => {
   // First roll.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
-    return roll();
+    return { moves: roll(), moveInfo: null };
   }
 
   const strategy = board.playerInfos[userId].strategy;
-  if (strategy.startsWith("new:")) {
+  if (strategy.startsWith("new")) {
+    const stochastic = !strategy.startsWith("new2");
     const policy = strategy
-      .substring(4)
+      .substring(stochastic ? 4 : 5)
       .split("/")
       .map((x) => parseFloat(x));
-    return newBotMove({ board, userId, policy });
+    return newBotMove({ board, userId, policy, stochastic });
   }
 
-  return botMove({ board, userId });
+  const move = botMove({ board, userId });
+  // FIXME this is getting very hacky
+  if ((move as any).chosenAction === undefined) {
+    return { moves: move, moveInfo: null };
+  } else {
+    return move as any;
+  }
 };
 
 const gamePlayerOptions: GamePlayerOptions = {
@@ -456,6 +518,59 @@ const gamePlayerOptions: GamePlayerOptions = {
   },
 };
 
+const logBoard = (board: ChickenrollBoard) => {
+  if (!board.diceSumOptions) {
+    console.log("info", board.info);
+    console.log("Num rolls:", board.numRollsThisTurn);
+  }
+  console.log("stage:", board.stage);
+  for (const col of ALL_COLS) {
+    process.stdout.write((col % 10) + " ");
+    const blockedBy = board.blockedSums[col];
+
+    const steps = Array(getNumStepsForSum(col, board.mountainShape))
+      .fill(undefined)
+      .map((_, k) => k + 1);
+
+    if (blockedBy) {
+      let blockedById = "#";
+      // Find index of player
+      for (let i = 0; i < board.playerOrder.length; i++) {
+        if (board.playerOrder[i] === blockedBy) {
+          blockedById = i.toString();
+        }
+      }
+
+      for (const step of steps) {
+        process.stdout.write(blockedById);
+      }
+      process.stdout.write("\n");
+      continue;
+    }
+    for (const step of steps) {
+      let str = ".";
+      let i = 0;
+      for (const userId of board.playerOrder) {
+        if (board.checkpointPositions[userId][col] === step) {
+          str = i.toString();
+          break;
+        }
+        i++;
+      }
+      if (board.currentPositions[col] === step) {
+        str = "X";
+      }
+      process.stdout.write(str);
+    }
+    process.stdout.write("\n");
+  }
+  if (board.diceSumOptions) {
+    console.log(board.diceSumOptions);
+  }
+  console.log("last move:");
+  console.log(board.moveHistory[board.moveHistory.length - 1]);
+};
+
 export const game: GameDef<ChickenrollBoard> = {
   initialBoard,
   initialItsYourTurn({ board }) {
@@ -467,4 +582,5 @@ export const game: GameDef<ChickenrollBoard> = {
   gamePlayerOptions,
   autoMove,
   playerScoreType: "integer",
+  logBoard,
 };
