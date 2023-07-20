@@ -27,11 +27,12 @@ import {
   DICE_INDICES,
   numCurrentPlayerOverlap,
   climbOneStep,
+  getAllowedColumns,
 } from "./math";
 
 import { canStop } from "./utils";
 
-import { getAllowedColumns, getOddsCalculator } from "./math/probs";
+import { getOddsCalculator } from "./math/probs";
 
 import {
   DiceSum,

@@ -287,3 +287,36 @@ export const climbOneStep = (
     throw new Error(`unexpected value for sameSpace: "${sameSpace}"`);
   }
 };
+
+export function getAllowedColumns(
+  currentPositions,
+  blockedSums,
+  mountainShape: MountainShape
+) {
+  // We start with the blocked columns.
+  const blockedSumsSet = new Set(
+    Object.keys(blockedSums).map((x) => parseInt(x))
+  );
+  // To which we add the columns for which the current position is at the last step,
+  // which makes them blocked too.
+  Object.entries(currentPositions).forEach(([sum, step]) => {
+    if (step === getNumStepsForSum(parseInt(sum), mountainShape)) {
+      blockedSumsSet.add(parseInt(sum));
+    }
+  });
+
+  let all: number[];
+  if (Object.keys(currentPositions).length < 3) {
+    // If not all the runners are there, allowed columns are everything but the blocked
+    // columns.
+
+    all = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  } else {
+    // If all the runners are available, then, we only have access to those
+    all = Object.keys(currentPositions).map((x) => parseInt(x));
+  }
+
+  // Then remove the blocked ones.
+  const allowed = all.filter((s) => !blockedSumsSet.has(s));
+  return allowed;
+}

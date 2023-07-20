@@ -2,15 +2,9 @@ import { UserId } from "bgkit";
 import { MatchTester, RandomMock } from "bgkit-game";
 
 import { CurrentPositions, CheckpointPositions } from "./types";
-import {
-  game,
-  ChickenrollBoard,
-  climbOneStep,
-  numCurrentPlayerOverlap,
-  roll,
-  pick,
-  stop,
-} from ".";
+import { game, ChickenrollBoard, climbOneStep, roll, pick, stop } from ".";
+
+import { numCurrentPlayerOverlap } from "./math";
 
 test.each([
   ["share", {}, {}, 1],
@@ -307,6 +301,7 @@ test.each(botTestConfigs)("bot games %s %s", async (numBots, matchOptions) => {
     numBots,
     matchOptions,
   });
+  match.start();
 
   await match.waitUntilEnd();
   expect(match.matchHasEnded).toBe(true);

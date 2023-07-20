@@ -21,12 +21,10 @@ import {
   numCurrentPlayerOverlap,
   climbOneStep,
   getNumStepsForSum,
-} from "./math";
-import {
-  OddsCalculator,
-  getOddsCalculator,
   getAllowedColumns,
-} from "./math/probs";
+} from "./math";
+
+import { OddsCalculator, getOddsCalculator } from "./math/probs";
 import { ALL_COLS } from "./constants";
 import { canStop } from "./utils";
 

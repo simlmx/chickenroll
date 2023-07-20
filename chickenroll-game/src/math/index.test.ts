@@ -1,4 +1,5 @@
-import { getSumOptions, SumOption } from "../math";
+import { SumOption } from "../types";
+import { getSumOptions, getAllowedColumns } from ".";
 
 /*
  * Convenient function to create a SumOption object
@@ -367,3 +368,29 @@ test.each([
     ).toEqual(expected);
   }
 );
+
+test.each([
+  [{}, {}, [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]],
+  [{}, { 12: 0 }, [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
+  [{}, { 12: 0, 11: 1 }, [2, 3, 4, 5, 6, 7, 8, 9, 10]],
+  [{ 2: 1 }, {}, [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]],
+  [{ 2: 1, 3: 3 }, {}, [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]],
+  [{ 2: 1, 3: 3, 4: 1 }, {}, [2, 3, 4]],
+  [{ 2: 1, 3: 3, 4: 1 }, { 5: 1 }, [2, 3, 4]],
+  [{ 2: 1, 3: 3, 4: 1 }, { 5: 1, 6: 0 }, [2, 3, 4]],
+  // That's the tricky case where we are at the top of a column
+  [{ 2: 3, 3: 3, 4: 1 }, {}, [3, 4]],
+  // If we are only one behind this adds a column!
+  [{ 2: 2, 3: 3, 4: 1 }, {}, [2, 3, 4]],
+  //
+  [{ 2: 3, 3: 5, 12: 3 }, {}, []],
+  [{ 2: 3, 3: 4, 12: 3 }, {}, [3]],
+  [{ 2: 3, 12: 3 }, {}, [3, 4, 5, 6, 7, 8, 9, 10, 11]],
+  // 2 blocked because at the top, one blocked by someone, all the rest is fair game!
+  [{ 2: 3, 12: 3 }, { 3: 1 }, [4, 5, 6, 7, 8, 9, 10, 11]],
+  [{ 2: 2, 12: 3 }, { 3: 1 }, [2, 4, 5, 6, 7, 8, 9, 10, 11]],
+])("getAllowedColumns %s %s %s", (currentPositions, blockedSums, expected) => {
+  expect(getAllowedColumns(currentPositions, blockedSums, "classic")).toEqual(
+    expected
+  );
+});
