@@ -1,4 +1,4 @@
-import { getNumStepsForSum } from "..";
+import { getNumStepsForSum } from ".";
 import { NUM_COLORS } from "../constants";
 import { MountainShape } from "../types";
 

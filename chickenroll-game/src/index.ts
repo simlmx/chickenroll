@@ -1,3 +1,10 @@
+// The bundled ESM version ends up being broken, I only got it to work with `require`.
+
+let ort;
+if (process.env.BACKEND) {
+  ort = require("onnxruntime-node");
+}
+
 import {
   GameOptions,
   UserId,
@@ -5,9 +12,13 @@ import {
   PlayerOptionType,
   endMatch,
   itsYourTurn,
+  MatchOptions,
+  MatchPlayersOptions,
+  reward,
+  Move as BgkitMove,
 } from "bgkit";
 
-import { Moves, BoardUpdates, GameDef, Move as BgkitMove } from "bgkit-game";
+import { Moves, BoardUpdates, GameDef, Random } from "bgkit-game";
 
 import {
   getSumOptions,
@@ -40,6 +51,7 @@ import {
   stop,
   STOPPED,
   stopped,
+  StoppedPayload,
   pick,
   PICK,
   PICKED,
@@ -48,6 +60,7 @@ import {
   RolledPayload,
   ShowProbsType,
   MoveInfo,
+  Strategy,
 } from "./types";
 
 import { botMove } from "./bots";
@@ -76,10 +89,37 @@ export {
   ShowProbsType,
 };
 
-// const STEP_REWARD = 0.0;
-// const COL_REWARD = 1.0;
-// const NO_COL_REWARD = -0.1;
-const WIN_REWARD = 1.0;
+const COL_REWARD = 1.0;
+
+// FIXME we need to make sure that all the bot code is not included in the client.
+// In particular all this onnx stuff.
+const STRATEGIES: Record<
+  string,
+  | { type: "weights"; values: number[] }
+  | { type: "onnx"; path: string; stochastic: boolean }
+> = {
+  share: {
+    type: "weights",
+    values: [
+      17.769, 0.03, 11.849, 0.009, 0.837, 0.024, 11.441, 0.011, 0.002, 0.122,
+      0.22, 4.895, 2.687, 0.732, 0.001, 0.155, 0.003,
+    ],
+  },
+  jump: {
+    type: "weights",
+    values: [
+      100.289, 0.829, 22.664, 0.004, 2.116, 0.213, 17.662, 0.078, 0.001, 0.79,
+      0.23, 0.159, 9.081, 0.091, 0.019, 0.266, -0.075,
+    ],
+  },
+  nostop: {
+    type: "weights",
+    values: [
+      24.613, 2.384, 33.085, 0.026, 5.329, 0.01, 45.865, 0.001, -0.007, 0.305,
+      0.805, 5.149, 2.816, 0.036, 1.073, 2.142, 0.037,
+    ],
+  },
+};
 
 /*
  * Return the last move in the history of moves.
@@ -161,10 +201,33 @@ const moves: Moves<ChickenrollBoard> = {
     canDo({ userId, board }) {
       return board.currentPlayer === userId && canStop(board);
     },
-    *executeNow() {
-      yield stopped();
-    },
-    *execute({ board }) {
+    *executeNow({ board, userId }) {
+      // Note the new checkpoints and the finished columns.
+      const newCheckpoints: [number, number][] = [];
+      const finishedCols: number[] = [];
+
+      Object.entries(board.currentPositions).forEach(([colStr, step]) => {
+        const col = parseInt(colStr);
+
+        if (step === getNumStepsForSum(col, board.mountainShape)) {
+          finishedCols.push(col);
+        } else {
+          newCheckpoints.push([col, step]);
+        }
+      });
+
+      if (finishedCols.length > 0) {
+        const n = finishedCols.length;
+        const rewards = {};
+        for (const userId of board.playerOrder) {
+          rewards[userId] = -COL_REWARD * n;
+        }
+        rewards[userId] = COL_REWARD * n;
+
+        yield reward({ rewards });
+      }
+      yield stopped({ newCheckpoints, finishedCols });
+
       if (board.stage === "gameover") {
         yield endMatch({ scores: board.scores });
       } else {
@@ -181,7 +244,6 @@ const moves: Moves<ChickenrollBoard> = {
     *executeNow({ payload, userId }) {
       // Simply forward the payload from the move.
       yield picked(payload);
-      console.log(JSON.stringify({ userId, reward: 0, isFinal: false }));
     },
   },
 };
@@ -214,43 +276,28 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
       gotoStage(board, "moving");
     }
 
-
     board.moveHistory.push(move);
   },
-  [STOPPED]: (board) => {
+  [STOPPED]: (board, payload) => {
+    const { newCheckpoints, finishedCols } = payload as StoppedPayload;
     const userId = board.currentPlayer;
     board.lastPickedDiceSumOption = undefined;
     board.diceSumOptions = undefined;
-    // let reward = 0;
-    let isFinal = false;
-    // Save current positions as checkpoints.
-    Object.entries(board.currentPositions).forEach(([diceSumStr, step]) => {
-      const diceSum = parseInt(diceSumStr);
 
-      // Compute reward for steps in col.
-      // {
-      //   const diff = step - (board.checkpointPositions[userId][diceSum] || 0);
-      //   reward +=
-      //     (diff / getNumStepsForSum(diceSum, board.mountainShape)) *
-      //     STEP_REWARD;
-      // }
+    // Update the checkpoints.
+    for (const [col, step] of newCheckpoints) {
+      board.checkpointPositions[userId][col] = step;
+    }
 
-      board.checkpointPositions[userId][diceSum] = step;
-      if (step === getNumStepsForSum(diceSum, board.mountainShape)) {
-        board.blockedSums[diceSum] = userId;
-        board.scores[userId] += 1;
-        // Remove all the checkpoints for that one
-        for (const userId of Object.keys(board.playerInfos)) {
-          delete board.checkpointPositions[userId][diceSum];
-        }
-
-        // reward += COL_REWARD;
+    // Block the finished columns.
+    for (const col of finishedCols) {
+      board.blockedSums[col] = userId;
+      board.scores[userId] += 1;
+      // Remove all the checkpoints for that one
+      for (const userId of Object.keys(board.playerInfos)) {
+        delete board.checkpointPositions[userId][col];
       }
-    });
-
-    // if (reward === 0) {
-    // reward = NO_COL_REWARD;
-    // }
+    }
 
     // Check if we should end the game,
     if (board.scores[userId] >= board.numColsToWin) {
@@ -262,9 +309,6 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
         ts: new Date().getTime(),
       };
 
-      // reward += WIN_REWARD;
-      isFinal = true;
-
       gotoStage(board, "gameover");
     } else {
       board.info = {
@@ -273,22 +317,6 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
         ts: new Date().getTime(),
       };
       endTurn(board, "stop");
-    }
-
-    if (isFinal) {
-      console.log(JSON.stringify({ userId, reward: WIN_REWARD, isFinal }));
-      for (const otherUser of board.playerOrder) {
-        if (otherUser === userId) {
-          continue;
-        }
-        console.log(
-          JSON.stringify({
-            userId: otherUser,
-            reward: -WIN_REWARD,
-            isFinal: true,
-          })
-        );
-      }
     }
   },
   [PICKED]: (board, payload) => {
@@ -387,6 +415,11 @@ const initialBoard = ({
   matchOptions,
   matchPlayersOptions,
   random,
+}: {
+  players: UserId[];
+  matchOptions: MatchOptions;
+  matchPlayersOptions: MatchPlayersOptions;
+  random: Random;
 }): ChickenrollBoard => {
   const scores: { [userId: string]: number } = {};
   const checkpointPositions: CheckpointPositions = {};
@@ -398,24 +431,29 @@ const initialBoard = ({
 
   const playerOrder = random.shuffled(userIds);
 
-  const strategies: Record<SameSpace, string> = {
-    share:
-      "17.769/0.03/11.849/0.009/0.837/0.024/11.441/0.011/0.002/0.122/0.22/4.895/2.687/0.732/0.001/0.155/0.003",
-    jump: "100.289/0.829/22.664/0.004/2.116/0.213/17.662/0.078/0.001/0.79/0.23/0.159/9.081/0.091/0.019/0.266/-0.075",
-    nostop:
-      // "24.613/2.384/33.085/0.026/5.329/0.01/45.865/0.001/-0.007/0.305/0.805/5.149/2.816/0.036/1.073/2.142/0.037",
-      "new2:-1.0845624067750548/-3.0138014748575697/-2.047797052250959/1.8464962600304207/1.2230326518001258/0.3920512967119147/2.397562853027784/0.045666174067959364/-0.27233397161434875/5.908527821833382/2.8817755106405154/7.529325231982538/1.175456200168667/2.076535768072077/0.716574522741395/0.0/0.123049123102464340.661689305305481",
-  };
-
   userIds.forEach((userId, i) => {
     scores[userId] = 0;
     checkpointPositions[userId] = {};
     const options = matchPlayersOptions[userId];
     const color = options?.color;
-    const strategy = options?.strategy;
+
+    let strategy: Strategy;
+    if (options?.strategy) {
+      // Assume it's JSON (even in the case where it's a string!).
+      const s = JSON.parse(options.strategy);
+      if (STRATEGIES[s] !== undefined) {
+        strategy = STRATEGIES[s];
+      } else {
+        strategy = s;
+      }
+    } else {
+      // If nothing is supplied, use the default for the game mode.
+      strategy = STRATEGIES[matchOptions.sameSpace];
+    }
+
     playerInfos[userId] = {
       color: color === undefined ? i : parseInt(color),
-      strategy: strategy || strategies[matchOptions.sameSpace],
+      strategy,
     };
   });
 
@@ -458,9 +496,9 @@ const initialBoard = ({
     bustProb: 0,
     endOfTurnBustProb: 0,
     // For now we hard-code the shape to our own default.
-    mountainShape: matchOptions.mountainShape,
-    sameSpace: matchOptions.sameSpace,
-    showProbs: matchOptions.showProbs,
+    mountainShape: matchOptions.mountainShape as MountainShape,
+    sameSpace: matchOptions.sameSpace as SameSpace,
+    showProbs: matchOptions.showProbs as ShowProbsType,
     lastOutcome: "stop",
 
     currentPlayerIndex: 0,
@@ -470,33 +508,57 @@ const initialBoard = ({
     numRollsThisTurn: 0,
   };
 };
+//FIXME peu importe ce qu'on fait on va finir par avoir besoin d'un chickenroll-data je pense:
+// un package qu'on load sur le serveru mais PAS sur le frontend
+// En attendant pour tester on va le laisser ici
 
-const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
+// FIXME think about how we want to do this
+// singleton for strategies
+// <some id> -> strategy function
+const onnxSessions: Record<string, any> = {};
+
+export const clearOnnxSessions = () => {
+  for (const prop of Object.getOwnPropertyNames(onnxSessions)) {
+    delete onnxSessions[prop];
+  }
+};
+
+const loadOnnxSession = async (path: string) => {
+  let session: any;
+  if (onnxSessions[path] === undefined) {
+    session = await ort.InferenceSession.create(path);
+    onnxSessions[path] = session;
+  } else {
+    session = onnxSessions[path];
+  }
+  return session;
+};
+
+const autoMove: GameDef<ChickenrollBoard>["autoMove"] = async ({
   board,
   userId,
   random,
-}): { moves: BgkitMove | BgkitMove[]; moveInfo: MoveInfo | null } => {
+}): Promise<{ moves: BgkitMove | BgkitMove[]; moveInfo: MoveInfo | null }> => {
   // First roll.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
     return { moves: roll(), moveInfo: null };
   }
 
   const strategy = board.playerInfos[userId].strategy;
-  if (strategy.startsWith("new")) {
-    const stochastic = !strategy.startsWith("new2");
-    const policy = strategy
-      .substring(stochastic ? 4 : 5)
-      .split("/")
-      .map((x) => parseFloat(x));
-    return newBotMove({ board, userId, policy, stochastic });
-  }
-
-  const move = botMove({ board, userId });
-  // FIXME this is getting very hacky
-  if ((move as any).chosenAction === undefined) {
-    return { moves: move, moveInfo: null };
+  if (strategy.type === "weights") {
+    const move = botMove({ board, userId });
+    // FIXME this is getting very hacky
+    if ((move as any).chosenAction === undefined) {
+      return { moves: move, moveInfo: null };
+    } else {
+      return move as any;
+    }
+  } else if (strategy.type === "onnx") {
+    const { stochastic, path } = strategy;
+    const onnxSession = await loadOnnxSession(path);
+    return newBotMove({ board, userId, onnxSession, stochastic });
   } else {
-    return move as any;
+    throw new Error(`unknow strategy type`);
   }
 };
 

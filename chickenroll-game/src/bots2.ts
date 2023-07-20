@@ -1,5 +1,10 @@
-import { UserId } from "bgkit";
-import { Move as BgkitMove } from "bgkit-game";
+// The bundled ESM version ends up being broken, I only got it to work with `require`.
+let ort;
+if (process.env.BACKEND) {
+  ort = require("onnxruntime-node");
+}
+
+import { UserId, Move as BgkitMove } from "bgkit";
 import {
   ChickenrollBoard,
   pick,
@@ -7,6 +12,8 @@ import {
   stop,
   CurrentPositions,
   MoveInfo,
+  CheckpointPositions,
+  MountainShape,
 } from "./types";
 
 import {
@@ -22,59 +29,6 @@ import {
 } from "./math/probs";
 import { ALL_COLS } from "./constants";
 import { canStop } from "./utils";
-
-const dot = (a: number[], b: number[]): number => {
-  if (a.length !== b.length) {
-    throw new Error(
-      `arrays must have same length (${a.length} != ${b.length})`
-    );
-  }
-  return a.map((_, i) => a[i] * b[i]).reduce((m, n) => m + n);
-};
-
-// How many columns would we finish if we choose the 2 columns `col`?
-const _getFinishCols = ({
-  board,
-  cols,
-}: {
-  board: ChickenrollBoard;
-  cols: number[];
-}): number[] => {
-  // Case where the two numbers are the same.
-  if (cols.length === 2 && cols[0] === cols[1]) {
-    if (
-      getSpaceLeft(
-        board.currentPositions,
-        board.checkpointPositions,
-        board.mountainShape,
-        board.sameSpace,
-        cols[0],
-        board.currentPlayer
-      ) === 2
-    ) {
-      return cols;
-    } else {
-      return [];
-    }
-  }
-
-  const finishedCols = [];
-  for (const col of cols) {
-    if (
-      getSpaceLeft(
-        board.currentPositions,
-        board.checkpointPositions,
-        board.mountainShape,
-        board.sameSpace,
-        col,
-        board.currentPlayer
-      ) === 1
-    ) {
-      finishedCols.push(col);
-    }
-  }
-  return finishedCols;
-};
 
 const getExpectedFinalProb = ({
   cols,
@@ -116,66 +70,6 @@ const getExpectedFinalProb = ({
 
   return expectation;
 };
-
-// RENDU ICI
-// q(s, a) == v * w (v=features of after state, w=learned weights)
-//
-// 0. on commence avec une policy parametrizee par w0
-// 1. on a un state donne: s
-// 2. on trouve a optimal en trouvant max_a q(s, a)
-// 3. on note ca mais on prend l'action selon e-greedy
-// 4. on note l'action prise (si differente?) et q(s, a)
-// 5. ca nous donne une serie de s0, a0_opt, a0, R0, s1, a1_opt, a1, R1, ...
-// 6. ou plutot
-//    v0_0, (v0_1), ...,v0_n; (parenth'eses = celui choisi)
-//    R0;
-//    v1_0, v1_1, ... (v1_j)...v1_n;
-//    R1;
-//    ...
-//
-//    i.e. * la liste de tous les (after)states possibles des actions (qu'on a besoin pour faire le max)
-//         * celui qui a ete choisi a ce moment-là
-//         * le Reward qu'on a recu
-//
-//    Notre memory replay devient:
-//    v0_1, R0, (v1_0, v1_1, ... v1_n)
-//    v1_j, R1, (v2_0, ..., v2_n)
-//
-//    pour le premier:
-//    Cost = (R0 * max_i(w * v_i_0) - w * v0_1) **2
-//    Et le truc de DQN c'est d'avoir 2 w differents, et le premier on l'update juste une fois de temps en temps
-//    Et meme chose pour le w de notre policy qui joue, on l'update de temps en temps.
-//
-//
-// en d'autres mots
-// 1. func (s, a) => feature_vector
-// 2. pour choisir le meilleur move on fait (s, a_i) => v_i pour chaque possibilite i
-// 3. on calculate w * v_i, et on garde le plus gros score.
-// 4. on va en fait avoir 2 vecteurs w different, 1 pour calculer le score du "move",
-//    et l'autre pour decider si on roll ou stop encore apres
-//    PAS besoin de 2 moves pcq c'est en fait une decision (pcq apres avoir choisis un "move" le resultat est deterministe)
-//
-// Ça ça nous fait jouer des matchs avec une strategie donnee. On va vouloir noter les
-// v_i, r_i v_(i+1) (c'est de ca qu`on a besoin right?)
-// On va avoir Cost = (w * v_i - r_i - gamma * max_a q(v_(i+1), a) ) ** 2
-// (donc on a besoin de tous les (v_(i+1), a) pour faire notre max!)
-//
-// Et on va deriver ca par rapport a w pour savoir dans quel sens bouger w pour minimiser le cost.
-//
-// J'imagine (pas sur) que ca converge plus vite si on commence par faire des updates pour des episodes de fin de partie...
-// Et que tranquillement on sample des exemples moins tard.. mais j'ai pas vu ca dans les papiers...
-// peut-etre meme commencer par des parties hackees pour etre presque finies deja: on met des pastilles de couleurs random
-// deja proche du haut avec des colonnes deja reussies meme! PEnser a ca aussi!
-//
-// On va peut-etre vouloir faire un peu de reward shaping: donner des points quand on fait du progres:
-// * weighter le progres pour donner plus de points a monter une meme colonne
-// * normaliser par la longueur de la colonne (monter des 12 compte pour plus)
-// * qqch comme reward = (position finale - position initiale) ** 2 avec le tout en pourcentage de progres
-// * qqch de plus gros quand on finit la colonne
-// * qqch de mega quand on gagne la partie
-// * idee: changer ces poids la pendant qu'on train (baisser les reward fake tranquillemennt et juste garder la reward final)
-//
-//
 
 type _PickAction = {
   // arguments for the `pick()` move.
@@ -227,13 +121,22 @@ const _getPickActions = (board: ChickenrollBoard): _PickAction[] => {
 const getActions = (board: ChickenrollBoard): Action[] => {
   const pickActions = _getPickActions(board);
   const actions: Action[] = [];
+  const actionKeys = new Set<string>();
   for (const pickAction of pickActions) {
+    // We note in a set the actions that we have already listed.
+    // We save some computation time by not having duplicated actions.
+    const key = JSON.stringify([...pickAction.cols].sort());
+    if (actionKeys.has(key)) {
+      continue;
+    }
     // We can always keep rolling.
     actions.push({ ...pickAction, roll: true });
     // But can we also stop!
     if (canStopAfterPick({ board, pickAction })) {
       actions.push({ ...pickAction, roll: false });
     }
+
+    actionKeys.add(key);
   }
   return actions;
 };
@@ -283,6 +186,67 @@ const _getNewCurrentPositions = ({
   return out;
 };
 
+const toNum = (b: boolean): number => {
+  return b ? 1 : 0;
+};
+
+const currentPositionsToMap = (
+  currentPositions: CurrentPositions
+): Map<number, number> => {
+  const map = new Map();
+  for (const [colStr, step] of Object.entries(currentPositions)) {
+    const col = parseInt(colStr);
+    map.set(col, step);
+  }
+  return map;
+};
+
+const getFinishedSet = (
+  pos: Map<number, number>,
+  mountainShape: MountainShape
+): Set<number> => {
+  const finished = new Set<number>();
+  for (const [col, step] of pos) {
+    const numStep = getNumStepsForSum(col, mountainShape);
+    if (step === numStep) {
+      finished.add(col);
+    }
+  }
+  return finished;
+};
+
+/*
+ * Return keys that are in map2 but not in map1
+ */
+const mapKeyDiff = <T>(map1: Map<T, any>, map2: Map<T, any>): Set<T> => {
+  const keys = new Set<T>();
+  for (const [key] of map2) {
+    if (!map1.has(key)) {
+      keys.add(key);
+    }
+  }
+  return keys;
+};
+
+/*
+ * Same as `numCurrentPlayerOverlap` but with a `Map` object.
+ */
+const countOverlap = (
+  currentPositions: Map<number, number>,
+  checkpointPositions: CheckpointPositions
+): number => {
+  let n = 0;
+  for (const [col, step] of currentPositions) {
+    for (const positions2 of Object.values(checkpointPositions)) {
+      if (positions2[col] === step) {
+        n++;
+        break;
+      }
+    }
+  }
+  return n;
+};
+
 const computeFeatures = ({
   board,
   userId,
@@ -293,240 +257,230 @@ const computeFeatures = ({
   userId: UserId;
   action: Action;
   calculator: OddsCalculator;
-}): number[] => {
-  // console.log('compute feature for')
-  // console.log(action);
-  const { cols, roll } = action;
+}): [string, number][] => {
+  // Definitions:
+  //   checkpoint: before this turn
+  //   before: everything before the current action
+  //   action: this action
+  //   after: everything including the current action
 
-  // * Num of finished columns.
+  const { cols: colsAction, roll } = action;
 
-  // Subset of `cols` that would be finished.
-  const finishedCols = _getFinishCols({ board, cols });
-
-  // Build the final set of columns.
-  const colSet = new Set(
-    Object.keys(board.currentPositions).map((col) => parseInt(col))
+  // Build `Map`s of the columns and steps for this turn.
+  const colsCheckpoint = currentPositionsToMap(
+    board.checkpointPositions[userId]
   );
-  const newCols = new Set<number>();
-  const numClimbersBefore = colSet.size;
+  const colsBefore = currentPositionsToMap(board.currentPositions);
+  const colsAfter = new Map(colsBefore);
+  for (const col of colsAction) {
+    const stepBefore = colsAfter.get(col) || colsCheckpoint.get(col) || 0;
+    colsAfter.set(col, stepBefore + 1);
+  }
 
-  cols.forEach((col) => {
-    if (!colSet.has(col)) {
-      newCols.add(col);
-      colSet.add(col);
-    }
-  });
+  // Num of finished columns.
+  const finishedAfter = getFinishedSet(colsAfter, board.mountainShape);
+  const finishedBefore = getFinishedSet(colsBefore, board.mountainShape);
 
-  let even = 0;
+  // Columns that are new in this action.
+  const colsNew = mapKeyDiff(colsBefore, colsAfter);
+
+  const isDouble = colsAction.length === 2 && colsAction[0] === colsAction[1];
+  const isSingle = colsAction.length === 1;
+
+  // Get some info about the new columns that this action adds.
+  let numEven = 0;
+  let num678 = 0;
   let avgProbCols = 0;
-  for (const col of newCols) {
-    if (col % 2 === 0) {
-      even += 1 / newCols.size;
-    }
-    avgProbCols += (1 - calculator.oddsBust([col])) / newCols.size;
-  }
+  {
+    for (const col of colsNew) {
+      if (col % 2 === 0) {
+        numEven++;
+      }
 
-  const climberCost = colSet.size - numClimbersBefore;
+      // We only care about bust probabilities if we roll.
+      if (roll) {
+        avgProbCols += calculator.oddsNoBust([col]) / colsNew.size;
+      }
 
-  // To get the prob of busting if we choose this option, we need to know how many
-  // columns will be blocked after.
-
-  let allowed: Set<number>; // = new Set(colSet);
-  if (colSet.size === 3) {
-    allowed = new Set(colSet);
-  } else {
-    // In the case where we would still have runners left, only blocked columns are
-    // not allowed.
-    allowed = new Set(ALL_COLS);
-  }
-
-  // Remove finished columns if this option is chosen.
-  for (const col of finishedCols) {
-    allowed.delete(col);
-  }
-
-  for (const col of Object.keys(board.blockedSums)) {
-    allowed.delete(parseInt(col));
-  }
-
-  const probBust = calculator.oddsBust(Array.from(allowed));
-
-  let progress = 0;
-  let progressTimesStep = 0;
-  let numAhead = 0;
-  // Use the current overlap number as the baseline
-  let numOverlap = numCurrentPlayerOverlap(
-    board.currentPositions,
-    board.checkpointPositions
-  );
-
-  for (const col of cols) {
-    const endsAt = climbOneStep(
-      board.currentPositions,
-      board.checkpointPositions,
-      col,
-      userId,
-      board.sameSpace
-    );
-    const startsAt =
-      board.currentPositions[col] ||
-      board.checkpointPositions[userId][col] ||
-      0;
-
-    const numSteps = getNumStepsForSum(col, board.mountainShape);
-    const colProgress = (endsAt - startsAt) / numSteps;
-
-    progress += colProgress;
-
-    progressTimesStep += (colProgress * endsAt) / numSteps;
-
-    // Check the people ahead
-    for (const checkpoint of Object.values(board.checkpointPositions)) {
-      const step = checkpoint[col] || 0;
-      if (step === endsAt) {
-        numOverlap++;
-      } else if (step > endsAt) {
-        numAhead++;
+      if (col === 6 || col === 7 || col === 8) {
+        num678++;
       }
     }
   }
 
+  const climbersBefore = colsBefore.size;
+  const climbersAfter = colsAfter.size;
+  const climberCost = climbersAfter - climbersBefore;
+
+  // To get the prob of busting if we choose this option, we need to know how many
+  // columns will be blocked after.
+  let probBust = 0;
+
+  {
+    let allowed: Set<number>;
+
+    if (climbersAfter === 3) {
+      allowed = new Set(colsAfter.keys());
+    } else {
+      // In the case where we would still have runners left, only blocked columns are
+      // not allowed.
+      allowed = new Set(ALL_COLS);
+    }
+
+    // Remove finished columns if this option is chosen.
+    for (const col of finishedAfter) {
+      allowed.delete(col);
+    }
+
+    for (const col of Object.keys(board.blockedSums)) {
+      allowed.delete(parseInt(col));
+    }
+
+    probBust = calculator.oddsBust(Array.from(allowed));
+  }
+
+  // Compute what progress we would keep if we stopped.
+  let progressRatioAfter = 0;
+  let progressRatioAfter2 = 0;
+  let progressRatioAfterSq = 0;
+  let progressAfter = 0;
+  {
+    for (const [col, step] of colsAfter) {
+      const numSteps = getNumStepsForSum(col, board.mountainShape);
+      // Compare with
+      const diff = step - (colsCheckpoint.get(col) || 0);
+      progressRatioAfter += diff / numSteps;
+      progressRatioAfter2 += (diff / numSteps) ** 2;
+      progressRatioAfterSq += Math.sqrt(diff / numSteps);
+      progressAfter += diff;
+    }
+  }
+
+  // Progress of this action.
+  let progressRatioAction = 0;
+  let progressRatioAction2 = 0;
+  let progressAction = 0;
+  {
+    for (const [col, step] of colsAfter) {
+      const numSteps = getNumStepsForSum(col, board.mountainShape);
+      const diff = step - (colsBefore.get(col) || colsCheckpoint.get(col) || 0);
+      progressRatioAction += diff / numSteps;
+      progressRatioAction2 += (diff / numSteps) ** 2;
+      progressAction += diff;
+    }
+  }
+
+  // Diff of overlap for this action.
+  const overlapBefore = countOverlap(colsBefore, board.checkpointPositions);
+  const overlapAfter = countOverlap(colsAfter, board.checkpointPositions);
+
   const expectedFinalProb =
-    colSet.size === 2
+    colsAfter.size === 2
       ? getExpectedFinalProb({
-          cols: Array.from(colSet),
+          cols: Array.from(colsAfter.keys()),
           calculator,
           blockedSums: board.blockedSums,
         })
       : 0;
 
-  // Added because it was in the features for the roll/stop in the legacy version.
-  const newClimberPositions: CurrentPositions = _getNewCurrentPositions({
-    board,
-    cols,
-  });
+  // TODO Add a feature that gives us an idea of how likely we are of getting stuck on the next roll.
+  // We had something like that for the previous bot.
 
-  let probHasToOverlap2 = 0;
-  let probHasToOverlap3 = 0;
-  const numClimbers = Object.keys(newClimberPositions).length;
-  if (numClimbers === 3) {
-    const colsCouldStuck = new Set<number>();
-    for (const [colStr, ourStep] of Object.entries(newClimberPositions)) {
-      const col = parseInt(colStr);
-      // Check if there is someone on the next step.
-      for (const checkpoint of Object.values(board.checkpointPositions)) {
-        if ((checkpoint[colStr] || 0) === ourStep + 1) {
-          colsCouldStuck.add(col);
-          // We found someone, we don't want another one.
-          break;
-        }
-      }
-    }
-    probHasToOverlap3 = calculator.oddsNoBust(Array.from(colsCouldStuck));
-  } else if (numClimbers === 2) {
-    // Check for all the starting position ones.
-    const colsAtStepOne = new Set<number>();
-    for (const checkpoint of Object.values(newClimberPositions)) {
-      for (const [colStr, step] of Object.entries(checkpoint)) {
-        const col = parseInt(colStr);
-        if (
-          // !board.currentPositions[colStr] &&
-          step ===
-          (board.checkpointPositions[userId][colStr] || 0) + 1
-        ) {
-          colsAtStepOne.add(col);
-        }
-      }
-    }
-    probHasToOverlap2 = calculator.oddsNoBust(Array.from(colsAtStepOne));
-  } else {
-    if (numClimbers != 1) {
-      throw Error(`wrong num climbers ${numClimbers}`);
-    }
-  }
+  const had3climbers = climbersBefore === 3;
+  const now3climbers = !had3climbers && climbersAfter === 3;
 
-  const oneIfRoll = roll ? 1 : 0;
-  const oneIfStop = 1 - oneIfRoll;
-  const out = [
-    finishedCols.length,
-    climberCost,
-    probBust,
-    progress,
-    avgProbCols,
-    expectedFinalProb,
-    progressTimesStep,
-    numOverlap,
-    numAhead,
-    even,
-    oneIfRoll,
-    // Some features to be able to recreate the previous bots when choosing roll/stop.
-    oneIfStop * finishedCols.length,
-    oneIfStop * progress * probBust,
-    oneIfStop * finishedCols.length * probBust,
-    oneIfStop * progressTimesStep * probBust,
-    oneIfStop * probHasToOverlap2,
-    oneIfStop * probHasToOverlap3,
+  return [
+    // Features to decide on the action.
+    // if we have 3 cols, how much progress do we make with the option
+    // progress = finished, steps, how close to the end those steps are
+    // if we don't have our 3 cols yet, we need to know what are the probs we'll end up with, and in general what columns we'll end up with
+    //
+    [
+      "num_finished>=1_3c",
+      toNum(roll && finishedAfter.size >= 1 && had3climbers),
+    ],
+    [
+      "num_finished>=2_3c",
+      toNum(roll && finishedAfter.size >= 2 && had3climbers),
+    ],
+    [
+      "num_finished>=1_no3c",
+      toNum(roll && finishedAfter.size >= 1 && !had3climbers),
+    ],
+    [
+      "num_finished>=2_no3c",
+      toNum(roll && finishedAfter.size >= 2 && !had3climbers),
+    ],
+    ["progress", progressAction * toNum(roll && !had3climbers)],
+    ["progress_3c", progressAction * toNum(roll && had3climbers)],
+    ["progress_ratio_no3c", progressRatioAction * toNum(roll && !had3climbers)],
+    ["progress_ratio_3c", progressRatioAction * toNum(roll && had3climbers)],
+    [
+      "progress_ratio2_no3c",
+      progressRatioAction2 * toNum(roll && !had3climbers),
+    ],
+    ["progress_ratio2_3c", progressRatioAction2 * toNum(roll && had3climbers)],
+    //
+    ["progress_after", toNum(roll) * progressAfter],
+    ["progress_ratio_after", toNum(roll) * progressRatioAfter],
+    ["progress_ratio_after2", toNum(roll) * progressRatioAfter2],
+    ["progress_ratio_after_sq", toNum(roll) * progressRatioAfterSq],
+    //
+    ["climber_cost=1", toNum(roll && climberCost === 1)],
+    ["climber_cost=2", toNum(roll && climberCost === 2)],
+    //
+    ["bust", toNum(roll) * probBust],
+    ["bust_now3c", probBust * toNum(roll && now3climbers)],
+    ["bust>0", toNum(roll && probBust > 0)],
+    //
+    ["had3climbers", toNum(roll && had3climbers)],
+    ["now3c", toNum(roll && now3climbers)],
+    ["avg_prob_cols_3c", avgProbCols * toNum(!had3climbers)],
+    ["overlap_diff", toNum(roll) * (overlapAfter - overlapBefore)],
+    ["overlap_after=0", toNum(roll && overlapAfter === 0)],
+    ["overlap_after=1", toNum(roll && overlapAfter === 1)],
+    ["overlap_after>=2", toNum(roll && overlapAfter >= 2)],
+    ["expected_final_prob", toNum(roll) * expectedFinalProb],
+    ["expected_final_prob", toNum(roll && !had3climbers) * expectedFinalProb],
+    //
+    ["even=0", toNum(roll && numEven === 0 && !had3climbers)],
+    ["even=1", toNum(roll && numEven === 1 && !had3climbers)],
+    ["even=2", toNum(roll && numEven === 2 && !had3climbers)],
+    ["single", toNum(roll && isSingle && !had3climbers)],
+    ["double", toNum(roll && isDouble && !had3climbers)],
+    ["678=0", toNum(roll && num678 === 0 && !had3climbers)],
+    ["678=1", toNum(roll && num678 === 1 && !had3climbers)],
+    ["678=2", toNum(roll && num678 === 2 && !had3climbers)],
+    //
+    //
+    ["is_stop", toNum(!roll)],
+    //
+    // Features to decide if we roll or stop.
+    ["stop_bust", toNum(!roll) * probBust],
+    ["stop_progress_after", progressAfter * toNum(!roll)],
+    ["stop_progress_ratio_after", progressRatioAfter * toNum(!roll)],
+    ["stop_progress_ratio_after2", progressRatioAfter2 * toNum(!roll)],
+    ["stop_progress_ratio_after_sq", progressRatioAfterSq * toNum(!roll)],
+    ["stop_progress_ratio_bust", toNum(!roll) * progressRatioAfter * probBust],
+    [
+      "stop_progress_ratio2_bust",
+      toNum(!roll) * progressRatioAfter2 * probBust,
+    ],
+    [
+      "stop_progress_ratio_sq_bust",
+      toNum(!roll) * progressRatioAfterSq * probBust,
+    ],
+    ["stop_progress_bust", toNum(!roll) * progressAfter * probBust],
+    ["stop_num_finished_bust", toNum(!roll) * finishedAfter.size * probBust],
+    ["stop_total_finish>=1", toNum(!roll) * toNum(finishedAfter.size >= 1)],
+    ["stop_total_finish>=2", toNum(!roll) * toNum(finishedAfter.size >= 2)],
   ];
-
-  /*
-  {
-    const featureNames = [
-      "num finishedCols",
-      "climberCost",
-      "probBust",
-      "progress",
-      "avProbCols",
-      "expectedFinalPRob",
-      "progressTimeStep",
-      "numOverlap",
-      "numAhead",
-      "even",
-      "oneIfRoll",
-      "stop num finished",
-      "stop progress * prob_bust",
-      "stop num finished * prob_bust",
-      "stop progress_time_Step * prob_bust",
-      "stop probHasToOverlap2",
-      "stop probHasToOverlap3",
-    ];
-
-    if (featureNames.length != out.length) {
-      throw new Error("length feature names does not match");
-    }
-    for (let i = 0; i < featureNames.length; ++i) {
-      console.log(`${featureNames[i]}   : ${out[i]}`);
-    }
-  }
-  */
-
-  return out;
-
-  // return [
-  //   finishedCols.length,
-  //   climberCost,
-  //   probBust,
-  //   progress,
-  //   avgProbCols,
-  //   expectedFinalProb,
-  //   progressTimesStep,
-  //   numOverlap,
-  //   numAhead,
-  //   even,
-  //   probHasToOverlap2,
-  //   probHasToOverlap3,
-  //   roll ? 1 : 0,
-  // Some features to be able to recreate the previous bots when choosing roll/stop.
-  //   progress * probBust,
-  //   finishedCols.length * probBust,
-  //   progressTimesStep * probBust,
-  // ];
 };
 
 const argMax = (arr: number[]): number => {
-  // FIXME
-  let idx = 0;
+  let idx = -1;
   let max = -Infinity;
-  for (let i=0; i < arr.length; ++i) {
+  for (let i = 0; i < arr.length; ++i) {
     const value = arr[i];
     if (value > max) {
       max = value;
@@ -534,8 +488,12 @@ const argMax = (arr: number[]): number => {
     }
   }
 
+  if (idx === -1) {
+    throw new Error("arg max not found");
+  }
+
   return idx;
-}
+};
 
 // https://stackoverflow.com/a/28933315/1067132
 const getRandomIndex = (weights: number[]): number => {
@@ -557,105 +515,139 @@ const getRandomIndex = (weights: number[]): number => {
   return lastIndex;
 };
 
-const getProbs = (features: number[][], weights: number[]): number[] => {
-  const exps: number[] = [];
-  for (let i = 0; i < features.length; ++i) {
-    let dotp = 0;
-    for (let j = 0; j < weights.length; ++j) {
-      dotp += features[i][j] * weights[j];
-    }
-    exps.push(Math.exp(dotp));
+const getProbs = async (
+  features: number[][],
+  onnxSession: any
+): Promise<number[]> => {
+  if (features.length === 1) {
+    return [1];
   }
 
-  const sum_ = exps.reduce((a, b) => a + b);
+  const flat = features.flat();
 
-  return exps.map((x) => x / sum_);
+  const input = new ort.Tensor("float64", flat, [
+    features.length,
+    features[0].length,
+  ]);
+
+  const { output } = await onnxSession.run({ input });
+
+  return output.data;
 };
 
-// const findBestFeatures = (features: number[][], weights: number[]): number => {
-//   let bestFeatureIdx: number;
-//   let bestScore = -Infinity;
-// console.log('weights')
-// console.log(weights)
-//   features.forEach((f, i) => {
-// console.log('feature', i)
-//     const score = dot(weights, f);
-// console.log(f)
-//     if (score > bestScore) {
-//       console.log("best score", score);
-//       console.log("at", i);
-//       bestScore = score;
-//       bestFeatureIdx = i;
-//     }
-//   });
-//   return bestFeatureIdx;
-// };
+const getPositionStats = (
+  pos: CurrentPositions,
+  mountainShape: MountainShape
+): { avg: number; max: number } => {
+  let max = 0;
+  let avg = 0;
+  let n = 0;
+  for (const [colStr, step] of Object.entries(pos)) {
+    const col = parseInt(colStr);
+    const numSteps = getNumStepsForSum(col, mountainShape);
+    const progress = step / numSteps;
+    if (progress > max) {
+      max = progress;
+    }
+    avg += progress;
+    n++;
+  }
 
-const argSample = <T>(arr: T[]): number => {
-  const len = arr == null ? 0 : arr.length;
-  return len ? Math.floor(Math.random() * len) : undefined;
+  if (n > 0) {
+    avg /= n;
+  }
+
+  return { max, avg };
 };
 
-export const botMove = ({
+const computeStateFeatures = ({
   board,
   userId,
-  policy,
-  stochastic,
 }: {
   board: ChickenrollBoard;
   userId: UserId;
-  policy: number[];
+}): [string, number][] => {
+  const numFinished = board.scores[userId];
+
+  const maxNumFinished = Math.max(...Object.values(board.scores));
+
+  const { max: maxProgress, avg: avgProgress } = getPositionStats(
+    board.checkpointPositions[userId],
+    board.mountainShape
+  );
+
+  const { max: maxProgressCurrent, avg: avgProgressCurrent } = getPositionStats(
+    board.currentPositions,
+    board.mountainShape
+  );
+
+  return [
+    ["numFinished", numFinished / board.numColsToWin],
+    ["numFinished/max", numFinished ? numFinished / maxNumFinished : 0],
+    ["maxProgress", maxProgress],
+    ["avgProgress", avgProgress],
+    ["maxProgressCur", maxProgressCurrent],
+    ["avgProgressCur", avgProgressCurrent],
+  ];
+};
+
+export const botMove = async ({
+  board,
+  userId,
+  onnxSession,
+  stochastic,
+  verbose = false,
+}: {
+  board: ChickenrollBoard;
+  userId: UserId;
+  onnxSession: any;
   stochastic: boolean;
-}): { moves: BgkitMove[]; moveInfo: MoveInfo | null } => {
+  verbose?: boolean;
+}): Promise<{ moves: BgkitMove[]; moveInfo: MoveInfo | null }> => {
   if (board.stage !== "moving") {
     return { moves: [roll()], moveInfo: null };
-    // We always roll/stop right after we move, so we should only get autoMove for stage="moving".
-    // throw Error('autoMove should always be calling for stage="moving"');
   }
-
-  // The first element of `policy` is the epsilon for the epsilon-greedy algorithm.
-  // let epsilon: number;
-  // [epsilon, ...policy] = policy;
-
-  // if (epsilon > 1.0 || epsilon < 0.0) {
-  //   throw new Error(`weird epsilon ${epsilon}`);
-  // }
-
   const calculator = getOddsCalculator();
 
+  // TODO when there is only one possible action, we shouldn't have any computation nor any Transition
   const actions = getActions(board);
-  // console.log("possibl actions");
+  // if (verbose) {
+  // console.log("possible actions");
   // console.log(actions);
+  // }
 
   // Gather some information for each option.
-  const features = actions.map((action) =>
+  const namedFeatures = actions.map((action) =>
     computeFeatures({ board, userId, action, calculator })
   );
 
   // console.log("features");
-  // console.log(features);
+  // console.log(namedFeatures);
 
-  // console.log('policy')
-  // console.log(policy)
+  const features = namedFeatures.map((featuresForAction) =>
+    featuresForAction.map((row) => row[1])
+  );
 
   let bestActionIdx: number;
 
-  // if (epsilon > 0 && Math.random() < epsilon) {
-  //   bestActionIdx = argSample(actions);
-  // } else {
-  // bestActionIdx = findBestFeatures(features, policy);
-  const probs = getProbs(features, policy);
-  // console.log('probs', probs)
+  // console.log('features', features);
+  const probs = await getProbs(features, onnxSession);
+
+  // if (verbose) {
+  // console.log(probs);
+  // }
+
   if (stochastic) {
     bestActionIdx = getRandomIndex(probs);
   } else {
     bestActionIdx = argMax(probs);
   }
-  // console.log("bestaction", bestActionIdx);
-  // }
 
-  // FIXME FIXME
-  const bestAction = actions[bestActionIdx] || actions[0];
+  // console.log('chosen actino', bestActionIdx)
+
+  const bestAction = actions[bestActionIdx];
+
+  const stateFeatures = computeStateFeatures({ board, userId });
 
   return {
     moves: [
@@ -667,8 +659,10 @@ export const botMove = ({
     ],
     moveInfo: {
       userId,
-      actionFeatures: features,
+      actionFeatures: namedFeatures,
       chosenAction: bestActionIdx,
+      state: stateFeatures,
+      probs,
     },
   };
 };

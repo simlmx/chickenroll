@@ -13,7 +13,6 @@
     "clean": "rm -rf ./dist",
     "compile": "rollup --config && tsc --emitDeclarationOnly",
     "watch": "rollup --config --watch",
-    "watch2": "tsc --emitDeclarationOnly --watch",
     "test": "jest --verbose"
   },
   "author": "Simon Lemieux",

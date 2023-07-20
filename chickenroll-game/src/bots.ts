@@ -1,5 +1,4 @@
-import { UserId } from "bgkit";
-import { Move as BgkitMove } from "bgkit-game";
+import { UserId, Move as BgkitMove } from "bgkit";
 import { ChickenrollBoard, pick, roll, stop, CurrentPositions } from "./types";
 import {
   getSpaceLeft,
@@ -148,66 +147,6 @@ const getExpectedFinalProb = ({
   return expectation;
 };
 
-// RENDU ICI
-// q(s, a) == v * w (v=features of after state, w=learned weights)
-//
-// 0. on commence avec une policy parametrizee par w0
-// 1. on a un state donne: s
-// 2. on trouve a optimal en trouvant max_a q(s, a)
-// 3. on note ca mais on prend l'action selon e-greedy
-// 4. on note l'action prise (si differente?) et q(s, a)
-// 5. ca nous donne une serie de s0, a0_opt, a0, R0, s1, a1_opt, a1, R1, ...
-// 6. ou plutot
-//    v0_0, (v0_1), ...,v0_n; (parenth'eses = celui choisi)
-//    R0;
-//    v1_0, v1_1, ... (v1_j)...v1_n;
-//    R1;
-//    ...
-//
-//    i.e. * la liste de tous les (after)states possibles des actions (qu'on a besoin pour faire le max)
-//         * celui qui a ete choisi a ce moment-là
-//         * le Reward qu'on a recu
-//
-//    Notre memory replay devient:
-//    v0_1, R0, (v1_0, v1_1, ... v1_n)
-//    v1_j, R1, (v2_0, ..., v2_n)
-//
-//    pour le premier:
-//    Cost = (R0 * max_i(w * v_i_0) - w * v0_1) **2
-//    Et le truc de DQN c'est d'avoir 2 w differents, et le premier on l'update juste une fois de temps en temps
-//    Et meme chose pour le w de notre policy qui joue, on l'update de temps en temps.
-//
-//
-// en d'autres mots
-// 1. func (s, a) => feature_vector
-// 2. pour choisir le meilleur move on fait (s, a_i) => v_i pour chaque possibilite i
-// 3. on calculate w * v_i, et on garde le plus gros score.
-// 4. on va en fait avoir 2 vecteurs w different, 1 pour calculer le score du "move",
-//    et l'autre pour decider si on roll ou stop encore apres
-//    PAS besoin de 2 moves pcq c'est en fait une decision (pcq apres avoir choisis un "move" le resultat est deterministe)
-//
-// Ça ça nous fait jouer des matchs avec une strategie donnee. On va vouloir noter les
-// v_i, r_i v_(i+1) (c'est de ca qu`on a besoin right?)
-// On va avoir Cost = (w * v_i - r_i - gamma * max_a q(v_(i+1), a) ) ** 2
-// (donc on a besoin de tous les (v_(i+1), a) pour faire notre max!)
-//
-// Et on va deriver ca par rapport a w pour savoir dans quel sens bouger w pour minimiser le cost.
-//
-// J'imagine (pas sur) que ca converge plus vite si on commence par faire des updates pour des episodes de fin de partie...
-// Et que tranquillement on sample des exemples moins tard.. mais j'ai pas vu ca dans les papiers...
-// peut-etre meme commencer par des parties hackees pour etre presque finies deja: on met des pastilles de couleurs random
-// deja proche du haut avec des colonnes deja reussies meme! PEnser a ca aussi!
-//
-// On va peut-etre vouloir faire un peu de reward shaping: donner des points quand on fait du progres:
-// * weighter le progres pour donner plus de points a monter une meme colonne
-// * normaliser par la longueur de la colonne (monter des 12 compte pour plus)
-// * qqch comme reward = (position finale - position initiale) ** 2 avec le tout en pourcentage de progres
-// * qqch de plus gros quand on finit la colonne
-// * qqch de mega quand on gagne la partie
-// * idee: changer ces poids la pendant qu'on train (baisser les reward fake tranquillemennt et juste garder la reward final)
-//
-//
-
 export type Action = {
   // arguments for the `pick()` move.
   diceSplitIndex: number;
@@ -234,7 +173,6 @@ export const computeFeatures = ({
   // Subset of `cols` that would be finished.
   const finishedCols = getFinishCols({ board, cols });
 
-  // console.log("old colset", Object.keys(board.currentPositions));
   // Build the final set of columns.
   const colSet = new Set(
     Object.keys(board.currentPositions).map((col) => parseInt(col))
@@ -248,9 +186,6 @@ export const computeFeatures = ({
       colSet.add(col);
     }
   });
-
-  // console.log("added col", newCols);
-  // console.log("final col", colSet);
 
   let even = 0;
   let avgProbCols = 0;
@@ -355,7 +290,13 @@ export const botMove = ({
   userId: UserId;
 }): BgkitMove => {
   const strategy = board.playerInfos[userId].strategy;
-  const weights = strategy.split("/").map((x) => parseFloat(x));
+  if (strategy.type !== "weights") {
+    throw new Error(
+      `old bot strategy should be of type weights but it "${strategy.type}"`
+    );
+  }
+  const weights = [...strategy.values];
+
   const weightsMoving = weights.splice(0, 10);
   const weightsRolling = weights;
   // console.log("weights", weightsMoving, weightsRolling);
@@ -382,8 +323,6 @@ export const botMove = ({
         bestAction = actions[i];
       }
     });
-
-    // console.log(bestAction);
 
     return pick({
       diceSplitIndex: bestAction.diceSplitIndex,
