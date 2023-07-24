@@ -4,14 +4,13 @@ if (process.env.BACKEND) {
   ort = require("onnxruntime-node");
 }
 
-import { UserId, Move as BgkitMove } from "bgkit";
+import { UserId, Move as BgkitMove, AutoMoveInfo } from "bgkit";
 import {
   ChickenrollBoard,
   pick,
   roll,
   stop,
   CurrentPositions,
-  MoveInfo,
   CheckpointPositions,
   MountainShape,
 } from "./types";
@@ -601,9 +600,9 @@ export const botMove = async ({
   onnxSession: any;
   stochastic: boolean;
   verbose?: boolean;
-}): Promise<{ moves: BgkitMove[]; moveInfo: MoveInfo | null }> => {
+}): Promise<{ moves: BgkitMove[]; autoMoveInfo?: AutoMoveInfo }> => {
   if (board.stage !== "moving") {
-    return { moves: [roll()], moveInfo: null };
+    return { moves: [roll()] };
   }
   const calculator = getOddsCalculator();
 
@@ -655,7 +654,7 @@ export const botMove = async ({
       }),
       bestAction.roll ? roll() : stop(),
     ],
-    moveInfo: {
+    autoMoveInfo: {
       userId,
       actionFeatures: namedFeatures,
       chosenAction: bestActionIdx,

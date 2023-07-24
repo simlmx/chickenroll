@@ -16,6 +16,7 @@ import {
   MatchPlayersOptions,
   reward,
   Move as BgkitMove,
+  AutoMoveInfo,
 } from "bgkit";
 
 import { Moves, BoardUpdates, GameDef, Random } from "bgkit-game";
@@ -60,7 +61,6 @@ import {
   ROLLED,
   RolledPayload,
   ShowProbsType,
-  MoveInfo,
   Strategy,
 } from "./types";
 
@@ -539,10 +539,13 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = async ({
   board,
   userId,
   random,
-}): Promise<{ moves: BgkitMove | BgkitMove[]; moveInfo: MoveInfo | null }> => {
+}): Promise<{
+  moves: BgkitMove | BgkitMove[];
+  autoMoveInfo?: AutoMoveInfo;
+}> => {
   // First roll.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
-    return { moves: roll(), moveInfo: null };
+    return { moves: roll(), autoMoveInfo: null };
   }
 
   const strategy = board.playerInfos[userId].strategy;
@@ -550,7 +553,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = async ({
     const move = botMove({ board, userId });
     // FIXME this is getting very hacky
     if ((move as any).chosenAction === undefined) {
-      return { moves: move, moveInfo: null };
+      return { moves: move, autoMoveInfo: null };
     } else {
       return move as any;
     }

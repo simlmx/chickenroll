@@ -145,21 +145,3 @@ export type StoppedPayload = {
 export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
 export const [PICKED, picked] = createBoardUpdate("picked");
 export const [STOPPED, stopped] = createBoardUpdate<StoppedPayload>("stopped");
-
-/*
- * Bot training
- */
-
-// FIXME this should not be in the game but in the framework.
-export type MoveInfo = {
-  // Who does the action.
-  userId: UserId;
-  // All the vectors for all their possible actions.
-  actionFeatures: [string, number][][];
-  // Features representing the state.
-  state: [string, number][];
-  // The action they chose.
-  chosenAction: number;
-  //
-  probs: number[];
-};
