@@ -658,7 +658,7 @@ export const botMove = async ({
       userId,
       actionFeatures: namedFeatures,
       chosenAction: bestActionIdx,
-      state: stateFeatures,
+      stateFeatures,
       probs,
     },
   };
