@@ -584,7 +584,7 @@ const gamePlayerOptions: GamePlayerOptions = {
   },
 };
 
-const logBoard = ({board}) => {
+const logBoard = ({ board }) => {
   if (!board.diceSumOptions) {
     console.log("info", board.info);
     console.log("Num rolls:", board.numRollsThisTurn);
