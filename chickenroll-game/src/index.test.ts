@@ -308,6 +308,8 @@ test.each(botTestConfigs)("bot games %s %s", async (numBots, matchOptions) => {
     matchOptions,
   });
 
+  match.start();
+
   await match.waitUntilEnd();
   expect(match.matchHasEnded).toBe(true);
 });
