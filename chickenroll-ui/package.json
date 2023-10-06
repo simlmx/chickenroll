@@ -39,7 +39,10 @@
     "ts-jest": "^27.0.7",
     "tslib": "^2.3.1",
     "typescript": "^4.5.2",
-    "typescript-eslint-parser": "^22.0.0"
+    "typescript-eslint-parser": "^22.0.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-redux": "7.2.2"
   },
   "dependencies": {
     "bgkit": "^1.0.0",
@@ -54,6 +57,6 @@
   "peerDependencies": {
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-redux": "^7.2.2"
+    "react-redux": "7.2.2"
   }
 }
