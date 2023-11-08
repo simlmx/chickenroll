@@ -15,6 +15,8 @@ import { State } from "./types";
 import { BustProb } from "./Bust";
 import { DiceSplit } from "./icons";
 
+import { fromBoardSelector } from "./selectors";
+
 import classNames from "classnames";
 
 /*
@@ -276,6 +278,10 @@ const MoveButtons = (props: MoveButtonsProps) => {
   const itsMe = userId === currentPlayer;
   const imThePrevious = userId === previousPlayer;
 
+  const isBot = useSelector(
+    fromBoardSelector((board) => board.playerInfos[currentPlayer].isBot)
+  );
+
   // There are two possibilities: either we show the Roll/Stop buttons, or we show the
   // Possibilities.
   const _stageIsMoving = stage === "moving";
@@ -290,12 +296,14 @@ const MoveButtons = (props: MoveButtonsProps) => {
       setShowPossibilities(_stageIsMoving);
       return;
     }
-    const delay = (wasRolling ? rollDuration : pickDuration) * 0.5;
+    const delay = isBot
+      ? (wasRolling ? rollDuration : pickDuration) * 0.5
+      : 300;
     const t = setTimeout(() => {
       setShowPossibilities(_stageIsMoving);
     }, delay);
     return () => clearTimeout(t);
-  }, [_stageIsMoving, itsMe, wasRolling]);
+  }, [_stageIsMoving, itsMe, wasRolling, isBot]);
 
   if (showPossibilities || (_justBusted && !itsMe)) {
     return (

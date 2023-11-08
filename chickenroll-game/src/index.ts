@@ -443,6 +443,7 @@ const initialBoard = ({
   matchOptions,
   matchPlayersOptions,
   random,
+  isBot,
 }): ChickenrollBoard => {
   const scores: { [userId: string]: number } = {};
   const checkpointPositions: CheckpointPositions = {};
@@ -471,6 +472,7 @@ const initialBoard = ({
     playerInfos[userId] = {
       color: color === undefined ? i : parseInt(color),
       strategy: strategy || strategies[matchOptions.sameSpace],
+      isBot: isBot[userId],
     };
   });
 

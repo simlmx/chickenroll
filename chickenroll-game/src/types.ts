@@ -8,6 +8,8 @@ export type PlayerInfo = {
   color: number;
   // Used for bots.
   strategy?: string;
+  // Optional for backward compatiblity.
+  isBot?: boolean;
 };
 
 export type MountainShape = "classic" | "tall" | "debug";
