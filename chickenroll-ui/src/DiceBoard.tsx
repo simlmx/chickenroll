@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Die } from "./Die";
+import classnames from "classnames";
 
 interface DiceBoardProps {
   diceValues: number[];
@@ -23,14 +24,8 @@ export const DiceBoard = (props: DiceBoardProps) => {
       />
     );
   };
-
-  let className = "diceContainer";
-  if (flat) {
-    className += " flatDiceContainer";
-  }
-
   return (
-    <div {...{ className }}>
+    <div className={classnames("diceContainer", flat && "flatDiceContainer")}>
       <div className="diceRow">
         {getDie(0)}
         {getDie(1)}

@@ -2,11 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { UserId } from "bgkit";
 import { useSelector, useDispatch } from "bgkit-ui";
-import { ShowProbsType, SumOption, pick, canStop } from "chickenroll-game";
+import {
+  ShowProbsType,
+  SumOption,
+  pick,
+  canStop,
+  pickDuration,
+  rollDuration,
+} from "chickenroll-game";
 
 import { State } from "./types";
 import { BustProb } from "./Bust";
 import { DiceSplit } from "./icons";
+
+import classNames from "classnames";
 
 /*
  * Given if it's us playing (itsMe) and if the button should be enabled, we return the
@@ -43,6 +52,7 @@ interface ActionButtonsProps {
   onStop: () => void;
   showProbs: ShowProbsType;
   bustProb: number;
+  lastAction?: "roll" | "stop" | null;
 }
 /* Roll / Stop buttons */
 const ActionButtons = (props: ActionButtonsProps) => {
@@ -54,6 +64,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
     currentPlayerHasStarted,
     showProbs,
     bustProb,
+    lastAction = null,
   } = props;
 
   const currentPlayerCanStop = useSelector((state: State) =>
@@ -63,17 +74,17 @@ const ActionButtons = (props: ActionButtonsProps) => {
   let rollClassName = getButtonClassNames(itsMe, true, color);
   const stopClassName = getButtonClassNames(itsMe, currentPlayerCanStop, color);
 
-  if (!currentPlayerHasStarted && itsMe) {
-    rollClassName += " flashVibrate";
-  }
-
   return (
     <div className="actionButtons">
       <button
         onClick={() => {
           onRoll();
         }}
-        className={rollClassName}
+        className={classNames(
+          rollClassName,
+          !currentPlayerHasStarted && itsMe && "flashVibrate",
+          lastAction === "roll" && !itsMe && "lastChoiceOtherPlayer"
+        )}
         disabled={!itsMe}
       >
         <div>Roll</div>
@@ -87,7 +98,10 @@ const ActionButtons = (props: ActionButtonsProps) => {
         onClick={() => {
           onStop();
         }}
-        className={stopClassName}
+        className={classNames(
+          stopClassName,
+          lastAction === "stop" && !itsMe && "lastChoiceOtherPlayer"
+        )}
         disabled={!itsMe || !currentPlayerCanStop}
       >
         Stop
@@ -247,6 +261,7 @@ const MoveButtons = (props: MoveButtonsProps) => {
   const lastPickedDiceSumOption = useSelector(
     (state: State) => state.board.lastPickedDiceSumOption
   );
+  const lastAction = useSelector((state: State) => state.board.lastAction);
   const diceSumOptions = useSelector(
     (state: State) => state.board.diceSumOptions
   );
@@ -263,51 +278,26 @@ const MoveButtons = (props: MoveButtonsProps) => {
 
   // There are two possibilities: either we show the Roll/Stop buttons, or we show the
   // Possibilities.
-  const [showPossibilities, setShowPossibilities] = useState(
-    stage === "moving"
-  );
+  const _stageIsMoving = stage === "moving";
+  const _justBusted = !currentPlayerHasStarted && lastOutcome === "bust";
 
-  // Decide if we show the Roll/Stop buttons or the Possibility buttons. We do it in a
-  // `useEffect` because of the timeouts.
+  const wasRolling = _stageIsMoving;
+
+  const [showPossibilities, setShowPossibilities] = useState(_stageIsMoving);
+
   useEffect(() => {
-    // If I'm playing, I want to see the real thing!
     if (itsMe) {
-      setShowPossibilities(stage === "moving");
+      setShowPossibilities(_stageIsMoving);
       return;
     }
+    const delay = (wasRolling ? rollDuration : pickDuration) * 0.5;
+    const t = setTimeout(() => {
+      setShowPossibilities(_stageIsMoving);
+    }, delay);
+    return () => clearTimeout(t);
+  }, [_stageIsMoving, itsMe, wasRolling]);
 
-    // If I was the previous player and I busted, I'll see all the impossible choices
-    // that made me bust. We show it for a couple seconds or until the current player starts.
-    if (!currentPlayerHasStarted && lastOutcome === "bust") {
-      setShowPossibilities(true);
-      const timeout = setTimeout(() => {
-        setShowPossibilities(false);
-      }, 3000);
-      return () => {
-        setShowPossibilities(false);
-        clearTimeout(timeout);
-      };
-    }
-
-    // If in showProbs=before it's a bit tricky: we want to show the choice but also the
-    // rolling button (because it contains a probability).
-    // The solution is to keep showing the possibilities a few milliseconds
-    // after the player has chosen them. Then we'll show the rolling buttons.
-    if (stage === "rolling" && currentPlayerHasStarted) {
-      setShowPossibilities(true);
-
-      const timeout = setTimeout(() => {
-        setShowPossibilities(false);
-      }, 300);
-      return () => {
-        setShowPossibilities(false);
-        clearTimeout(timeout);
-      };
-    }
-    setShowPossibilities(stage === "moving");
-  }, [stage, itsMe, showProbs, currentPlayerHasStarted, lastOutcome]);
-
-  if (showPossibilities) {
+  if (showPossibilities || (_justBusted && !itsMe)) {
     return (
       <Possibilities
         onMouseEnter={(buttonRow, buttonColumn) =>
@@ -336,6 +326,7 @@ const MoveButtons = (props: MoveButtonsProps) => {
           onStop,
           showProbs,
           bustProb,
+          lastAction,
         }}
       />
     );

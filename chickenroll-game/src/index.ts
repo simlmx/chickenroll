@@ -36,6 +36,11 @@ import {
   CurrentPositions,
   CheckpointPositions,
   PlayerInfo,
+  ChickenrollBoard,
+  Info,
+  Move,
+  ShowProbsType,
+  Stage,
 } from "./types";
 
 import { NUM_STEPS } from "./constants";
@@ -50,79 +55,12 @@ export {
   SameSpace,
   MountainShape,
   PlayerInfo,
+  ChickenrollBoard,
+  Move,
+  ShowProbsType,
 };
 
 const ALL_COLS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-interface Info {
-  // Player that is referred by the message.
-  userId?: UserId;
-  // Here "start" means we'll only write 'it's your turn' to the starting player.
-  code: "bust" | "stop" | "win" | "start";
-  // Timestamp at which we got the info. This is treated as an ID to compare two info.
-  ts: number;
-}
-
-export type Move = {
-  // Values of the 4 dice.
-  diceValues?: number[];
-  //0=horzontal, 1=vertical, 2=diagonal
-  diceSplitIndex?: number;
-  // [0] for the first 2, [1] for the last 2 and [0, 1] for all 4.
-  diceUsed?: number[];
-  // Did we bust on that move?
-  bust?: boolean;
-  // Player who made the move.
-  userId: string;
-};
-
-export type ShowProbsType = "before" | "after" | "never";
-type Stage = "moving" | "rolling" | "gameover";
-
-export type ChickenrollBoard = {
-  diceValues: number[];
-  currentPositions: CurrentPositions;
-  checkpointPositions: CheckpointPositions;
-  diceSumOptions?: SumOption[];
-  lastPickedDiceSumOption?: number[];
-  blockedSums: { [diceSum: number]: UserId };
-  info?: Info;
-  // Number of columns finished for each player.
-  scores: { [userId: number]: number };
-  // By default we'll set the game to the *maximum* number of players, but maybe less
-  // people will join.
-  numPlayers: number;
-  // Number of victories for the current match.
-  currentPlayerHasStarted: boolean;
-  // UserId -> color, etc.
-  playerInfos: Record<UserId, PlayerInfo>;
-  // Number of columns to complete to win.
-  // 2 players: 4
-  // 3 players: 3
-  // 4 players: 3
-  // 5 players: 2
-  numColsToWin: number;
-  // History of all the moves.
-  moveHistory: Move[];
-  showProbs: ShowProbsType;
-  // Probability of busting.
-  bustProb: number;
-  // Probability of busting at the end of the last turn. This is for the 'after' mode of
-  // showing the probabilities.
-  endOfTurnBustProb: number;
-  mountainShape: MountainShape;
-  // What happens when tokens occupy the same spot.
-  sameSpace: SameSpace;
-  // Id of the previous player;
-  previousPlayer?: UserId;
-  // How did the last player finish;
-  lastOutcome: "stop" | "bust";
-
-  stage: Stage;
-  currentPlayer: UserId;
-  currentPlayerIndex: number;
-  playerOrder: UserId[];
-};
 
 /*
  * Return the last move in the history of moves.
@@ -352,6 +290,7 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
     board.diceValues = diceValues;
 
     board.lastPickedDiceSumOption = undefined;
+    board.lastAction = "roll";
     board.diceSumOptions = diceSumOptions;
 
     if (busted) {
@@ -371,6 +310,7 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
   },
   [STOPPED]: (board) => {
     board.lastPickedDiceSumOption = undefined;
+    board.lastAction = "stop";
     board.diceSumOptions = undefined;
     // Save current positions as checkpoints.
     Object.entries(board.currentPositions).forEach(([diceSumStr, step]) => {
@@ -430,6 +370,7 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
         .filter((x) => x != null) as number[];
     }
     board.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
+    board.lastAction = null;
 
     newDiceSums.forEach((col, i) => {
       board.currentPositions[col] = climbOneStep(
@@ -558,6 +499,7 @@ const initialBoard = ({
     checkpointPositions,
     diceSumOptions: undefined,
     lastPickedDiceSumOption: undefined,
+    lastAction: null,
     blockedSums,
     scores,
     playerInfos,
@@ -717,6 +659,19 @@ const getExpectedFinalProb = ({
   return expectation;
 };
 
+export const rollDuration = 300;
+export const pickDuration = 300;
+
+const rollMove = {
+  move: roll(),
+  duration: rollDuration,
+};
+
+const stopMove = {
+  move: stop(),
+  duration: rollDuration,
+};
+
 const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   board,
   userId,
@@ -724,7 +679,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
 }) => {
   // First roll ever.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
-    return roll();
+    return rollMove;
   }
 
   const strategy = board.playerInfos[userId].strategy;
@@ -897,18 +852,21 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
 
     const bestOption = optionsWithCriteria.sort((a, b) => b.score - a.score)[0];
 
-    return pick({
-      diceSplitIndex: bestOption.diceSplitIndex,
-      choiceIndex: bestOption.choiceIndex,
-    });
+    return {
+      move: pick({
+        diceSplitIndex: bestOption.diceSplitIndex,
+        choiceIndex: bestOption.choiceIndex,
+      }),
+      duration: pickDuration,
+    };
   }
 
   if (board.bustProb === 0) {
-    return roll();
+    return rollMove;
   }
 
   if (!canStop(board)) {
-    return roll();
+    return rollMove;
   }
 
   // Here we need to choose between stopping and rolling.
@@ -938,7 +896,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
 
   // Special case: if we can win by stopping we stop.
   if (numFinishedCol + board.scores[userId] >= board.numColsToWin) {
-    return stop();
+    return stopMove;
   }
 
   // Compute the probabily of getting a number that can make us stuck - this is a proxy
@@ -1000,9 +958,9 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
     w[4] * probHasToOverlap2 +
     w[5] * probHasToOverlap3;
   if (linearComb > 0) {
-    return roll();
+    return rollMove;
   } else {
-    return stop();
+    return stopMove;
   }
 };
 

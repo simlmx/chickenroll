@@ -9,7 +9,7 @@ import {
   useIsPlayer,
 } from "bgkit-ui";
 
-import { ChickenrollBoard, PlayerInfo, roll, stop } from "chickenroll-game";
+import { PlayerInfo, roll, stop } from "chickenroll-game";
 
 import "./index.scss";
 
@@ -22,6 +22,7 @@ import MoveHistory from "./MoveHistory";
 
 import InGameIcons from "./InGameIcons";
 import { BustProb } from "./Bust";
+import { fromBoardSelector } from "./selectors";
 
 interface InfoProps {
   info?: { code: string; userId?: UserId };
@@ -148,8 +149,10 @@ export const Board = () => {
   const isPlayer = useIsPlayer();
 
   //FIXME useSelector instead of this
+  //Otherwise since we return an object we'll rerender everything for every change.
   const board = useSelector((state: State) => state.board);
   const userId = useSelector((state: State) => state.userId);
+  const showProbs = useSelector(fromBoardSelector((board) => board.showProbs));
 
   const {
     checkpointPositions,
@@ -163,7 +166,6 @@ export const Board = () => {
     endOfTurnBustProb,
     numColsToWin,
     moveHistory,
-    showProbs,
     mountainShape,
     sameSpace,
     currentPlayer,
