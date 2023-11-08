@@ -34,7 +34,7 @@
     "typescript": "^4.5.2"
   },
   "jest": {
-    "preset": "ts-jest/presets/default-esm",
+    "preset": "ts-jest",
     "globals": {
       "ts-jest": {
         "useESM": true
