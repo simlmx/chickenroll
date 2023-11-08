@@ -71,7 +71,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
     canStop(state.board)
   );
 
-  let rollClassName = getButtonClassNames(itsMe, true, color);
+  const rollClassName = getButtonClassNames(itsMe, true, color);
   const stopClassName = getButtonClassNames(itsMe, currentPlayerCanStop, color);
 
   return (

@@ -55,7 +55,7 @@ export const ScoreBoard = ({
           </td>
         );
       });
-    let opts: any = { className: `scoreBoardPlayerName bgcolor${color}` };
+    const opts: any = { className: `scoreBoardPlayerName bgcolor${color}` };
     if (userId === currentPlayer) {
       opts.className += " scoreBoardPlayerNameCurrent";
     }

@@ -169,7 +169,6 @@ export const Board = () => {
     mountainShape,
     sameSpace,
     currentPlayer,
-    numPlayers,
     playerOrder,
     stage,
   } = board;
@@ -444,7 +443,12 @@ export const Board = () => {
   // The onClick is necessary to disable the double-click zoom on ios.
   // See stackoverflow.com/a/54753520/1067132
   return (
-    <div className="cantStopBoard manipulation" onClick={() => {}}>
+    <div
+      className="cantStopBoard manipulation"
+      onClick={() => {
+        /**/
+      }}
+    >
       {infoTag}
       {modal === "history" && historyModal}
       {inGameIcons}

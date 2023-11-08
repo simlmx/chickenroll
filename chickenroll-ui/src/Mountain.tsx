@@ -185,7 +185,7 @@ export const Mountain = (props: MountainProps) => {
   // given turn. This is everything but the checkpoints. We memoize that part for faster
   // re-render.
 
-  let elMatrix: MountainCell[][] = useMemo(() => {
+  const elMatrix: MountainCell[][] = useMemo(() => {
     const elMatrix: MountainCell[][] = Array(numRows)
       .fill(undefined)
       .map(() =>
