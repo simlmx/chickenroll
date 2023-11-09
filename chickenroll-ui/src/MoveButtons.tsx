@@ -7,8 +7,7 @@ import {
   SumOption,
   pick,
   canStop,
-  pickDuration,
-  rollDuration,
+  botMoveDuration,
 } from "chickenroll-game";
 
 import { State } from "./types";
@@ -296,9 +295,7 @@ const MoveButtons = (props: MoveButtonsProps) => {
       setShowPossibilities(_stageIsMoving);
       return;
     }
-    const delay = isBot
-      ? (wasRolling ? rollDuration : pickDuration) * 0.5
-      : 300;
+    const delay = isBot ? botMoveDuration * 0.5 : 300;
     const t = setTimeout(() => {
       setShowPossibilities(_stageIsMoving);
     }, delay);

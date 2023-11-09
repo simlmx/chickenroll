@@ -62,6 +62,8 @@ export {
 
 const ALL_COLS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
+export const botMoveDuration = 300;
+
 /*
  * Return the last move in the history of moves.
  */
@@ -661,19 +663,6 @@ const getExpectedFinalProb = ({
   return expectation;
 };
 
-export const rollDuration = 300;
-export const pickDuration = 300;
-
-const rollMove = {
-  move: roll(),
-  duration: rollDuration,
-};
-
-const stopMove = {
-  move: stop(),
-  duration: rollDuration,
-};
-
 const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   board,
   userId,
@@ -681,7 +670,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
 }) => {
   // First roll ever.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
-    return rollMove;
+    return roll();
   }
 
   const strategy = board.playerInfos[userId].strategy;
@@ -854,21 +843,18 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
 
     const bestOption = optionsWithCriteria.sort((a, b) => b.score - a.score)[0];
 
-    return {
-      move: pick({
-        diceSplitIndex: bestOption.diceSplitIndex,
-        choiceIndex: bestOption.choiceIndex,
-      }),
-      duration: pickDuration,
-    };
+    return pick({
+      diceSplitIndex: bestOption.diceSplitIndex,
+      choiceIndex: bestOption.choiceIndex,
+    });
   }
 
   if (board.bustProb === 0) {
-    return rollMove;
+    return roll();
   }
 
   if (!canStop(board)) {
-    return rollMove;
+    return roll();
   }
 
   // Here we need to choose between stopping and rolling.
@@ -898,7 +884,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
 
   // Special case: if we can win by stopping we stop.
   if (numFinishedCol + board.scores[userId] >= board.numColsToWin) {
-    return stopMove;
+    return stop();
   }
 
   // Compute the probabily of getting a number that can make us stuck - this is a proxy
@@ -960,9 +946,9 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
     w[4] * probHasToOverlap2 +
     w[5] * probHasToOverlap3;
   if (linearComb > 0) {
-    return rollMove;
+    return roll();
   } else {
-    return stopMove;
+    return stop();
   }
 };
 
@@ -995,4 +981,5 @@ export const game: GameDef<ChickenrollBoard> = {
   gamePlayerOptions,
   autoMove,
   playerScoreType: "integer",
+  botMoveDuration,
 };
