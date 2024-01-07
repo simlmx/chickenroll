@@ -38,7 +38,7 @@ $theme-colors: (
 $buttonsWidth: 150px;
 $buttonsHeight: 175px;
 
-@import "node_modules/bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap.scss";
 
 .manipulation {
   touch-action: manipulation;

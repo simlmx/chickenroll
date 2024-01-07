@@ -20,7 +20,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.6",
-    "@rollup/plugin-typescript": "^8.2.1",
+    "@rollup/plugin-typescript": "^11.1.5",
     "@types/jest": "^27.0.3",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.2",
@@ -28,15 +28,17 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "autoprefixer": "^10.4.0",
+    "bgkit-ui-testing": "workspace:^",
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.3.1",
+    "postcss": "^8.4.33",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-redux": "7.2.2",
     "rollup": "^2.60.1",
-    "rollup-plugin-scss": "^2.6.1",
+    "rollup-plugin-scss": "^3.0.0",
     "sass": "^1.43.5",
     "tailwindcss": "^2.2.19",
     "ts-jest": "^27.0.7",
@@ -45,18 +47,18 @@
     "typescript-eslint-parser": "^22.0.0"
   },
   "dependencies": {
-    "bgkit": "^1.0.0",
-    "bgkit-game": "^1.0.0",
-    "bgkit-ui": "^1.0.0",
-    "bgkit-ui-testing": "^1.0.0",
+    "bgkit": "workspace:^",
+    "bgkit-game": "workspace:^",
+    "bgkit-ui": "workspace:^",
     "bootstrap": "^4.5.3",
-    "chickenroll-game": "^1.0.0",
+    "chickenroll-game": "workspace:^",
     "classnames": "^2.3.1",
     "react-spring": "^9.3.2"
   },
   "peerDependencies": {
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-redux": "7.2.2"
+    "react-redux": "7.2.2",
+    "redux": "4.1.2"
   }
 }

@@ -14,7 +14,7 @@ interface DiceBoardProps {
 export const DiceBoard = (props: DiceBoardProps) => {
   const { diceValues, color, diceHighlight, flat } = props;
 
-  const getDie = (index: number): JSX.Element => {
+  const getDie = (index: number) => {
     return (
       <Die
         value={diceValues[index]}

@@ -80,37 +80,35 @@ interface DieProps {
   onClick?: () => void;
 }
 
-export class Die extends React.Component<DieProps> {
-  render() {
-    const { color, value, highlight, onClick } = this.props;
+export const Die = (props: DieProps) => {
+  const { color, value, highlight, onClick } = props;
 
-    let className = "die";
-    if (color != null) {
-      className += ` bgcolor${color}`;
-    }
-    if (highlight) {
-      className += " dieHighlight";
-    }
-    const opts: any = { className };
-
-    if (onClick) {
-      // onMousedown doesn't fall laggy compared to onClick
-      opts["onMouseDown"] = (e: MouseEvent) => {
-        e.preventDefault();
-        onClick();
-      };
-      opts["className"] += " pointer";
-    }
-
-    return (
-      <svg
-        viewBox="0 0 100 100"
-        version="1.1"
-        xmlns="http://www.w3.org/2000/svg"
-        {...opts}
-      >
-        <g fill="#000000">{diceDots(value, color)}</g>
-      </svg>
-    );
+  let className = "die";
+  if (color != null) {
+    className += ` bgcolor${color}`;
   }
-}
+  if (highlight) {
+    className += " dieHighlight";
+  }
+  const opts: any = { className };
+
+  if (onClick) {
+    // onMousedown doesn't fall laggy compared to onClick
+    opts["onMouseDown"] = (e: MouseEvent) => {
+      e.preventDefault();
+      onClick();
+    };
+    opts["className"] += " pointer";
+  }
+
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      {...opts}
+    >
+      <g fill="#000000">{diceDots(value, color)}</g>
+    </svg>
+  );
+};
