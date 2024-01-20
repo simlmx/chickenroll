@@ -193,7 +193,7 @@ export const Mountain = (props: MountainProps) => {
           .fill(undefined)
           .map(() => {
             return { climbers: [] };
-          })
+          }),
       );
 
     for (let j = 0; j < numCols; ++j) {
@@ -244,7 +244,7 @@ export const Mountain = (props: MountainProps) => {
           return;
         }
         elMatrix[numSteps - minRow][diceSum - minCol].climbers.push(
-          <Climber color={playerInfos[playerID].color} key={playerID} />
+          <Climber color={playerInfos[playerID].color} key={playerID} />,
         );
       });
     });
@@ -285,7 +285,7 @@ export const Mountain = (props: MountainProps) => {
         checkpointPositions,
         sum,
         currentPlayer,
-        sameSpace
+        sameSpace,
       );
       updatedCurrentPositions[sum] = newStep;
     });

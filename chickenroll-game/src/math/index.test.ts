@@ -8,7 +8,7 @@ const so = (
   d1,
   enabled0?: boolean,
   enabled1?: boolean,
-  forceSplit = false
+  forceSplit = false,
 ): SumOption => {
   const diceSums: [number, number] = [d0, d1];
   const enabled: [boolean, boolean] = [
@@ -175,7 +175,7 @@ test.each([
     climberPositions: { [col: string]: number },
     checkpointPositions: { [col: string]: number },
     blockedSums: { [col: string]: string },
-    expected: SumOption[]
+    expected: SumOption[],
   ) => {
     expect(
       getSumOptions(
@@ -185,8 +185,8 @@ test.each([
         blockedSums,
         "classic",
         "share",
-        "0"
-      )
+        "0",
+      ),
     ).toEqual(expected);
 
     // In jump mode it should be the same since we don't have opponents in these
@@ -199,10 +199,10 @@ test.each([
         blockedSums,
         "classic",
         "jump",
-        "0"
-      )
+        "0",
+      ),
     ).toEqual(expected);
-  }
+  },
 );
 
 test.each([
@@ -352,7 +352,7 @@ test.each([
     climberPositions: { [col: string]: number },
     checkpointPositions: { [userId: string]: { [col: string]: number } },
     blockedSums: { [col: string]: string },
-    expected: SumOption[]
+    expected: SumOption[],
   ) => {
     expect(
       getSumOptions(
@@ -362,8 +362,8 @@ test.each([
         blockedSums,
         "classic",
         "jump",
-        "0"
-      )
+        "0",
+      ),
     ).toEqual(expected);
-  }
+  },
 );

@@ -13,7 +13,9 @@
     "clean": "rm -rf ./dist",
     "compile": "rollup --config",
     "watch": "rollup --config --watch",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "format": "yarn run prettier --write src && yarn run eslint src --fix",
+    "lint": "yarn run prettier --check src && yarn run eslint src --quiet"
   },
   "author": "Simon Lemieux",
   "license": "ISC",
@@ -25,7 +27,12 @@
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@types/jest": "^29.5.11",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
     "jest": "^29.7.0",
+    "prettier": "^3.2.4",
     "rollup": "^2.79.1",
     "rollup-plugin-typescript2": "^0.31.2",
     "ts-jest": "^29.1.1",

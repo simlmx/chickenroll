@@ -66,7 +66,7 @@ test.each([
   [4, 6, [2, 3, 4, 5, 7, 9, 10, 11, 12], 10 / Math.pow(6, 4)],
 ])("oddsBust %s %s %s %s", (numDice, numSides, allowedSums, expected) => {
   expect(
-    new OddsCalculator(numDice, numSides).oddsBust(allowedSums)
+    new OddsCalculator(numDice, numSides).oddsBust(allowedSums),
   ).toBeCloseTo(expected, 16);
 });
 
@@ -92,6 +92,6 @@ test.each([
   [{ 2: 2, 12: 3 }, { 3: 1 }, [2, 4, 5, 6, 7, 8, 9, 10, 11]],
 ])("getAllowedColumns %s %s %s", (currentPositions, blockedSums, expected) => {
   expect(getAllowedColumns(currentPositions, blockedSums, "classic")).toEqual(
-    expected
+    expected,
   );
 });

@@ -25,7 +25,7 @@ import classNames from "classnames";
 const getButtonClassNames = (
   itsMe: boolean,
   enabled: boolean,
-  color: number
+  color: number,
 ): string => {
   let className = "btn btnAction";
 
@@ -69,7 +69,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
   } = props;
 
   const currentPlayerCanStop = useSelector((state: State) =>
-    canStop(state.board)
+    canStop(state.board),
   );
 
   const rollClassName = getButtonClassNames(itsMe, true, color);
@@ -84,7 +84,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
         className={classNames(
           rollClassName,
           !currentPlayerHasStarted && itsMe && "flashVibrate",
-          lastAction === "roll" && !itsMe && "lastChoiceOtherPlayer"
+          lastAction === "roll" && !itsMe && "lastChoiceOtherPlayer",
         )}
         disabled={!itsMe}
       >
@@ -101,7 +101,7 @@ const ActionButtons = (props: ActionButtonsProps) => {
         }}
         className={classNames(
           stopClassName,
-          lastAction === "stop" && !itsMe && "lastChoiceOtherPlayer"
+          lastAction === "stop" && !itsMe && "lastChoiceOtherPlayer",
         )}
         disabled={!itsMe || !currentPlayerCanStop}
       >
@@ -163,7 +163,7 @@ const Possibilities = (props: {
             className += getButtonClassNames(
               itsMe || (imThePrevious && !currentPlayerHasStarted),
               enabled,
-              color
+              color,
             );
 
             if (wasSelected) {
@@ -188,7 +188,7 @@ const Possibilities = (props: {
                       pick({
                         diceSplitIndex: i,
                         choiceIndex: j,
-                      })
+                      }),
                     );
                 }}
                 // Using mouse over and mouse out because the behaviour is
@@ -218,7 +218,7 @@ const Possibilities = (props: {
                     <div className="possNumber">{sums[1]}</div>
                   </>
                 )}
-              </button>
+              </button>,
             );
           });
 
@@ -256,21 +256,21 @@ const MoveButtons = (props: MoveButtonsProps) => {
 
   const userId = useSelector((state: State) => state.userId);
   const currentPlayer = useSelector(
-    (state: State) => state.board.currentPlayer
+    (state: State) => state.board.currentPlayer,
   );
   const stage = useSelector((state: State) => state.board.stage);
   const lastPickedDiceSumOption = useSelector(
-    (state: State) => state.board.lastPickedDiceSumOption
+    (state: State) => state.board.lastPickedDiceSumOption,
   );
   const lastAction = useSelector((state: State) => state.board.lastAction);
   const diceSumOptions = useSelector(
-    (state: State) => state.board.diceSumOptions
+    (state: State) => state.board.diceSumOptions,
   );
   const currentPlayerHasStarted = useSelector(
-    (state: State) => state.board.currentPlayerHasStarted
+    (state: State) => state.board.currentPlayerHasStarted,
   );
   const previousPlayer = useSelector(
-    (state: State) => state.board.previousPlayer
+    (state: State) => state.board.previousPlayer,
   );
   const lastOutcome = useSelector((state: State) => state.board.lastOutcome);
 
@@ -278,7 +278,7 @@ const MoveButtons = (props: MoveButtonsProps) => {
   const imThePrevious = userId === previousPlayer;
 
   const isBot = useSelector(
-    fromBoardSelector((board) => board.playerInfos[currentPlayer].isBot)
+    fromBoardSelector((board) => board.playerInfos[currentPlayer].isBot),
   );
 
   // There are two possibilities: either we show the Roll/Stop buttons, or we show the

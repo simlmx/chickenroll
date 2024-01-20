@@ -1,8 +1,5 @@
 import { getNumStepsForSum } from "../math";
-import { NUM_COLORS } from "../constants";
 import { MountainShape } from "../types";
-
-type Dice2sums = { [key: string]: Set<number> };
 
 // https://stackoverflow.com/a/12628791/1067132
 const _f = (a, b) => [].concat(...a.map((d) => b.map((e) => [].concat(d, e))));
@@ -55,7 +52,7 @@ export class OddsCalculator {
 
     let numSuccess = 0;
     this.dice2sums.forEach((sums) => {
-      for (let sum of sums) {
+      for (const sum of sums) {
         if (allowedSumsSet.has(sum)) {
           numSuccess += 1;
           break;
@@ -71,7 +68,7 @@ export class OddsCalculator {
    */
   oddsNeedsForbidden(
     allowed: number,
-    forbidden: Set<number> = new Set()
+    forbidden: Set<number> = new Set(),
   ): number {
     let numSuccess = 0;
 
@@ -79,7 +76,7 @@ export class OddsCalculator {
       let foundAllowed = false;
       let foundForbidden = false;
 
-      for (let sum of sums) {
+      for (const sum of sums) {
         if (forbidden.has(sum)) {
           foundForbidden = true;
           break;
@@ -99,11 +96,11 @@ export class OddsCalculator {
 export function getAllowedColumns(
   currentPositions,
   blockedSums,
-  mountainShape: MountainShape
+  mountainShape: MountainShape,
 ) {
   // We start with the blocked columns.
   const blockedSumsSet = new Set(
-    Object.keys(blockedSums).map((x) => parseInt(x))
+    Object.keys(blockedSums).map((x) => parseInt(x)),
   );
   // To which we add the columns for which the current position is at the last step,
   // which makes them blocked too.

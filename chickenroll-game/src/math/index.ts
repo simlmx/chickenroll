@@ -40,7 +40,7 @@ export const getSpaceLeft = (
   mountainShape: MountainShape,
   sameSpace: SameSpace,
   column: number,
-  userId: UserId
+  userId: UserId,
 ) => {
   const startStep =
     currentPositions[column] || checkpointPositions[userId]?.[column] || 0;
@@ -76,7 +76,7 @@ export const getSumOptions = (
   blockedSums: { [key: number]: string },
   mountainShape: MountainShape,
   sameSpace: SameSpace,
-  userId: UserId
+  userId: UserId,
 ): SumOption[] => {
   if (diceValues.length !== 4) {
     throw new Error("Should have 4 values");
@@ -85,13 +85,13 @@ export const getSumOptions = (
   const numClimbersLeft = 3 - Object.keys(currentPositions).length;
 
   // How many space left for each current climber.
-  let currentClimberSpaceLeft = new Map<DiceSum, number>();
+  const currentClimberSpaceLeft = new Map<DiceSum, number>();
 
-  let updatedBlockedSums = new Set(
-    Object.keys(blockedSums).map((x) => parseInt(x))
+  const updatedBlockedSums = new Set(
+    Object.keys(blockedSums).map((x) => parseInt(x)),
   );
 
-  Object.entries(currentPositions).forEach(([diceSumStr, currentStep]) => {
+  Object.entries(currentPositions).forEach(([diceSumStr]) => {
     const diceSum = parseInt(diceSumStr);
     const space = getSpaceLeft(
       currentPositions,
@@ -99,7 +99,7 @@ export const getSumOptions = (
       mountainShape,
       sameSpace,
       diceSum,
-      userId
+      userId,
     );
 
     currentClimberSpaceLeft.set(diceSum, space);
@@ -117,7 +117,7 @@ export const getSumOptions = (
     const diceSums: [DiceSum, DiceSum] = group.map(
       (twoDiceIndices): DiceSum => {
         return twoDiceIndices.map((i) => diceValues[i]).reduce((a, b) => a + b);
-      }
+      },
     ) as [DiceSum, DiceSum];
 
     if (diceSums[0] === diceSums[1]) {
@@ -149,7 +149,7 @@ export const getSumOptions = (
               mountainShape,
               sameSpace,
               diceSum,
-              userId
+              userId,
             ) === 1
           ) {
             return { diceSums, enabled: [true, true], split: true };
@@ -166,7 +166,7 @@ export const getSumOptions = (
 
       // Are they enabled?
       const enabled = diceSums.map((diceSum: DiceSum): boolean => {
-        const alreadyClimbingIt = currentPositions.hasOwnProperty(diceSum);
+        const alreadyClimbingIt = currentPositions[diceSum] !== undefined;
 
         if (alreadyClimbingIt) {
           // While we are at it note that we are climbing at least one of those
@@ -207,7 +207,7 @@ export const getSumOptions = (
  */
 export function getNumStepsForSum(
   sum: number,
-  mountainShape: MountainShape
+  mountainShape: MountainShape,
 ): number {
   // Using the symetry.
   if (sum >= 7) {

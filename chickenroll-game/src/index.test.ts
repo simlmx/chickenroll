@@ -30,12 +30,12 @@ test.each([
     sameSpace: "share" | "jump",
     currentPositions: { [col: string]: number },
     checkpointPositions: { [userId: string]: { [col: string]: number } },
-    expected: number
+    expected: number,
   ) => {
     expect(
-      climbOneStep(currentPositions, checkpointPositions, 7, "0", sameSpace)
+      climbOneStep(currentPositions, checkpointPositions, 7, "0", sameSpace),
     ).toEqual(expected);
-  }
+  },
 );
 
 test.each([
@@ -50,12 +50,12 @@ test.each([
   (
     currentPositions: CurrentPositions,
     checkpointPositions: CheckpointPositions,
-    expected: number
+    expected: number,
   ) => {
     expect(
-      numCurrentPlayerOverlap(currentPositions, checkpointPositions)
+      numCurrentPlayerOverlap(currentPositions, checkpointPositions),
     ).toEqual(expected);
-  }
+  },
 );
 
 test("happy path", () => {
@@ -72,7 +72,7 @@ test("happy path", () => {
   const checkItsTheirTurn = (userId: UserId): void => {
     match.meta.players.allIds.forEach((otherUserId) => {
       expect(match.meta.players.byId[otherUserId].itsYourTurn).toBe(
-        userId === otherUserId
+        userId === otherUserId,
       );
     });
   };
@@ -280,7 +280,6 @@ test("when only one step left because of jump, option is split - already climbin
   // There is only one step left for player 0
   random.next([1, 2, 1, 2]);
   match.makeMove(p0, roll());
-  const option = { diceSums: [3, 3], enabled: [true, true], split: true };
   expect(match.board.diceSumOptions).toEqual([
     { diceSums: [3, 3], enabled: [true, true], split: true },
     { diceSums: [2, 4], enabled: [true, true], split: false },

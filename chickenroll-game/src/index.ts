@@ -37,7 +37,6 @@ import {
   CheckpointPositions,
   PlayerInfo,
   ChickenrollBoard,
-  Info,
   Move,
   ShowProbsType,
   Stage,
@@ -86,7 +85,7 @@ const updateBustProb = (board: ChickenrollBoard, endOfTurn: boolean): void => {
   const allowedColumns = getAllowedColumns(
     board.currentPositions,
     board.blockedSums,
-    board.mountainShape
+    board.mountainShape,
   );
   board.bustProb = getOddsCalculator().oddsBust(allowedColumns);
 };
@@ -100,11 +99,11 @@ export const climbOneStep = (
   checkpointPositions: CheckpointPositions,
   column: number,
   userId: UserId,
-  sameSpace: SameSpace
+  sameSpace: SameSpace,
 ): number => {
   let newStep;
 
-  if (currentPositions.hasOwnProperty(column)) {
+  if (currentPositions[column] !== undefined) {
     newStep = currentPositions[column] + 1;
   } else {
     const playerCheckpoint = checkpointPositions[userId];
@@ -134,7 +133,7 @@ export const climbOneStep = (
             return true;
           }
           return false;
-        }
+        },
       );
       if (weJumped) {
         newStep++;
@@ -186,11 +185,11 @@ export const [STOPPED, stopped] = createBoardUpdate("stopped");
 // overlaps. Useful for the "nostop" mode.
 export const numCurrentPlayerOverlap = (
   currentPositions: CurrentPositions,
-  checkpointPositions: CheckpointPositions
+  checkpointPositions: CheckpointPositions,
 ): number => {
   let numOverlap = 0;
-  for (let [col, step] of Object.entries(currentPositions)) {
-    for (let positions2 of Object.values(checkpointPositions)) {
+  for (const [col, step] of Object.entries(currentPositions)) {
+    for (const positions2 of Object.values(checkpointPositions)) {
       if (positions2[col] === step) {
         numOverlap++;
         break;
@@ -244,12 +243,12 @@ const moves: Moves<ChickenrollBoard> = {
         board.blockedSums,
         board.mountainShape,
         board.sameSpace,
-        board.currentPlayer
+        board.currentPlayer,
       );
 
       // Check if busted.
       const busted = diceSumOptions.every((sumOption: SumOption) =>
-        sumOption.enabled.every((x) => !x)
+        sumOption.enabled.every((x) => !x),
       );
 
       yield rolled({ diceValues, diceSumOptions, move, busted });
@@ -275,7 +274,7 @@ const moves: Moves<ChickenrollBoard> = {
     },
   },
   [PICK]: {
-    canDo({ userId, board, payload }) {
+    canDo({ userId, board }) {
       // FIXME Also check that we can choose *that* move option
       return board.currentPlayer === userId && board.stage === "moving";
     },
@@ -374,13 +373,13 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
     board.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
     board.lastAction = null;
 
-    newDiceSums.forEach((col, i) => {
+    newDiceSums.forEach((col) => {
       board.currentPositions[col] = climbOneStep(
         board.currentPositions,
         board.checkpointPositions,
         col,
         board.currentPlayer,
-        board.sameSpace
+        board.sameSpace,
       );
     });
     updateBustProb(board, /* endOfTurn */ false);
@@ -595,7 +594,7 @@ const getFinishCols = ({
         board.mountainShape,
         board.sameSpace,
         cols[0],
-        board.currentPlayer
+        board.currentPlayer,
       ) === 2
     ) {
       return cols;
@@ -613,7 +612,7 @@ const getFinishCols = ({
         board.mountainShape,
         board.sameSpace,
         col,
-        board.currentPlayer
+        board.currentPlayer,
       ) === 1
     ) {
       finishedCols.push(col);
@@ -638,7 +637,7 @@ const getExpectedFinalProb = ({
   // that column.
   // Then sort in increasing order of bust probability.
   const thirdColInfo: { col: number; probBust: number }[] = ALL_COLS.filter(
-    (col) => col !== a && col !== b
+    (col) => col !== a && col !== b,
   )
     .filter((col) => !blockedSums[col])
     .map((col) => ({
@@ -663,11 +662,7 @@ const getExpectedFinalProb = ({
   return expectation;
 };
 
-const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
-  board,
-  userId,
-  random,
-}) => {
+const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({ board, userId }) => {
   // First roll ever.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
     return roll();
@@ -722,7 +717,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
       // console.log("old colset", Object.keys(board.currentPositions));
       // Build the final set of columns.
       const colSet = new Set(
-        Object.keys(board.currentPositions).map((col) => parseInt(col))
+        Object.keys(board.currentPositions).map((col) => parseInt(col)),
       );
       const newCols = new Set<number>();
       const numClimbersBefore = colSet.size;
@@ -777,7 +772,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
       // Use the current overlap number as the baseline
       let numOverlap = numCurrentPlayerOverlap(
         board.currentPositions,
-        board.checkpointPositions
+        board.checkpointPositions,
       );
       for (const col of cols) {
         const endsAt = climbOneStep(
@@ -785,7 +780,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
           board.checkpointPositions,
           col,
           userId,
-          board.sameSpace
+          board.sameSpace,
         );
         const startsAt =
           board.currentPositions[col] ||
@@ -876,12 +871,6 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
     }
   });
 
-  const allowed = getAllowedColumns(
-    board.currentPositions,
-    board.blockedSums,
-    board.mountainShape
-  );
-
   // Special case: if we can win by stopping we stop.
   if (numFinishedCol + board.scores[userId] >= board.numColsToWin) {
     return stop();
@@ -893,9 +882,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({
   let probHasToOverlap2 = 0;
   let probHasToOverlap3 = 0;
   const numClimbers = Object.keys(board.currentPositions).length;
-  const cols = Object.keys(Object.entries(board.currentPositions)).map((x) =>
-    parseInt(x)
-  );
+
   if (numClimbers === 3) {
     const colsCouldStuck = new Set();
     for (const [colStr, ourStep] of Object.entries(board.currentPositions)) {
