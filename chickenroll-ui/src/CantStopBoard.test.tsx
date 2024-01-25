@@ -1,3 +1,4 @@
+import { test } from "vitest";
 import type { UserId } from "bgkit";
 import { MatchTester as MatchTesterOrig } from "bgkit-game";
 import { render } from "bgkit-ui-testing";

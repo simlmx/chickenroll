@@ -17,5 +17,6 @@ export default {
     typescript({ tsconfig: "./tsconfig.json" }),
     scss({ sass }),
   ],
-  external: ["react", "react-dom", "react-redux"],
+  preserveSymlinks: true,
+  external: [/node_modules/],
 };

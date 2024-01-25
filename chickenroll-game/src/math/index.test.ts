@@ -1,3 +1,4 @@
+import { test, expect } from "vitest";
 import { getSumOptions, SumOption } from "../math";
 
 /*

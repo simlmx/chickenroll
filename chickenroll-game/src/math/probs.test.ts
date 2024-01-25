@@ -1,3 +1,4 @@
+import { test, expect } from "vitest";
 import { cartesian, OddsCalculator, getAllowedColumns } from "../math/probs";
 
 test.each([

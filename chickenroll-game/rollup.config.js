@@ -10,15 +10,12 @@ export default {
       format: "esm",
       sourcemap: true,
     },
-    {
-      file: "dist/cjs/index.js",
-      format: "cjs",
-      sourcemap: true,
-    },
   ],
   plugins: [
     nodeResolve(),
     commonjs(),
     typescript({ useTsconfigDeclarationDir: true }),
   ],
+  external: [/node_modules/],
+  preserveSymlinks: true,
 };
