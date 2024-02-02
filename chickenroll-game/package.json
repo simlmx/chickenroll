@@ -19,7 +19,7 @@
   },
   "author": "Simon Lemieux",
   "license": "ISC",
-  "dependencies": {
+  "peerDependencies": {
     "bgkit": "workspace:^",
     "bgkit-game": "workspace:^"
   },
@@ -28,6 +28,8 @@
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
+    "bgkit": "workspace:^",
+    "bgkit-game": "workspace:^",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.4",

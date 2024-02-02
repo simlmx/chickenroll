@@ -16,6 +16,6 @@ export default {
     commonjs(),
     typescript({ useTsconfigDeclarationDir: true }),
   ],
-  external: [/node_modules/],
   preserveSymlinks: true,
+  external: ["bgkit", "bgkit-game"],
 };

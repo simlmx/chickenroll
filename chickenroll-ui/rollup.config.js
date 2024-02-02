@@ -18,5 +18,5 @@ export default {
     scss({ sass }),
   ],
   preserveSymlinks: true,
-  external: [/node_modules/],
+  external: ["bgkit", "bgkit-game", "bgkit-ui", "react", "react-redux"],
 };
