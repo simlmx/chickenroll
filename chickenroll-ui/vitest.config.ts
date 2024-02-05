@@ -5,7 +5,6 @@ export default defineConfig({
     environment: "jsdom",
   },
   resolve: {
-    preserveSymlinks: true,
     dedupe: ["react", "react-dom", "react-redux", "redux"],
     mainFields: ["module", "main"],
   },

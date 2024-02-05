@@ -14,8 +14,8 @@
     "compile": "rollup --config",
     "watch": "NODE_ENV=development rollup --config --watch",
     "test": "vitest run src",
-    "format": "yarn run prettier --write src && yarn run eslint src --fix",
-    "lint": "yarn run prettier --check src && yarn run eslint src --quiet"
+    "format": "pnpm exec prettier --write src && pnpm exec eslint src --fix",
+    "lint": "pnpm exec prettier --check src && pnpm exec eslint src --quiet"
   },
   "author": "Simon Lemieux",
   "license": "ISC",

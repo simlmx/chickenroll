@@ -17,6 +17,5 @@ export default {
     typescript({ tsconfig: "./tsconfig.json" }),
     scss({ sass }),
   ],
-  preserveSymlinks: true,
   external: ["bgkit", "bgkit-game", "bgkit-ui", "react", "react-redux"],
 };
