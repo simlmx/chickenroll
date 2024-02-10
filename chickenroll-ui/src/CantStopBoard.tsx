@@ -198,31 +198,6 @@ export const Board = () => {
     };
   }, [infoCode, infoTs, itsYourTurn]);
 
-  // Make the web page's title flash when it's your turn!
-  useEffect(() => {
-    if (!itsYourTurn) {
-      return;
-    }
-    const title = document.title;
-    let interval: ReturnType<typeof setInterval>;
-    if (itsYourTurn) {
-      const titles = ["It's your turn!", title];
-      // Call it right way to display "It's your turn!" as fast as possible. Then re-run
-      // every 1.5 seconds.
-      document.title = titles[0];
-      let i = 1;
-      interval = setInterval(() => {
-        document.title = titles[i];
-        i = 1 - i;
-      }, 1500);
-    }
-
-    return () => {
-      clearInterval(interval);
-      document.title = title;
-    };
-  }, [itsYourTurn]);
-
   // Make a sound when it's your turn.
   useEffect(() => {
     if (itsYourTurn) {
