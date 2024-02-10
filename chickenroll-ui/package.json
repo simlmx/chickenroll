@@ -57,7 +57,7 @@
   "dependencies": {
     "bootstrap": "^4.5.3",
     "classnames": "^2.3.1",
-    "react-spring": "^9.3.2"
+    "react-spring": "9.3.2"
   },
   "peerDependencies": {
     "bgkit": "workspace:^",
