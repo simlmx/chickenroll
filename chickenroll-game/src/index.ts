@@ -391,9 +391,8 @@ const gameOptions: GameOptions = [
   {
     key: "sameSpace",
     label: "Egg overlap",
-    shortLabel: null,
     options: [
-      { value: "share", label: "Allow", shortLabel: null, default: true },
+      { value: "share", label: "Allow", default: true },
       { value: "jump", label: "Jump over", shortLabel: "Jump" },
       { value: "nostop", label: "Must roll" },
     ],
@@ -402,9 +401,8 @@ const gameOptions: GameOptions = [
   {
     key: "mountainShape",
     label: "Column height",
-    shortLabel: null,
     options: [
-      { value: "tall", label: "Modern", shortLabel: null, default: true },
+      { value: "tall", label: "Modern", default: true },
       { value: "classic", label: "Classic" },
     ],
     help: "Height of the columns. Modern is taller and better calibrated than Classic.",
@@ -412,16 +410,14 @@ const gameOptions: GameOptions = [
   {
     key: "showProbs",
     label: "Show probabilities",
-    shortLabel: "Probs",
     options: [
-      { value: "before", label: "Always" },
+      { value: "before", label: "Always", shortLabel: "Probs: Always" },
       {
         value: "after",
         label: "End of the turn",
         default: true,
-        shortLabel: null,
       },
-      { value: "never", label: "Never" },
+      { value: "never", label: "Never", shortLabel: "Probs: Never" },
     ],
     help: "When to show the probability of cracking.",
   },
