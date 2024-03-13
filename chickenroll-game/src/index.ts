@@ -965,4 +965,6 @@ export const game: GameDef<ChickenrollBoard> = {
   autoMove,
   playerScoreType: "integer",
   botMoveDuration,
+  minPlayers: 2,
+  maxPlayers: 5,
 };

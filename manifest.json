@@ -3,8 +3,6 @@
   "version": "1",
   "name": "Chicken Roll",
   "author": "simlmx",
-  "minPlayers": 2,
-  "maxPlayers": 5,
   "meta": {
     "relatedGames": {
       "how": "inspired",
