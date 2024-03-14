@@ -173,7 +173,7 @@ test("when only one step left because of jump, option is split", () => {
     gameDef: game,
     numPlayers: 3,
     random,
-    matchOptions: {
+    matchSettings: {
       sameSpace: "jump",
       mountainShape: "classic",
       showProbs: "after",
@@ -210,7 +210,7 @@ test("when only one step left because of jump, option is split - already climbin
     gameDef: game,
     numPlayers: 3,
     random,
-    matchOptions: {
+    matchSettings: {
       sameSpace: "jump",
       mountainShape: "classic",
       showProbs: "after",
@@ -247,7 +247,7 @@ test("when only one step left because of jump, option is split - already climbin
     gameDef: game,
     numPlayers: 3,
     random,
-    matchOptions: {
+    matchSettings: {
       sameSpace: "jump",
       mountainShape: "classic",
       showProbs: "after",
@@ -300,12 +300,12 @@ for (const numBots of [2, 3, 4, 5]) {
   }
 }
 
-test.each(botTestConfigs)("bot games %s %s", async (numBots, matchOptions) => {
+test.each(botTestConfigs)("bot games %s %s", async (numBots, matchSettings) => {
   const match = new MatchTester<ChickenrollBoard>({
     gameDef: game,
     numPlayers: 0,
     numBots,
-    matchOptions,
+    matchSettings,
   });
 
   await match.start();

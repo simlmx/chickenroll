@@ -1,8 +1,8 @@
 import {
-  GameOptions,
+  GameSettings,
   UserId,
-  GamePlayerOptions,
-  PlayerOptionType,
+  GamePlayerSettings,
+  PlayerSettingType,
   endMatch,
   itsYourTurn,
 } from "bgkit";
@@ -387,7 +387,7 @@ const boardUpdates: BoardUpdates<ChickenrollBoard> = {
   },
 };
 
-const gameOptions: GameOptions = [
+const gameSettings: GameSettings = [
   {
     key: "sameSpace",
     label: "Egg overlap",
@@ -437,8 +437,8 @@ const numPlayersToNumCols = (numPlayers: number): number => {
 
 const initialBoard = ({
   players,
-  matchOptions,
-  matchPlayersOptions,
+  matchSettings,
+  matchPlayersSettings,
   random,
   isBot,
 }): ChickenrollBoard => {
@@ -463,12 +463,12 @@ const initialBoard = ({
   userIds.forEach((userId, i) => {
     scores[userId] = 0;
     checkpointPositions[userId] = {};
-    const options = matchPlayersOptions[userId];
-    const color = options?.color;
-    const strategy = options?.strategy;
+    const settings = matchPlayersSettings[userId];
+    const color = settings?.color;
+    const strategy = settings?.strategy;
     playerInfos[userId] = {
       color: color === undefined ? i : parseInt(color),
-      strategy: strategy || strategies[matchOptions.sameSpace],
+      strategy: strategy || strategies[matchSettings.sameSpace],
       isBot: isBot[userId],
     };
   });
@@ -513,9 +513,9 @@ const initialBoard = ({
     bustProb: 0,
     endOfTurnBustProb: 0,
     // For now we hard-code the shape to our own default.
-    mountainShape: matchOptions.mountainShape,
-    sameSpace: matchOptions.sameSpace,
-    showProbs: matchOptions.showProbs,
+    mountainShape: matchSettings.mountainShape,
+    sameSpace: matchSettings.sameSpace,
+    showProbs: matchSettings.showProbs,
     lastOutcome: "stop",
 
     currentPlayerIndex: 0,
@@ -935,7 +935,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({ board, userId }) => {
   }
 };
 
-const gamePlayerOptions: GamePlayerOptions = {
+const gamePlayerSettings: GamePlayerSettings = {
   color: {
     label: "Color",
     options: [
@@ -948,7 +948,7 @@ const gamePlayerOptions: GamePlayerOptions = {
       { label: "#f35076", value: "5" },
       { label: "#a32ea3", value: "6" },
     ],
-    type: "color" as PlayerOptionType,
+    type: "color" as PlayerSettingType,
     exclusive: true,
   },
 };
@@ -960,8 +960,8 @@ export const game: GameDef<ChickenrollBoard> = {
   },
   moves,
   boardUpdates,
-  gameOptions,
-  gamePlayerOptions,
+  gameSettings,
+  gamePlayerSettings,
   autoMove,
   playerScoreType: "integer",
   botMoveDuration,
