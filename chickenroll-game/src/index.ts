@@ -2,7 +2,6 @@ import {
   GameSettings,
   UserId,
   GamePlayerSettings,
-  PlayerSettingType,
   endMatch,
   itsYourTurn,
 } from "bgkit";
@@ -948,7 +947,7 @@ const gamePlayerSettings: GamePlayerSettings = {
       { label: "#f35076", value: "5" },
       { label: "#a32ea3", value: "6" },
     ],
-    type: "color" as PlayerSettingType,
+    type: "color",
     exclusive: true,
   },
 };
