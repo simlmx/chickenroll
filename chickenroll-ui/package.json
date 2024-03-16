@@ -15,7 +15,7 @@
     "watch": "NODE_ENV=development rollup --config --watch",
     "test": "vitest run src",
     "format": "pnpm exec prettier --write src && pnpm exec eslint src --fix",
-    "lint": "pnpm exec prettier --check src && pnpm exec eslint src --quiet"
+    "check-format": "pnpm exec prettier --check src && pnpm exec eslint src --quiet"
   },
   "author": "Simon Lemieux",
   "license": "ISC",
