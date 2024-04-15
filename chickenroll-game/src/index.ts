@@ -1,18 +1,6 @@
-import {
-  GameSettings,
-  UserId,
-  GamePlayerSettings,
-  endMatch,
-  itsYourTurn,
-} from "bgkit";
+import { GameSettings, UserId, GamePlayerSettings } from "bgkit";
 
-import {
-  createMove,
-  createBoardUpdate,
-  Moves,
-  BoardUpdates,
-  GameDef,
-} from "bgkit-game";
+import { createMove, Moves, GameDef } from "bgkit-game";
 
 import {
   getSumOptions,
@@ -166,20 +154,6 @@ type PickPayload = {
 };
 export const [PICK, pick] = createMove<PickPayload>("pick");
 
-type RolledPayload = {
-  // Dice values we rolled.
-  diceValues: number[];
-  // diceSumOptions after this roll (if any!)
-  diceSumOptions: SumOption[];
-  // The move to add to the history.
-  move: Move;
-  // This we bust on that roll or not.
-  busted: boolean;
-};
-export const [ROLLED, rolled] = createBoardUpdate<RolledPayload>("rolled");
-export const [PICKED, picked] = createBoardUpdate("picked");
-export const [STOPPED, stopped] = createBoardUpdate("stopped");
-
 // Compare the current positions with the checkpoint positions to see if anything
 // overlaps. Useful for the "nostop" mode.
 export const numCurrentPlayerOverlap = (
@@ -226,11 +200,11 @@ const moves: Moves<ChickenrollBoard> = {
     canDo({ userId, board }) {
       return board.currentPlayer === userId && board.stage === "rolling";
     },
-    *executeNow() {
+    executeNow() {
       // FIXME we need to set a flag saying we are rolling. This way in the UI we can have
       // something.
     },
-    *execute({ board, random }) {
+    execute({ board, random, itsYourTurn }) {
       const diceValues = random.d6(4);
 
       const move: Move = { diceValues, userId: board.currentPlayer };
@@ -250,10 +224,31 @@ const moves: Moves<ChickenrollBoard> = {
         sumOption.enabled.every((x) => !x),
       );
 
-      yield rolled({ diceValues, diceSumOptions, move, busted });
+      {
+        board.diceValues = diceValues;
+
+        board.lastPickedDiceSumOption = undefined;
+        board.lastAction = "roll";
+        board.diceSumOptions = diceSumOptions;
+
+        if (busted) {
+          board.info = {
+            code: "bust",
+            userId: board.currentPlayer,
+            ts: new Date().getTime(),
+          };
+          endTurn(board, "bust");
+          move.bust = true;
+        } else {
+          board.currentPlayerHasStarted = true;
+          gotoStage(board, "moving");
+        }
+
+        board.moveHistory.push(move);
+      }
 
       if (busted) {
-        yield itsYourTurn({ userIds: [board.currentPlayer] });
+        itsYourTurn({ userIds: [board.currentPlayer] });
       }
     },
   },
@@ -261,14 +256,49 @@ const moves: Moves<ChickenrollBoard> = {
     canDo({ userId, board }) {
       return board.currentPlayer === userId && canStop(board);
     },
-    *executeNow() {
-      yield stopped();
-    },
-    *execute({ board }) {
-      if (board.stage === "gameover") {
-        yield endMatch({ scores: board.scores });
+    executeNow({ board }) {
+      board.lastPickedDiceSumOption = undefined;
+      board.lastAction = "stop";
+      board.diceSumOptions = undefined;
+      // Save current positions as checkpoints.
+      Object.entries(board.currentPositions).forEach(([diceSumStr, step]) => {
+        const diceSum = parseInt(diceSumStr);
+        board.checkpointPositions[board.currentPlayer][diceSum] = step;
+        if (step === getNumStepsForSum(diceSum, board.mountainShape)) {
+          board.blockedSums[diceSum] = board.currentPlayer;
+          board.scores[board.currentPlayer] += 1;
+          // Remove all the checkpoints for that one
+          for (const userId of Object.keys(board.playerInfos)) {
+            delete board.checkpointPositions[userId][diceSum];
+          }
+        }
+      });
+
+      // Check if we should end the game,
+      if (board.scores[board.currentPlayer] >= board.numColsToWin) {
+        // Clean the board a bit.
+        board.currentPositions = {};
+        board.info = {
+          code: "win",
+          userId: board.currentPlayer,
+          ts: new Date().getTime(),
+        };
+        gotoStage(board, "gameover");
       } else {
-        yield itsYourTurn({ userIds: [board.currentPlayer] });
+        board.info = {
+          code: "stop",
+          userId: board.currentPlayer,
+          ts: new Date().getTime(),
+        };
+
+        endTurn(board, "stop");
+      }
+    },
+    execute({ board, endMatch, itsYourTurn }) {
+      if (board.stage === "gameover") {
+        endMatch({ scores: board.scores });
+      } else {
+        itsYourTurn({ userIds: [board.currentPlayer] });
       }
     },
   },
@@ -277,112 +307,45 @@ const moves: Moves<ChickenrollBoard> = {
       // FIXME Also check that we can choose *that* move option
       return board.currentPlayer === userId && board.stage === "moving";
     },
-    *executeNow({ payload }) {
+    executeNow({ board, payload }) {
       // Simply forward the payload from the move.
-      yield picked(payload);
-    },
-  },
-};
+      const { diceSplitIndex, choiceIndex } = payload;
 
-const boardUpdates: BoardUpdates<ChickenrollBoard> = {
-  [ROLLED]: (board, payload: RolledPayload) => {
-    const { diceValues, diceSumOptions, move, busted } = payload;
-    board.diceValues = diceValues;
+      const move = getLastMove(board);
+      move.diceSplitIndex = diceSplitIndex;
 
-    board.lastPickedDiceSumOption = undefined;
-    board.lastAction = "roll";
-    board.diceSumOptions = diceSumOptions;
-
-    if (busted) {
-      board.info = {
-        code: "bust",
-        userId: board.currentPlayer,
-        ts: new Date().getTime(),
-      };
-      endTurn(board, "bust");
-      move.bust = true;
-    } else {
-      board.currentPlayerHasStarted = true;
-      gotoStage(board, "moving");
-    }
-
-    board.moveHistory.push(move);
-  },
-  [STOPPED]: (board) => {
-    board.lastPickedDiceSumOption = undefined;
-    board.lastAction = "stop";
-    board.diceSumOptions = undefined;
-    // Save current positions as checkpoints.
-    Object.entries(board.currentPositions).forEach(([diceSumStr, step]) => {
-      const diceSum = parseInt(diceSumStr);
-      board.checkpointPositions[board.currentPlayer][diceSum] = step;
-      if (step === getNumStepsForSum(diceSum, board.mountainShape)) {
-        board.blockedSums[diceSum] = board.currentPlayer;
-        board.scores[board.currentPlayer] += 1;
-        // Remove all the checkpoints for that one
-        for (const userId of Object.keys(board.playerInfos)) {
-          delete board.checkpointPositions[userId][diceSum];
-        }
+      // Should not happen but makes typescript happy.
+      if (board.diceSumOptions == null) {
+        throw new Error("assert false");
       }
-    });
+      const sumOption = board.diceSumOptions[diceSplitIndex];
+      const { diceSums, enabled } = sumOption;
+      let newDiceSums: number[];
 
-    // Check if we should end the game,
-    if (board.scores[board.currentPlayer] >= board.numColsToWin) {
-      // Clean the board a bit.
-      board.currentPositions = {};
-      board.info = {
-        code: "win",
-        userId: board.currentPlayer,
-        ts: new Date().getTime(),
-      };
-      gotoStage(board, "gameover");
-    } else {
-      board.info = {
-        code: "stop",
-        userId: board.currentPlayer,
-        ts: new Date().getTime(),
-      };
+      if (sumOption.split) {
+        newDiceSums = [diceSums[choiceIndex]];
+        move.diceUsed = [choiceIndex];
+      } else {
+        newDiceSums = diceSums;
+        move.diceUsed = diceSums
+          .map((s, i) => (enabled[i] ? i : null))
+          .filter((x) => x != null) as number[];
+      }
+      board.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
+      board.lastAction = null;
 
-      endTurn(board, "stop");
-    }
-  },
-  [PICKED]: (board, payload) => {
-    const { diceSplitIndex, choiceIndex } = payload;
-
-    const move = getLastMove(board);
-    move.diceSplitIndex = diceSplitIndex;
-
-    // Should not happen but makes typescript happy.
-    if (board.diceSumOptions == null) {
-      throw new Error("assert false");
-    }
-    const sumOption = board.diceSumOptions[diceSplitIndex];
-    const { diceSums, enabled } = sumOption;
-    let newDiceSums: number[];
-
-    if (sumOption.split) {
-      newDiceSums = [diceSums[choiceIndex]];
-      move.diceUsed = [choiceIndex];
-    } else {
-      newDiceSums = diceSums;
-      move.diceUsed = diceSums
-        .map((s, i) => (enabled[i] ? i : null))
-        .filter((x) => x != null) as number[];
-    }
-    board.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];
-    board.lastAction = null;
-
-    newDiceSums.forEach((col) => {
-      board.currentPositions[col] = climbOneStep(
-        board.currentPositions,
-        board.checkpointPositions,
-        col,
-        board.currentPlayer,
-        board.sameSpace,
-      );
-    });
-    updateBustProb(board, /* endOfTurn */ false);
-    gotoStage(board, "rolling");
+      newDiceSums.forEach((col) => {
+        board.currentPositions[col] = climbOneStep(
+          board.currentPositions,
+          board.checkpointPositions,
+          col,
+          board.currentPlayer,
+          board.sameSpace,
+        );
+      });
+      updateBustProb(board, /* endOfTurn */ false);
+      gotoStage(board, "rolling");
+    },
   },
 };
 
@@ -958,7 +921,6 @@ export const game: GameDef<ChickenrollBoard> = {
     return [board.currentPlayer];
   },
   moves,
-  boardUpdates,
   gameSettings,
   gamePlayerSettings,
   autoMove,
