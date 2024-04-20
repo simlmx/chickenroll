@@ -397,13 +397,13 @@ const numPlayersToNumCols = (numPlayers: number): number => {
   return numCols;
 };
 
-const initialBoard = ({
+const initialBoards = ({
   players,
   matchSettings,
   matchPlayersSettings,
   random,
-  isBot,
-}): ChickenrollBoard => {
+  areBots,
+}) => {
   const scores: { [userId: string]: number } = {};
   const checkpointPositions: CheckpointPositions = {};
 
@@ -431,7 +431,7 @@ const initialBoard = ({
     playerInfos[userId] = {
       color: color === undefined ? i : parseInt(color),
       strategy: strategy || strategies[matchSettings.sameSpace],
-      isBot: isBot[userId],
+      isBot: areBots[userId],
     };
   });
 
@@ -447,7 +447,9 @@ const initialBoard = ({
   // checkpointPositions[p0][6] = 12;
   // checkpointPositions[p1][12] = 2;
 
-  return {
+  const currentPlayer = playerOrder[0];
+
+  const board = {
     /*
      * Rows are 1-indexed. This means that
      * 0 == not on the board
@@ -466,7 +468,7 @@ const initialBoard = ({
     playerInfos,
     numPlayers,
     // This will contain the details about the last info we want to show to the user.
-    info: { code: "start", ts: new Date().getTime() },
+    info: { code: "start" as const, ts: new Date().getTime() },
     // This tells us if the current player has started playing. When this is true we'll
     // show the players things like "it's your turn" messages.
     currentPlayerHasStarted: false,
@@ -478,13 +480,15 @@ const initialBoard = ({
     mountainShape: matchSettings.mountainShape,
     sameSpace: matchSettings.sameSpace,
     showProbs: matchSettings.showProbs,
-    lastOutcome: "stop",
+    lastOutcome: "stop" as const,
 
     currentPlayerIndex: 0,
-    currentPlayer: playerOrder[0],
-    stage: "rolling",
+    currentPlayer,
+    stage: "rolling" as const,
     playerOrder,
   };
+
+  return { board, itsYourTurnUsers: [currentPlayer] };
 };
 
 // A list of criteria we are interested in when choosing an option.
@@ -916,10 +920,7 @@ const gamePlayerSettings: GamePlayerSettings = {
 };
 
 export const game: GameDef<ChickenrollBoard> = {
-  initialBoard,
-  initialItsYourTurn({ board }) {
-    return [board.currentPlayer];
-  },
+  initialBoards,
   moves,
   gameSettings,
   gamePlayerSettings,
