@@ -1,5 +1,3 @@
-import React, { useMemo } from "react";
-
 import { UserId } from "bgkit";
 import {
   climbOneStep,
@@ -10,6 +8,7 @@ import {
   SameSpace,
   SumOption,
 } from "chickenroll-game";
+import React, { useMemo } from "react";
 
 import Chicken from "./Chicken";
 

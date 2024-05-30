@@ -1,7 +1,6 @@
-import { expect, test } from "vitest";
-
 import { UserId } from "bgkit";
 import { MatchTester, RandomMock } from "bgkit-game";
+import { expect, test } from "vitest";
 
 import {
   ChickenrollBoard,

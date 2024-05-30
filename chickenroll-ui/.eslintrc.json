@@ -14,31 +14,7 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/no-explicit-any": "off",
-    "simple-import-sort/imports": [
-      "error",
-      {
-        "groups": [
-          [
-            "^\\u0000"
-          ],
-          [
-            "^node:"
-          ],
-          [
-            "^@?\\w"
-          ],
-          [
-            "(^bgkit|^common$|^frontend$|-game$|-ui$|-data$)"
-          ],
-          [
-            "^"
-          ],
-          [
-            "^\\."
-          ]
-        ]
-      }
-    ],
+    "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error"
   },
   "parserOptions": {
