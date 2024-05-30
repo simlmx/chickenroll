@@ -1,6 +1,7 @@
+import React from "react";
+
 import { UserId } from "bgkit";
 import { DICE_INDICES, Move, PlayerInfo } from "chickenroll-game";
-import React from "react";
 
 import { BustEmoji } from "./Bust";
 import { DiceBoard } from "./DiceBoard";

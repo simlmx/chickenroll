@@ -5,8 +5,8 @@
     "strict": true,
     "jsx": "react-jsx",
     "outDir": "dist",
-    "declarationDir": "types"
+    "declarationDir": "types",
   },
 
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
 }
