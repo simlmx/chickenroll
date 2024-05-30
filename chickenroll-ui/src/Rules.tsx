@@ -1,7 +1,8 @@
 import "./index.scss";
 
-import { MountainShape, SameSpace } from "chickenroll-game";
 import React from "react";
+
+import { MountainShape, SameSpace } from "chickenroll-game";
 
 import { Die } from "./Die";
 import { Climber, Mountain } from "./Mountain";

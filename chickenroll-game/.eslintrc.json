@@ -10,7 +10,31 @@
   ],
   "root": true,
   "rules": {
-    "simple-import-sort/imports": "error",
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          [
+            "^\\u0000"
+          ],
+          [
+            "^node:"
+          ],
+          [
+            "^@?\\w"
+          ],
+          [
+            "(^bgkit|^common$|^frontend$|-game$|-ui$|-data$)"
+          ],
+          [
+            "^"
+          ],
+          [
+            "^\\."
+          ]
+        ]
+      }
+    ],
     "simple-import-sort/exports": "error"
   }
 }

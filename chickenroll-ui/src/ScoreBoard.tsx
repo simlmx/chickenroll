@@ -1,7 +1,8 @@
+import React from "react";
+
 import { UserId } from "bgkit";
 import { useUsernames } from "bgkit-ui";
 import { PlayerInfo } from "chickenroll-game";
-import React from "react";
 
 import Chicken from "./Chicken";
 
