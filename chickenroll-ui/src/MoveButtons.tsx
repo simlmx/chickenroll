@@ -1,22 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
-
 import { UserId } from "bgkit";
-import { useSelector, useDispatch } from "bgkit-ui";
+import { useDispatch, useSelector } from "bgkit-ui";
 import {
+  botMoveDuration,
+  canStop,
+  pick,
   ShowProbsType,
   SumOption,
-  pick,
-  canStop,
-  botMoveDuration,
 } from "chickenroll-game";
+import classNames from "classnames";
+import React, { useEffect, useRef, useState } from "react";
 
-import { State } from "./types";
 import { BustProb } from "./Bust";
 import { DiceSplit } from "./icons";
-
 import { fromBoardSelector } from "./selectors";
-
-import classNames from "classnames";
+import { State } from "./types";
 
 /*
  * Given if it's us playing (itsMe) and if the button should be enabled, we return the

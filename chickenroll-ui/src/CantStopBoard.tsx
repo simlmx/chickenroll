@@ -1,28 +1,25 @@
-import React, { useState, useEffect, useMemo, ReactNode } from "react";
+import "./index.scss";
 
 import { UserId } from "bgkit";
 import {
-  useSelector,
-  useDispatch,
   playSound,
-  useUsername,
+  useDispatch,
   useIsPlayer,
+  useSelector,
+  useUsername,
 } from "bgkit-ui";
-
 import { PlayerInfo, roll, stop } from "chickenroll-game";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
-import "./index.scss";
-
-import { State } from "./types";
+import { BustProb } from "./Bust";
 import { DiceBoard } from "./DiceBoard";
-import { Mountain, EggsLeft, Climber } from "./Mountain";
-import { ScoreBoard } from "./ScoreBoard";
+import InGameIcons from "./InGameIcons";
+import { Climber, EggsLeft, Mountain } from "./Mountain";
 import MoveButtons from "./MoveButtons";
 import MoveHistory from "./MoveHistory";
-
-import InGameIcons from "./InGameIcons";
-import { BustProb } from "./Bust";
+import { ScoreBoard } from "./ScoreBoard";
 import { fromBoardSelector } from "./selectors";
+import { State } from "./types";
 
 interface InfoProps {
   info?: { code: string; userId?: UserId };

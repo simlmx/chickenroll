@@ -1,6 +1,7 @@
 import { UserId } from "bgkit";
-import { DiceSum, MountainShape, SameSpace } from "../types";
+
 import { NUM_STEPS } from "../constants";
+import { DiceSum, MountainShape, SameSpace } from "../types";
 
 export const DICE_INDICES = [
   [

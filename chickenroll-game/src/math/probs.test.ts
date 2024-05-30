@@ -1,5 +1,6 @@
-import { test, expect } from "vitest";
-import { cartesian, OddsCalculator, getAllowedColumns } from "../math/probs";
+import { expect, test } from "vitest";
+
+import { cartesian, getAllowedColumns, OddsCalculator } from "../math/probs";
 
 test.each([
   [

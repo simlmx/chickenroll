@@ -1,17 +1,17 @@
-import { test, expect } from "vitest";
 import { UserId } from "bgkit";
 import { MatchTester, RandomMock } from "bgkit-game";
+import { expect, test } from "vitest";
 
-import { CurrentPositions, CheckpointPositions } from "./types";
 import {
-  game,
   ChickenrollBoard,
   climbOneStep,
+  game,
   numCurrentPlayerOverlap,
-  roll,
   pick,
+  roll,
   stop,
 } from ".";
+import { CheckpointPositions, CurrentPositions } from "./types";
 
 test.each([
   ["share", {}, {}, 1],

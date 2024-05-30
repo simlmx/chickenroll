@@ -1,15 +1,14 @@
-import React, { useMemo } from "react";
-
 import { UserId } from "bgkit";
 import {
-  getNumStepsForSum,
-  SumOption,
-  PlayerInfo,
-  MountainShape,
-  SameSpace,
-  NUM_STEPS,
   climbOneStep,
+  getNumStepsForSum,
+  MountainShape,
+  NUM_STEPS,
+  PlayerInfo,
+  SameSpace,
+  SumOption,
 } from "chickenroll-game";
+import React, { useMemo } from "react";
 
 import Chicken from "./Chicken";
 

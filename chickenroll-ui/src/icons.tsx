@@ -1,5 +1,5 @@
-import React from "react";
 import { DICE_INDICES } from "chickenroll-game";
+import React from "react";
 
 // From: https://github.com/tailwindlabs/heroicons/blob/master/src/solid/pencil.svg
 export const Pencil = (props: { color?: number }) => {

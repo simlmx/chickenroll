@@ -1,7 +1,7 @@
+import classnames from "classnames";
 import React from "react";
 
 import { Die } from "./Die";
-import classnames from "classnames";
 
 interface DiceBoardProps {
   diceValues: number[];

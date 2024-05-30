@@ -1,49 +1,45 @@
-import { GameSettings, UserId, GamePlayerSettings } from "bgkit";
+import { GamePlayerSettings, GameSettings, UserId } from "bgkit";
+import { createMove, GameDef, Moves } from "bgkit-game";
 
-import { createMove, Moves, GameDef } from "bgkit-game";
-
+import { NUM_STEPS } from "./constants";
 import {
-  getSumOptions,
-  getNumStepsForSum,
-  SumOption,
-  getSpaceLeft,
   DICE_INDICES,
+  getNumStepsForSum,
+  getSpaceLeft,
+  getSumOptions,
+  SumOption,
 } from "./math";
-
 import {
   getAllowedColumns,
   getOddsCalculator,
   OddsCalculator,
 } from "./math/probs";
-
 import {
+  CheckpointPositions,
+  ChickenrollBoard,
+  CurrentPositions,
   DiceSum,
   MountainShape,
-  SameSpace,
-  CurrentPositions,
-  CheckpointPositions,
-  PlayerInfo,
-  ChickenrollBoard,
   Move,
+  PlayerInfo,
+  SameSpace,
   ShowProbsType,
   Stage,
 } from "./types";
 
-import { NUM_STEPS } from "./constants";
-
 // Imports that should also be exported.
 export {
-  SumOption,
-  getNumStepsForSum,
-  DICE_INDICES,
-  NUM_STEPS,
-  DiceSum,
-  SameSpace,
-  MountainShape,
-  PlayerInfo,
   ChickenrollBoard,
+  DICE_INDICES,
+  DiceSum,
+  getNumStepsForSum,
+  MountainShape,
   Move,
+  NUM_STEPS,
+  PlayerInfo,
+  SameSpace,
   ShowProbsType,
+  SumOption,
 };
 
 const ALL_COLS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
