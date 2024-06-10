@@ -1,4 +1,4 @@
-import { UserId } from "bgkit";
+import { UserId } from "@lefun/core";
 
 import { SumOption } from "./math";
 

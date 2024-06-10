@@ -1,8 +1,8 @@
+import { UserId } from "@lefun/core";
+import { useDispatch, useSelector } from "@lefun/ui";
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 
-import { UserId } from "bgkit";
-import { useDispatch, useSelector } from "bgkit-ui";
 import {
   botMoveDuration,
   canStop,

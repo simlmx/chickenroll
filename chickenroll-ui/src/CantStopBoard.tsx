@@ -1,15 +1,15 @@
 import "./index.scss";
 
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
-
-import { UserId } from "bgkit";
+import { UserId } from "@lefun/core";
 import {
   playSound,
   useDispatch,
   useIsPlayer,
   useSelector,
   useUsername,
-} from "bgkit-ui";
+} from "@lefun/ui";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
+
 import { PlayerInfo, roll, stop } from "chickenroll-game";
 
 import { BustProb } from "./Bust";

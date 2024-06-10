@@ -1,5 +1,5 @@
-import { GamePlayerSettings, GameSettings, UserId } from "bgkit";
-import { createMove, GameDef, Moves } from "bgkit-game";
+import { GamePlayerSettings, GameSettings, UserId } from "@lefun/core";
+import { createMove, GameDef, Moves } from "@lefun/game";
 
 import { NUM_STEPS } from "./constants";
 import {

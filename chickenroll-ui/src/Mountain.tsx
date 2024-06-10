@@ -1,6 +1,6 @@
+import { UserId } from "@lefun/core";
 import React, { useMemo } from "react";
 
-import { UserId } from "bgkit";
 import {
   climbOneStep,
   getNumStepsForSum,

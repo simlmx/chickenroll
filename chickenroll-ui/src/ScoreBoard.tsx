@@ -1,7 +1,7 @@
+import { UserId } from "@lefun/core";
+import { useUsernames } from "@lefun/ui";
 import React from "react";
 
-import { UserId } from "bgkit";
-import { useUsernames } from "bgkit-ui";
 import { PlayerInfo } from "chickenroll-game";
 
 import Chicken from "./Chicken";

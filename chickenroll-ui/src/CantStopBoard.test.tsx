@@ -1,8 +1,8 @@
+import type { UserId } from "@lefun/core";
+import { MatchTester as MatchTesterOrig } from "@lefun/game";
+import { render } from "@lefun/ui-testing";
 import { test } from "vitest";
 
-import type { UserId } from "bgkit";
-import { MatchTester as MatchTesterOrig } from "bgkit-game";
-import { render } from "bgkit-ui-testing";
 import { ChickenrollBoard, game } from "chickenroll-game";
 
 import { Board } from "./CantStopBoard";

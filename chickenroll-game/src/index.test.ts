@@ -1,7 +1,6 @@
+import { UserId } from "@lefun/core";
+import { MatchTester, RandomMock } from "@lefun/game";
 import { expect, test } from "vitest";
-
-import { UserId } from "bgkit";
-import { MatchTester, RandomMock } from "bgkit-game";
 
 import {
   ChickenrollBoard,

@@ -16,5 +16,5 @@ export default {
     commonjs(),
     typescript({ useTsconfigDeclarationDir: true }),
   ],
-  external: ["bgkit", "bgkit-game"],
+  external: ["@lefun/core", "@lefun/game"],
 };

@@ -1,4 +1,4 @@
-import { UserId } from "bgkit";
+import { UserId } from "@lefun/core";
 
 import { NUM_STEPS } from "../constants";
 import { DiceSum, MountainShape, SameSpace } from "../types";

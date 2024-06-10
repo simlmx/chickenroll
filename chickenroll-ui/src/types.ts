@@ -1,4 +1,5 @@
-import { UserId } from "bgkit";
+import { UserId } from "@lefun/core";
+
 import { ChickenrollBoard } from "chickenroll-game";
 
 export interface State {

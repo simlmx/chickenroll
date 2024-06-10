@@ -1,6 +1,6 @@
+import { UserId } from "@lefun/core";
 import React from "react";
 
-import { UserId } from "bgkit";
 import { DICE_INDICES, Move, PlayerInfo } from "chickenroll-game";
 
 import { BustEmoji } from "./Bust";

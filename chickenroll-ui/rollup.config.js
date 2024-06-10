@@ -17,5 +17,5 @@ export default {
     typescript({ tsconfig: "./tsconfig.json" }),
     scss({ sass }),
   ],
-  external: ["bgkit", "bgkit-game", "bgkit-ui", "react", "react-redux"],
+  external: ["@lefun/core", "@lefun/game", "@lefun/ui", "react", "react-redux"],
 };
