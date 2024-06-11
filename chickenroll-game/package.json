@@ -21,15 +21,15 @@
   "license": "ISC",
   "peerDependencies": {
     "@lefun/core": "*",
-    "@lefun/game": "workspace:^"
+    "@lefun/game": "*"
   },
   "devDependencies": {
+    "@lefun/core": "*",
+    "@lefun/game": "*",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
-    "@lefun/core": "*",
-    "@lefun/game": "workspace:^",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
