@@ -24,8 +24,8 @@
     "@lefun/game": "*"
   },
   "devDependencies": {
-    "@lefun/core": "1.1.0",
-    "@lefun/game": "1.1.0",
+    "@lefun/core": "1.1.1",
+    "@lefun/game": "1.1.1",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
