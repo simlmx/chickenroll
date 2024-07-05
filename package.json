@@ -1,0 +1,7 @@
+{
+  "name": "chickenroll",
+  "private": true,
+  "devDependencies": {
+    "prettier": "^3.2.4"
+  }
+}
