@@ -2,15 +2,19 @@ import "./index.scss";
 
 import { UserId } from "@lefun/core";
 import {
+  makeUseMakeMove,
+  makeUseSelector,
   playSound,
-  useDispatch,
   useIsPlayer,
-  useSelector,
   useUsername,
 } from "@lefun/ui";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
-import { PlayerInfo, roll, stop } from "chickenroll-game";
+import {
+  ChickenrollGame,
+  ChickenrollGameState,
+  PlayerInfo,
+} from "chickenroll-game";
 
 import { BustProb } from "./Bust";
 import { DiceBoard } from "./DiceBoard";
@@ -21,6 +25,9 @@ import MoveHistory from "./MoveHistory";
 import { ScoreBoard } from "./ScoreBoard";
 import { fromBoardSelector } from "./selectors";
 import { State } from "./types";
+
+const useSelector = makeUseSelector<ChickenrollGameState>();
+const useMakeMove = makeUseMakeMove<ChickenrollGame>();
 
 interface InfoProps {
   info?: { code: string; userId?: UserId };
@@ -143,7 +150,7 @@ export const Board = () => {
     { buttonRow: number; buttonColumn: number } | undefined
   >(undefined);
 
-  const dispatch = useDispatch();
+  const makeMove = useMakeMove();
   const isPlayer = useIsPlayer();
 
   //FIXME useSelector instead of this
@@ -291,11 +298,11 @@ export const Board = () => {
             playerInfos[userId == null || !isPlayer ? currentPlayer : userId]
               .color,
           onRoll: () => {
-            dispatch(roll());
+            makeMove("roll");
             setShowInfo(false);
           },
           onStop: () => {
-            dispatch(stop());
+            makeMove("stop");
             setShowInfo(false);
           },
           showProbs,

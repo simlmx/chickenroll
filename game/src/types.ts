@@ -1,4 +1,5 @@
-import { UserId } from "@lefun/core";
+import type { UserId } from "@lefun/core";
+import type { GameState } from "@lefun/game";
 
 import { SumOption } from "./math";
 
@@ -95,3 +96,5 @@ export type Move = {
 
 export type ShowProbsType = "before" | "after" | "never";
 export type Stage = "moving" | "rolling" | "gameover";
+
+export type ChickenrollGameState = GameState<ChickenrollBoard>;

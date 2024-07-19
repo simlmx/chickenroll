@@ -1,12 +1,13 @@
 import { UserId } from "@lefun/core";
-import { useDispatch, useSelector } from "@lefun/ui";
+import { makeUseMakeMove, makeUseSelector } from "@lefun/ui";
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
   botMoveDuration,
   canStop,
-  pick,
+  ChickenrollGame,
+  ChickenrollGameState,
   ShowProbsType,
   SumOption,
 } from "chickenroll-game";
@@ -15,6 +16,9 @@ import { BustProb } from "./Bust";
 import { DiceSplit } from "./icons";
 import { fromBoardSelector } from "./selectors";
 import { State } from "./types";
+
+const useSelector = makeUseSelector<ChickenrollGameState>();
+const useMakeMove = makeUseMakeMove<ChickenrollGame>();
 
 /*
  * Given if it's us playing (itsMe) and if the button should be enabled, we return the
@@ -123,7 +127,7 @@ const Possibilities = (props: {
 }) => {
   const touch = useRef(false);
 
-  const dispatch = useDispatch();
+  const makeMove = useMakeMove();
 
   const {
     lastPickedDiceSumOption,
@@ -182,12 +186,10 @@ const Possibilities = (props: {
                 onClick={() => {
                   itsMe &&
                     enabled &&
-                    dispatch(
-                      pick({
-                        diceSplitIndex: i,
-                        choiceIndex: j,
-                      }),
-                    );
+                    makeMove("pick", {
+                      diceSplitIndex: i,
+                      choiceIndex: j,
+                    });
                 }}
                 // Using mouse over and mouse out because the behaviour is
                 // nicer!

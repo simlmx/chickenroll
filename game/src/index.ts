@@ -1,5 +1,5 @@
 import { GamePlayerSettings, GameSettings, UserId } from "@lefun/core";
-import { createMove, GameDef, Moves } from "@lefun/game";
+import { AutoMove, Game, PlayerMove } from "@lefun/game";
 
 import { NUM_STEPS } from "./constants";
 import {
@@ -17,6 +17,7 @@ import {
 import {
   CheckpointPositions,
   ChickenrollBoard,
+  ChickenrollGameState,
   CurrentPositions,
   DiceSum,
   MountainShape,
@@ -30,6 +31,7 @@ import {
 // Imports that should also be exported.
 export {
   ChickenrollBoard,
+  ChickenrollGameState,
   DICE_INDICES,
   DiceSum,
   getNumStepsForSum,
@@ -141,14 +143,10 @@ const endTurn = (board: ChickenrollBoard, outcome: "bust" | "stop"): void => {
   updateBustProb(board, /* endOfTurn */ true);
 };
 
-export const [ROLL, roll] = createMove("roll");
-export const [STOP, stop] = createMove("stop");
-
 type PickPayload = {
   diceSplitIndex: number;
   choiceIndex: number;
 };
-export const [PICK, pick] = createMove<PickPayload>("pick");
 
 // Compare the current positions with the checkpoint positions to see if anything
 // overlaps. Useful for the "nostop" mode.
@@ -191,8 +189,9 @@ export const canStop = (board: ChickenrollBoard): boolean => {
   return numCurrentPlayerOverlap(currentPositions, checkpointPositions) === 0;
 };
 
-const moves: Moves<ChickenrollBoard> = {
-  [ROLL]: {
+const roll: PlayerMove<ChickenrollGameState> =
+  //
+  {
     canDo({ userId, board }) {
       return board.currentPlayer === userId && board.stage === "rolling";
     },
@@ -247,8 +246,11 @@ const moves: Moves<ChickenrollBoard> = {
         itsYourTurn({ userIds: [board.currentPlayer] });
       }
     },
-  },
-  [STOP]: {
+  };
+
+const stop: PlayerMove<ChickenrollGameState> =
+  //
+  {
     canDo({ userId, board }) {
       return board.currentPlayer === userId && canStop(board);
     },
@@ -297,8 +299,11 @@ const moves: Moves<ChickenrollBoard> = {
         itsYourTurn({ userIds: [board.currentPlayer] });
       }
     },
-  },
-  [PICK]: {
+  };
+
+const pick: PlayerMove<ChickenrollGameState, PickPayload> =
+  //
+  {
     canDo({ userId, board }) {
       // FIXME Also check that we can choose *that* move option
       return board.currentPlayer === userId && board.stage === "moving";
@@ -342,8 +347,7 @@ const moves: Moves<ChickenrollBoard> = {
       updateBustProb(board, /* endOfTurn */ false);
       gotoStage(board, "rolling");
     },
-  },
-};
+  };
 
 const gameSettings: GameSettings = [
   {
@@ -620,10 +624,13 @@ const getExpectedFinalProb = ({
   return expectation;
 };
 
-const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({ board, userId }) => {
+export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
+  board,
+  userId,
+}) => {
   // First roll ever.
   if (!board.currentPlayerHasStarted && board.stage === "rolling") {
-    return roll();
+    return "roll";
   }
 
   const strategy = board.playerInfos[userId].strategy;
@@ -796,18 +803,21 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({ board, userId }) => {
 
     const bestOption = optionsWithCriteria.sort((a, b) => b.score - a.score)[0];
 
-    return pick({
-      diceSplitIndex: bestOption.diceSplitIndex,
-      choiceIndex: bestOption.choiceIndex,
-    });
+    return [
+      "pick",
+      {
+        diceSplitIndex: bestOption.diceSplitIndex,
+        choiceIndex: bestOption.choiceIndex,
+      },
+    ];
   }
 
   if (board.bustProb === 0) {
-    return roll();
+    return "roll";
   }
 
   if (!canStop(board)) {
-    return roll();
+    return "roll";
   }
 
   // Here we need to choose between stopping and rolling.
@@ -831,7 +841,7 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({ board, userId }) => {
 
   // Special case: if we can win by stopping we stop.
   if (numFinishedCol + board.scores[userId] >= board.numColsToWin) {
-    return stop();
+    return "stop";
   }
 
   // Compute the probabily of getting a number that can make us stuck - this is a proxy
@@ -891,9 +901,9 @@ const autoMove: GameDef<ChickenrollBoard>["autoMove"] = ({ board, userId }) => {
     w[4] * probHasToOverlap2 +
     w[5] * probHasToOverlap3;
   if (linearComb > 0) {
-    return roll();
+    return "roll";
   } else {
-    return stop();
+    return "stop";
   }
 };
 
@@ -915,14 +925,19 @@ const gamePlayerSettings: GamePlayerSettings = {
   },
 };
 
-export const game: GameDef<ChickenrollBoard> = {
+export const game = {
   initialBoards,
-  moves,
+  playerMoves: {
+    roll,
+    stop,
+    pick,
+  },
   gameSettings,
   gamePlayerSettings,
-  autoMove,
   playerScoreType: "integer",
   botMoveDuration,
   minPlayers: 2,
   maxPlayers: 5,
-};
+} satisfies Game<ChickenrollGameState>;
+
+export type ChickenrollGame = typeof game;

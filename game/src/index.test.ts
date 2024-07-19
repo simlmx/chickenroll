@@ -1,17 +1,21 @@
 import { UserId } from "@lefun/core";
-import { MatchTester, RandomMock } from "@lefun/game";
+import { MatchTester as _MatchTester, RandomMock } from "@lefun/game";
 import { expect, test } from "vitest";
 
 import {
-  ChickenrollBoard,
+  autoMove,
+  ChickenrollGame,
   climbOneStep,
   game,
   numCurrentPlayerOverlap,
-  pick,
-  roll,
-  stop,
 } from ".";
-import { CheckpointPositions, CurrentPositions } from "./types";
+import {
+  CheckpointPositions,
+  ChickenrollGameState,
+  CurrentPositions,
+} from "./types";
+
+class MatchTester extends _MatchTester<ChickenrollGameState, ChickenrollGame> {}
 
 test.each([
   ["share", {}, {}, 1],
@@ -61,8 +65,9 @@ test.each([
 
 test("happy path", () => {
   const random = new RandomMock();
-  const match = new MatchTester<ChickenrollBoard>({
-    gameDef: game,
+  const match = new MatchTester({
+    game,
+    autoMove,
     numPlayers: 3,
     random,
   });
@@ -81,26 +86,26 @@ test("happy path", () => {
   checkItsTheirTurn(p0);
   random.next([6, 6, 6, 6]);
 
-  match.makeMove(p0, roll());
+  match.makeMove(p0, "roll");
   checkItsTheirTurn(p0);
 
-  match.makeMove(p0, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
+  match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
   checkItsTheirTurn(p0);
 
   random.next([6, 6, 1, 1]);
-  match.makeMove(p0, roll());
-  match.makeMove(p0, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
+  match.makeMove(p0, "roll");
+  match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
 
   random.next([1, 1, 1, 1]);
-  match.makeMove(p0, roll());
-  match.makeMove(p0, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
+  match.makeMove(p0, "roll");
+  match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
 
   checkItsTheirTurn(p0);
 
   expect(match.board.currentPositions).toEqual({ 2: 3, 12: 3 });
 
   // At this point player p0 has finished column 12 and 2.
-  match.makeMove(p0, stop());
+  match.makeMove(p0, "stop");
 
   expect(match.board.blockedSums).toEqual({
     2: p0,
@@ -109,29 +114,29 @@ test("happy path", () => {
 
   checkItsTheirTurn(p1);
 
-  // Quickly check the two other "pick" options.
+  // Quickly check the two other "'pick'," options.
   random.next([2, 3, 4, 5]);
-  match.makeMove(p1, roll());
-  match.makeMove(p1, pick({ diceSplitIndex: 2, choiceIndex: 0 }));
+  match.makeMove(p1, "roll");
+  match.makeMove(p1, "pick", { diceSplitIndex: 2, choiceIndex: 0 });
 
   expect(match.board.currentPositions).toEqual({ 7: 2 });
 
   random.next([2, 3, 4, 5]);
-  match.makeMove(p1, roll());
-  match.makeMove(p1, pick({ diceSplitIndex: 1, choiceIndex: 0 }));
+  match.makeMove(p1, "roll");
+  match.makeMove(p1, "pick", { diceSplitIndex: 1, choiceIndex: 0 });
 
   expect(match.board.currentPositions).toEqual({ 7: 2, 6: 1, 8: 1 });
 
   // Pick only one number.
   random.next([1, 1, 3, 4]);
-  match.makeMove(p1, roll());
-  match.makeMove(p1, pick({ diceSplitIndex: 0, choiceIndex: 1 }));
+  match.makeMove(p1, "roll");
+  match.makeMove(p1, "pick", { diceSplitIndex: 0, choiceIndex: 1 });
 
   expect(match.board.currentPositions).toEqual({ 7: 3, 6: 1, 8: 1 });
 
   checkItsTheirTurn(p1);
 
-  match.makeMove(p1, stop());
+  match.makeMove(p1, "stop");
   checkItsTheirTurn(p2);
 
   expect(match.board.currentPositions).toEqual({});
@@ -142,9 +147,9 @@ test("happy path", () => {
   });
 
   random.next([3, 3, 3, 3]);
-  match.makeMove(p2, roll());
-  match.makeMove(p2, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p2, stop());
+  match.makeMove(p2, "roll");
+  match.makeMove(p2, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p2, "stop");
 
   expect(match.board.checkpointPositions).toEqual({
     [p0]: {},
@@ -157,11 +162,11 @@ test("happy path", () => {
   // Let's roll 3 double 3s
   for (let i = 0; i < 3; ++i) {
     random.next([1, 2, 1, 2]);
-    match.makeMove(p0, roll());
-    match.makeMove(p0, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
+    match.makeMove(p0, "roll");
+    match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
     checkItsTheirTurn(p0);
   }
-  match.makeMove(p0, stop());
+  match.makeMove(p0, "stop");
 
   expect(match.matchHasEnded).toEqual(true);
 });
@@ -169,8 +174,9 @@ test("happy path", () => {
 test("when only one step left because of jump, option is split", () => {
   const random = new RandomMock();
 
-  const match = new MatchTester<ChickenrollBoard>({
-    gameDef: game,
+  const match = new MatchTester({
+    game,
+    autoMove,
     numPlayers: 3,
     random,
     matchSettings: {
@@ -184,21 +190,21 @@ test("when only one step left because of jump, option is split", () => {
 
   // p0 climbs on 2
   random.next([1, 1, 3, 4]);
-  match.makeMove(p0, roll());
-  match.makeMove(p0, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p0, stop());
+  match.makeMove(p0, "roll");
+  match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p0, "stop");
   expect(match.board.checkpointPositions[p0][2]).toEqual(1);
 
   // p1 climbs on 2
   random.next([1, 1, 3, 4]);
-  match.makeMove(p1, roll());
-  match.makeMove(p1, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p1, stop());
+  match.makeMove(p1, "roll");
+  match.makeMove(p1, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p1, "stop");
   expect(match.board.checkpointPositions[p1][2]).toEqual(2);
 
   // p2 should have a split option because he can get to the top in only one step.
   random.next([1, 1, 1, 1]);
-  match.makeMove(p2, roll());
+  match.makeMove(p2, "roll");
   const option = { diceSums: [2, 2], enabled: [true, true], split: true };
   expect(match.board.diceSumOptions).toEqual([option, option, option]);
 });
@@ -206,8 +212,9 @@ test("when only one step left because of jump, option is split", () => {
 test("when only one step left because of jump, option is split - already climbing", () => {
   const random = new RandomMock();
 
-  const match = new MatchTester<ChickenrollBoard>({
-    gameDef: game,
+  const match = new MatchTester({
+    game,
+    autoMove,
     numPlayers: 3,
     random,
     matchSettings: {
@@ -221,21 +228,21 @@ test("when only one step left because of jump, option is split - already climbin
 
   // p0 climbs on 2
   random.next([1, 1, 3, 4]);
-  match.makeMove(p0, roll());
-  match.makeMove(p0, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p0, stop());
+  match.makeMove(p0, "roll");
+  match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p0, "stop");
   expect(match.board.checkpointPositions[p0][2]).toEqual(1);
 
   // p1 climbs on 2
   random.next([1, 1, 3, 4]);
-  match.makeMove(p1, roll());
-  match.makeMove(p1, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p1, stop());
+  match.makeMove(p1, "roll");
+  match.makeMove(p1, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p1, "stop");
   expect(match.board.checkpointPositions[p1][2]).toEqual(2);
 
   // p2 should have a split option because he can get to the top in only one step.
   random.next([1, 1, 1, 1]);
-  match.makeMove(p2, roll());
+  match.makeMove(p2, "roll");
   const option = { diceSums: [2, 2], enabled: [true, true], split: true };
   expect(match.board.diceSumOptions).toEqual([option, option, option]);
 });
@@ -243,8 +250,9 @@ test("when only one step left because of jump, option is split - already climbin
 test("when only one step left because of jump, option is split - already climbing", () => {
   const random = new RandomMock();
 
-  const match = new MatchTester<ChickenrollBoard>({
-    gameDef: game,
+  const match = new MatchTester({
+    game,
+    autoMove,
     numPlayers: 3,
     random,
     matchSettings: {
@@ -258,21 +266,21 @@ test("when only one step left because of jump, option is split - already climbin
 
   // p0 climbs 2 steps on 3
   random.next([1, 2, 1, 2]);
-  match.makeMove(p0, roll());
-  match.makeMove(p0, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p0, stop());
+  match.makeMove(p0, "roll");
+  match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p0, "stop");
 
   // p1 climbs on 2 steps
   random.next([1, 2, 1, 2]);
-  match.makeMove(p1, roll());
-  match.makeMove(p1, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p1, stop());
+  match.makeMove(p1, "roll");
+  match.makeMove(p1, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p1, "stop");
 
   // p2 same
   random.next([1, 2, 1, 2]);
-  match.makeMove(p2, roll());
-  match.makeMove(p2, pick({ diceSplitIndex: 0, choiceIndex: 0 }));
-  match.makeMove(p2, stop());
+  match.makeMove(p2, "roll");
+  match.makeMove(p2, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+  match.makeMove(p2, "stop");
 
   expect(match.board.checkpointPositions[p0][3]).toEqual(2);
   expect(match.board.checkpointPositions[p1][3]).toEqual(3);
@@ -280,7 +288,7 @@ test("when only one step left because of jump, option is split - already climbin
 
   // There is only one step left for player 0
   random.next([1, 2, 1, 2]);
-  match.makeMove(p0, roll());
+  match.makeMove(p0, "roll");
   expect(match.board.diceSumOptions).toEqual([
     { diceSums: [3, 3], enabled: [true, true], split: true },
     { diceSums: [2, 4], enabled: [true, true], split: false },
@@ -301,8 +309,9 @@ for (const numBots of [2, 3, 4, 5]) {
 }
 
 test.each(botTestConfigs)("bot games %s %s", async (numBots, matchSettings) => {
-  const match = new MatchTester<ChickenrollBoard>({
-    gameDef: game,
+  const match = new MatchTester({
+    game,
+    autoMove,
     numPlayers: 0,
     numBots,
     matchSettings,
