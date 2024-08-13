@@ -32,7 +32,7 @@ export type ChickenrollBoard = {
   lastPickedDiceSumOption?: number[];
   // What was the last action between roll and stop. Optional for backward compatibility.
   lastAction?: "roll" | "stop" | null;
-  blockedSums: { [diceSum: number]: UserId };
+  blockedSums: Record<number, UserId>;
   info?: Info;
   // Number of columns finished for each player.
   // scores: { [userId: number]: number };

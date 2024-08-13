@@ -1,5 +1,16 @@
-import { GamePlayerSettings, GameSettings, UserId } from "@lefun/core";
-import { AutoMove, Game, PlayerMove } from "@lefun/game";
+import {
+  GamePlayerSettings,
+  GameSettings,
+  GameStats,
+  UserId,
+} from "@lefun/core";
+import {
+  AutoMove,
+  Game,
+  INIT_MOVE,
+  InitialBoard,
+  PlayerMove,
+} from "@lefun/game";
 
 import { NUM_STEPS } from "./constants";
 import {
@@ -157,7 +168,7 @@ export const numCurrentPlayerOverlap = (
   let numOverlap = 0;
   for (const [col, step] of Object.entries(currentPositions)) {
     for (const positions2 of Object.values(checkpointPositions)) {
-      if (positions2[col] === step) {
+      if (positions2[parseInt(col)] === step) {
         numOverlap++;
         break;
       }
@@ -199,7 +210,7 @@ const roll: PlayerMove<ChickenrollGameState> =
       // FIXME we need to set a flag saying we are rolling. This way in the UI we can have
       // something.
     },
-    execute({ board, random, itsYourTurn }) {
+    execute({ board, random, turns }) {
       const diceValues = random.d6(4);
 
       const move: Move = { diceValues, userId: board.currentPlayer };
@@ -243,7 +254,8 @@ const roll: PlayerMove<ChickenrollGameState> =
       }
 
       if (busted) {
-        itsYourTurn({ userIds: [board.currentPlayer] });
+        turns.end("all");
+        turns.begin(board.currentPlayer);
       }
     },
   };
@@ -292,11 +304,15 @@ const stop: PlayerMove<ChickenrollGameState> =
         endTurn(board, "stop");
       }
     },
-    execute({ board, endMatch, itsYourTurn }) {
+    execute({ board, endMatch, turns, logPlayerStat }) {
       if (board.stage === "gameover") {
-        endMatch({ scores: board.scores });
+        endMatch();
+        for (const [userId, score] of Object.entries(board.scores)) {
+          logPlayerStat(userId, "numCols", score);
+        }
       } else {
-        itsYourTurn({ userIds: [board.currentPlayer] });
+        turns.end("all");
+        turns.begin(board.currentPlayer);
       }
     },
   };
@@ -397,7 +413,7 @@ const numPlayersToNumCols = (numPlayers: number): number => {
   return numCols;
 };
 
-const initialBoards = ({
+const initialBoards: InitialBoard<ChickenrollGameState> = ({
   players,
   matchSettings,
   matchPlayersSettings,
@@ -407,7 +423,7 @@ const initialBoards = ({
   const scores: { [userId: string]: number } = {};
   const checkpointPositions: CheckpointPositions = {};
 
-  const playerInfos = {};
+  const playerInfos: Record<UserId, PlayerInfo> = {};
 
   const userIds = players;
   const numPlayers = userIds.length;
@@ -430,7 +446,7 @@ const initialBoards = ({
     const strategy = settings?.strategy;
     playerInfos[userId] = {
       color: color === undefined ? i : parseInt(color),
-      strategy: strategy || strategies[matchSettings.sameSpace],
+      strategy: strategy || strategies[matchSettings.sameSpace as SameSpace],
       isBot: areBots[userId],
     };
   });
@@ -477,9 +493,9 @@ const initialBoards = ({
     bustProb: 0,
     endOfTurnBustProb: 0,
     // For now we hard-code the shape to our own default.
-    mountainShape: matchSettings.mountainShape,
-    sameSpace: matchSettings.sameSpace,
-    showProbs: matchSettings.showProbs,
+    mountainShape: matchSettings.mountainShape as MountainShape,
+    sameSpace: matchSettings.sameSpace as SameSpace,
+    showProbs: matchSettings.showProbs as ShowProbsType,
     lastOutcome: "stop" as const,
 
     currentPlayerIndex: 0,
@@ -488,7 +504,7 @@ const initialBoards = ({
     playerOrder,
   };
 
-  return { board, itsYourTurnUsers: [currentPlayer] };
+  return { board };
 };
 
 // A list of criteria we are interested in when choosing an option.
@@ -634,6 +650,9 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
   }
 
   const strategy = board.playerInfos[userId].strategy;
+  if (!strategy) {
+    throw new Error(`no strategy for player "${userId}"`);
+  }
   const weights = strategy.split("/").map((x) => parseFloat(x));
   const weightsMoving = weights.splice(0, 10);
   const weightsRolling = weights;
@@ -650,7 +669,7 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
       cols: number[];
     }[] = [];
 
-    board.diceSumOptions.forEach((sumOption, diceSplitIndex) => {
+    board.diceSumOptions!.forEach((sumOption, diceSplitIndex) => {
       if (sumOption.split) {
         for (const choiceIndex of [0, 1]) {
           if (sumOption.enabled[choiceIndex]) {
@@ -852,19 +871,19 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
   const numClimbers = Object.keys(board.currentPositions).length;
 
   if (numClimbers === 3) {
-    const colsCouldStuck = new Set();
+    const colsCouldStuck = new Set<number>();
     for (const [colStr, ourStep] of Object.entries(board.currentPositions)) {
       const col = parseInt(colStr);
       // Check if there is someone on the next step.
       for (const checkpoint of Object.values(board.checkpointPositions)) {
-        if ((checkpoint[colStr] || 0) === ourStep + 1) {
+        if ((checkpoint[parseInt(colStr)] || 0) === ourStep + 1) {
           colsCouldStuck.add(col);
           // We found someone, we don't want another one.
           break;
         }
       }
     }
-    probHasToOverlap3 = calculator.oddsNoBust(colsCouldStuck);
+    probHasToOverlap3 = calculator.oddsNoBust(Array.from(colsCouldStuck));
   } else if (numClimbers === 2) {
     // Check for all the starting position ones.
     const colsAtStepOne = new Set<number>();
@@ -874,13 +893,13 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
         if (
           // !board.currentPositions[colStr] &&
           step ===
-          (board.checkpointPositions[userId][colStr] || 0) + 1
+          (board.checkpointPositions[userId][parseInt(colStr)] || 0) + 1
         ) {
           colsAtStepOne.add(col);
         }
       }
     }
-    probHasToOverlap2 = calculator.oddsNoBust(colsAtStepOne);
+    probHasToOverlap2 = calculator.oddsNoBust(Array.from(colsAtStepOne));
   }
 
   // console.log("should we roll");
@@ -925,6 +944,14 @@ const gamePlayerSettings: GamePlayerSettings = {
   },
 };
 
+const playerStats: GameStats = [
+  {
+    key: "numCols",
+    type: "integer",
+    determinesRank: true,
+  },
+];
+
 export const game = {
   initialBoards,
   playerMoves: {
@@ -932,12 +959,19 @@ export const game = {
     stop,
     pick,
   },
+  boardMoves: {
+    [INIT_MOVE]: {
+      execute({ board, turns }) {
+        turns.begin(board.currentPlayer);
+      },
+    },
+  },
   gameSettings,
   gamePlayerSettings,
-  playerScoreType: "integer",
   botMoveDuration,
   minPlayers: 2,
   maxPlayers: 5,
+  playerStats,
 } satisfies Game<ChickenrollGameState>;
 
 export type ChickenrollGame = typeof game;

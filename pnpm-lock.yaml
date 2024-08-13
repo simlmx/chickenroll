@@ -15,11 +15,11 @@ importers:
   game:
     devDependencies:
       '@lefun/core':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: 2.3.0-alpha.0
+        version: 2.3.0-alpha.0
       '@lefun/game':
-        specifier: ^2.0.0
-        version: 2.0.0(@lefun/core@2.0.0)
+        specifier: 2.3.0-alpha.0
+        version: 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
         version: 21.1.0(rollup@2.79.1)
@@ -70,17 +70,17 @@ importers:
         version: 2.5.1
     devDependencies:
       '@lefun/core':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: 2.3.0-alpha.0
+        version: 2.3.0-alpha.0
       '@lefun/game':
-        specifier: ^2.0.0
-        version: 2.0.0(@lefun/core@2.0.0)
+        specifier: 2.3.0-alpha.0
+        version: 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)
       '@lefun/ui':
-        specifier: ^2.0.0
-        version: 2.0.0(@lefun/core@2.0.0)(@lefun/game@2.0.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
+        specifier: 2.3.0-alpha.0
+        version: 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)(@lefun/game@2.3.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
       '@lefun/ui-testing':
-        specifier: ^2.0.0
-        version: 2.0.0(@lefun/ui@2.0.0)(@lingui/core@4.11.2)(@lingui/react@4.11.2)(@testing-library/dom@10.3.2)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
+        specifier: 2.3.0-alpha.0
+        version: 2.3.0-alpha.0(@lefun/ui@2.3.0-alpha.0)(@lingui/core@4.11.3)(@lingui/react@4.11.3)(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
         version: 21.1.0(rollup@2.79.1)
@@ -201,8 +201,8 @@ packages:
       regenerator-runtime: 0.14.1
     dev: true
 
-  /@babel/runtime@7.24.8:
-    resolution: {integrity: sha512-5F7SDGs1T72ZczbRwbGO9lQi0NLjQxzl6i4lJxLxfW9U5UluCSyEJeniWvnhl3/euNiqQVbo8zruhsDfid0esA==}
+  /@babel/runtime@7.25.0:
+    resolution: {integrity: sha512-7dRy4DwXwtzBrPbZflqxnvfxLF8kdZXPkhymtDeFoFqE6ldzjQFgYTtYIFARcLEYDrqfBfYcZt1WqFxRoyC9Rw==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.1
@@ -485,35 +485,35 @@ packages:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
     dev: true
 
-  /@lefun/core@2.0.0:
-    resolution: {integrity: sha512-xjGSPYRDpmQHWnKPjBKuVRQR+ApMIzq3b2pNC24pr6fMP5IU4iG4tc53OAPS07LgchI+Bj1qiSQ4+dFbamuFtQ==}
+  /@lefun/core@2.3.0-alpha.0:
+    resolution: {integrity: sha512-hmBZuxHBpP4daPvxb9kNGQYVMgelsAyIf0aXtvMJm+kZICIqE1VWhc7d8yovzpsn3Sa8vbVoqW+2DY9OLdqksA==}
     dev: true
 
-  /@lefun/game@2.0.0(@lefun/core@2.0.0):
-    resolution: {integrity: sha512-hnr4JMpb4kvpT3gKJLcqtRmXjj1FJUgxYkIuaaXbYvLTkFauaH/jbak6pbkh44wFvVlMExve0rLJ00cvJ8Y4MA==}
+  /@lefun/game@2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0):
+    resolution: {integrity: sha512-YTwX4lMqLluU8x9AzPgp8p8VlbEmKcBFdCtjks4TvqXhrAo8olVUxZdjsNr7vobIaN3rZpVjlJpEveZoyjx9Zw==}
     peerDependencies:
-      '@lefun/core': 2.0.0
+      '@lefun/core': 2.3.0-alpha.0
     dependencies:
-      '@lefun/core': 2.0.0
+      '@lefun/core': 2.3.0-alpha.0
       lodash-es: 4.17.21
     dev: true
 
-  /@lefun/ui-testing@2.0.0(@lefun/ui@2.0.0)(@lingui/core@4.11.2)(@lingui/react@4.11.2)(@testing-library/dom@10.3.2)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-tUA6kF3bVMeabhsJu3lIiS4blZgxpfQCgpcJcQ0xICDpMnq0K1NJhou/xI4B31j7ks1XDwev85gIDaHKrdmHjA==}
+  /@lefun/ui-testing@2.3.0-alpha.0(@lefun/ui@2.3.0-alpha.0)(@lingui/core@4.11.3)(@lingui/react@4.11.3)(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-5iW6KCE7mjjE/GBjsqhr8OHHljoa7L6+OpG8y8FEj/zeJNS1+lvTvy/hv+drGKwDaiP09TtIpWYgp5f10gnoGw==}
     peerDependencies:
-      '@lefun/ui': 2.0.0
+      '@lefun/ui': 2.3.0-alpha.0
       '@lingui/core': ^4.7.1
       '@lingui/react': ^4.7.1
       react: '>=17.0.2'
       react-dom: '>=17.0.2'
     dependencies:
-      '@lefun/ui': 2.0.0(@lefun/core@2.0.0)(@lefun/game@2.0.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
-      '@lingui/core': 4.11.2
-      '@lingui/react': 4.11.2(react@18.3.1)
-      '@testing-library/react': 16.0.0(@testing-library/dom@10.3.2)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
+      '@lefun/ui': 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)(@lefun/game@2.3.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
+      '@lingui/core': 4.11.3
+      '@lingui/react': 4.11.3(react@18.3.1)
+      '@testing-library/react': 16.0.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.5.4(@types/react@18.3.3)(react@18.3.1)
+      zustand: 4.5.5(@types/react@18.3.3)(react@18.3.1)
     transitivePeerDependencies:
       - '@testing-library/dom'
       - '@types/react'
@@ -521,49 +521,49 @@ packages:
       - immer
     dev: true
 
-  /@lefun/ui@2.0.0(@lefun/core@2.0.0)(@lefun/game@2.0.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-xxODM85EcVlKLkG99MOpyMla9H2y4f594iqz2ZEPNzH4HHQfThq1aGYFhrhFdqxTBNOqbvaETDY5l7oocewajg==}
+  /@lefun/ui@2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)(@lefun/game@2.3.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-G+LDod50MNkgVDaTR6SwrD8oqmO3u75jV+vuk2cdpsG2lkjrtq1+ZSTA0OWxeMM1RifLvz7GBH4b0lUJvdtrLg==}
     peerDependencies:
-      '@lefun/core': 2.0.0
-      '@lefun/game': 2.0.0
+      '@lefun/core': 2.3.0-alpha.0
+      '@lefun/game': 2.3.0-alpha.0
       react: '>=17.0.2'
       react-dom: '>=17.0.2'
     dependencies:
-      '@lefun/core': 2.0.0
-      '@lefun/game': 2.0.0(@lefun/core@2.0.0)
+      '@lefun/core': 2.3.0-alpha.0
+      '@lefun/game': 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.5.4(@types/react@18.3.3)(react@18.3.1)
+      zustand: 4.5.5(@types/react@18.3.3)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
       - immer
     dev: true
 
-  /@lingui/core@4.11.2:
-    resolution: {integrity: sha512-5wFmpHeDbLXEqaEUwlayS4SoqrCbDI3/bVRlwhmdNCeUcUYWh+7dTDlQnp4tPek1x1dEppABIkdN/0qLDdKcBQ==}
+  /@lingui/core@4.11.3:
+    resolution: {integrity: sha512-IjJxn0Kvzv+ICnGlMqn8wRIQLikCJVrolb1oyi6GqtbiuPiwKYeU0D6Hbe146lMaTN8juc3tOCBS+Fr02XqFIQ==}
     engines: {node: '>=16.0.0'}
     dependencies:
-      '@babel/runtime': 7.24.8
-      '@lingui/message-utils': 4.11.2
+      '@babel/runtime': 7.25.0
+      '@lingui/message-utils': 4.11.3
       unraw: 3.0.0
     dev: true
 
-  /@lingui/message-utils@4.11.2:
-    resolution: {integrity: sha512-3oJk7ZKExk4NVa4d3CM0z0iNqIokaFOWeu7lYVzu0oEX7DP6OxNjlCAtObIhJCB0FdIPz8sXxhDkyDHFj+eIvw==}
+  /@lingui/message-utils@4.11.3:
+    resolution: {integrity: sha512-ZSw3OoKbknOw3nSrqt194g2F8r0guKow9csb46zlL7zX/yOWCaj767wvSvMoglZtVvurfQs4NPv2cohYlWORNw==}
     engines: {node: '>=16.0.0'}
     dependencies:
       '@messageformat/parser': 5.1.0
       js-sha256: 0.10.1
     dev: true
 
-  /@lingui/react@4.11.2(react@18.3.1):
-    resolution: {integrity: sha512-OKHCg3yPW2xhYWoY2kOz+eP7qpdkab+4tERUvJ9QJ9bzQ6OnPLCagaRftB3nqdKuWzKoA5F2VG2QLUhF7DjpGA==}
+  /@lingui/react@4.11.3(react@18.3.1):
+    resolution: {integrity: sha512-FuorwDsz5zDpUNpyj7J8ZKqJrrVxOz1EtQ3aJGJsmnTtVO01N3nR3ckMzpYvZ71XXdDEvhUC9ihmiKbFvpaZ/w==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@babel/runtime': 7.24.8
-      '@lingui/core': 4.11.2
+      '@babel/runtime': 7.25.0
+      '@lingui/core': 4.11.3
       react: 18.3.1
     dev: true
 
@@ -812,12 +812,12 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
-  /@testing-library/dom@10.3.2:
-    resolution: {integrity: sha512-0bxIdP9mmPiOJ6wHLj8bdJRq+51oddObeCGdEf6PNEhYd93ZYAN+lPRnEOVFtheVwDM7+p+tza3LAQgp0PTudg==}
+  /@testing-library/dom@10.4.0:
+    resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
     engines: {node: '>=18'}
     dependencies:
       '@babel/code-frame': 7.24.7
-      '@babel/runtime': 7.24.8
+      '@babel/runtime': 7.25.0
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -826,7 +826,7 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@testing-library/react@16.0.0(@testing-library/dom@10.3.2)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
+  /@testing-library/react@16.0.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-guuxUKRWQ+FgNX0h0NS0FIq3Q3uLtWVpBzcLOggmfMoUpgBnzBzvLLd4fbm6yS8ydJd94cIfY4yP9qUQjM2KwQ==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -841,8 +841,8 @@ packages:
       '@types/react-dom':
         optional: true
     dependencies:
-      '@babel/runtime': 7.24.8
-      '@testing-library/dom': 10.3.2
+      '@babel/runtime': 7.25.0
+      '@testing-library/dom': 10.4.0
       '@types/react': 18.3.3
       '@types/react-dom': 18.3.0
       react: 18.3.1
@@ -3326,14 +3326,6 @@ packages:
       requires-port: 1.0.0
     dev: true
 
-  /use-sync-external-store@1.2.0(react@18.3.1):
-    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.3.1
-    dev: true
-
   /use-sync-external-store@1.2.2(react@18.3.1):
     resolution: {integrity: sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==}
     peerDependencies:
@@ -3559,8 +3551,8 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /zustand@4.5.4(@types/react@18.3.3)(react@18.3.1):
-    resolution: {integrity: sha512-/BPMyLKJPtFEvVL0E9E9BTUM63MNyhPGlvxk1XjrfWTUlV+BR8jufjsovHzrtR6YNcBEcL7cMHovL1n9xHawEg==}
+  /zustand@4.5.5(@types/react@18.3.3)(react@18.3.1):
+    resolution: {integrity: sha512-+0PALYNJNgK6hldkgDq2vLrw5f6g/jCInz52n9RTpropGgeAf/ioFUCdtsjCqu4gNhW9D01rUQBROoRjdzyn2Q==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
       '@types/react': '>=16.8'
@@ -3576,5 +3568,5 @@ packages:
     dependencies:
       '@types/react': 18.3.3
       react: 18.3.1
-      use-sync-external-store: 1.2.0(react@18.3.1)
+      use-sync-external-store: 1.2.2(react@18.3.1)
     dev: true

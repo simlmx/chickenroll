@@ -1,7 +1,13 @@
 import { UserId } from "@lefun/core";
 
 import { NUM_STEPS } from "../constants";
-import { DiceSum, MountainShape, SameSpace } from "../types";
+import {
+  CheckpointPositions,
+  CurrentPositions,
+  DiceSum,
+  MountainShape,
+  SameSpace,
+} from "../types";
 
 export const DICE_INDICES = [
   [
@@ -36,8 +42,8 @@ export type SumOption = {
  * in jump mode.
  */
 export const getSpaceLeft = (
-  currentPositions: { [key: string]: number },
-  checkpointPositions: { [key: number]: { [key: number]: number } },
+  currentPositions: CurrentPositions,
+  checkpointPositions: CheckpointPositions,
   mountainShape: MountainShape,
   sameSpace: SameSpace,
   column: number,
@@ -52,7 +58,7 @@ export const getSpaceLeft = (
   // those spaces.
   if (sameSpace === "jump") {
     Object.values(checkpointPositions).forEach((playerCheckpoints) => {
-      const otherPlayerCurrentStep = playerCheckpoints[column.toString()];
+      const otherPlayerCurrentStep = playerCheckpoints[column];
       // If that other player is on the same column and more advanced than us, then it's
       // a space we need to remove.
       if (

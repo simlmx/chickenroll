@@ -1,16 +1,4 @@
-let server;
-
-// We also use the constants on the backend server, for which `window` is not defined.
-if (typeof window !== "undefined") {
-  const { protocol, hostname, port } = window.location;
-
-  server = `${protocol}//${hostname}`;
-
-  if (port) {
-    server += `:${port}`;
-  }
-}
-export const SERVER = server;
+import { DiceSum, MountainShape } from "./types";
 
 export const MAX_PLAYERS = 5;
 
@@ -29,7 +17,7 @@ export const AUTO_NUM_COLS_TO_WIN = new Map([
 ]);
 
 // Number of steps for each columns for the different modes.
-export const NUM_STEPS = {
+export const NUM_STEPS: Record<MountainShape, Record<DiceSum, number>> = {
   debug: {
     2: 3,
     3: 3,

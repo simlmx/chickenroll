@@ -1,9 +1,13 @@
-import { getNumStepsForSum } from "../math";
-import { MountainShape } from "../types";
+import { UserId } from "@lefun/core";
 
-// https://stackoverflow.com/a/12628791/1067132
-const _f = (a, b) => [].concat(...a.map((d) => b.map((e) => [].concat(d, e))));
-export const cartesian = (...c) => c.reduce(_f);
+import { getNumStepsForSum } from "../math";
+import { CurrentPositions, MountainShape } from "../types";
+
+// https://stackoverflow.com/a/43053803/1067132
+export const cartesian = <T>(...a: T[][]): T[][] =>
+  (a as any).reduce((a: any, b: any) =>
+    a.flatMap((d: any) => b.map((e: any) => [d, e].flat())),
+  );
 
 export const diceValues2sums = (diceValues: number[]): Set<number> => {
   const sums: Set<number> = new Set();
@@ -38,7 +42,9 @@ export class OddsCalculator {
       .map((_, i) => i + 1);
 
     // All the possibilities of N dice.
-    const allDiceValues = cartesian(...Array(this.numDice).fill(diceSides));
+    const allDiceValues = cartesian<number>(
+      ...Array(this.numDice).fill(diceSides),
+    );
 
     return allDiceValues.map((diceValues) => diceValues2sums(diceValues));
   }
@@ -94,8 +100,8 @@ export class OddsCalculator {
 }
 
 export function getAllowedColumns(
-  currentPositions,
-  blockedSums,
+  currentPositions: CurrentPositions,
+  blockedSums: Record<number, UserId>,
   mountainShape: MountainShape,
 ) {
   // We start with the blocked columns.
@@ -126,7 +132,7 @@ export function getAllowedColumns(
   return allowed;
 }
 
-let oddsCalculator;
+let oddsCalculator: OddsCalculator | null = null;
 /* OddsCalculator Singleton */
 export const getOddsCalculator = () => {
   if (oddsCalculator == null) {
