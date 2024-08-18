@@ -63,7 +63,7 @@ importers:
   ui:
     dependencies:
       bootstrap:
-        specifier: ^4.5.3
+        specifier: ^4.6.2
         version: 4.6.2(jquery@3.7.1)(popper.js@1.16.1)
       classnames:
         specifier: ^2.3.1
