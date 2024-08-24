@@ -15,11 +15,11 @@ importers:
   game:
     devDependencies:
       '@lefun/core':
-        specifier: 2.3.0-alpha.0
-        version: 2.3.0-alpha.0
+        specifier: 2.4.0-alpha.0
+        version: 2.4.0-alpha.0
       '@lefun/game':
-        specifier: 2.3.0-alpha.0
-        version: 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)
+        specifier: 2.4.0-alpha.0
+        version: 2.4.0-alpha.0(@lefun/core@2.4.0-alpha.0)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
         version: 21.1.0(rollup@2.79.1)
@@ -70,17 +70,17 @@ importers:
         version: 2.5.1
     devDependencies:
       '@lefun/core':
-        specifier: 2.3.0-alpha.0
-        version: 2.3.0-alpha.0
+        specifier: 2.4.0-alpha.0
+        version: 2.4.0-alpha.0
       '@lefun/game':
-        specifier: 2.3.0-alpha.0
-        version: 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)
+        specifier: 2.4.0-alpha.0
+        version: 2.4.0-alpha.0(@lefun/core@2.4.0-alpha.0)
       '@lefun/ui':
-        specifier: 2.3.0-alpha.0
-        version: 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)(@lefun/game@2.3.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
+        specifier: 2.4.0-alpha.0
+        version: 2.4.0-alpha.0(@lefun/core@2.4.0-alpha.0)(@lefun/game@2.4.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
       '@lefun/ui-testing':
-        specifier: 2.3.0-alpha.0
-        version: 2.3.0-alpha.0(@lefun/ui@2.3.0-alpha.0)(@lingui/core@4.11.3)(@lingui/react@4.11.3)(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
+        specifier: 2.4.0-alpha.0
+        version: 2.4.0-alpha.0(@lefun/ui@2.4.0-alpha.0)(@lingui/core@4.11.3)(@lingui/react@4.11.3)(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
         version: 21.1.0(rollup@2.79.1)
@@ -201,8 +201,8 @@ packages:
       regenerator-runtime: 0.14.1
     dev: true
 
-  /@babel/runtime@7.25.0:
-    resolution: {integrity: sha512-7dRy4DwXwtzBrPbZflqxnvfxLF8kdZXPkhymtDeFoFqE6ldzjQFgYTtYIFARcLEYDrqfBfYcZt1WqFxRoyC9Rw==}
+  /@babel/runtime@7.25.4:
+    resolution: {integrity: sha512-DSgLeL/FNcpXuzav5wfYvHCGvynXkJbn3Zvc3823AEe9nPwW9IK4UoCSS5yGymmQzN0pCPvivtgS6/8U2kkm1w==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.1
@@ -485,29 +485,29 @@ packages:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
     dev: true
 
-  /@lefun/core@2.3.0-alpha.0:
-    resolution: {integrity: sha512-hmBZuxHBpP4daPvxb9kNGQYVMgelsAyIf0aXtvMJm+kZICIqE1VWhc7d8yovzpsn3Sa8vbVoqW+2DY9OLdqksA==}
+  /@lefun/core@2.4.0-alpha.0:
+    resolution: {integrity: sha512-3GKz5t1drGJzgyK6w0VfRXp/CHmB5wHAz9WrLzk9/UXlInveq6RQ/Xde+RlhYvbf6BgnLAvqdHQBEH/jx/ZsOw==}
     dev: true
 
-  /@lefun/game@2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0):
-    resolution: {integrity: sha512-YTwX4lMqLluU8x9AzPgp8p8VlbEmKcBFdCtjks4TvqXhrAo8olVUxZdjsNr7vobIaN3rZpVjlJpEveZoyjx9Zw==}
+  /@lefun/game@2.4.0-alpha.0(@lefun/core@2.4.0-alpha.0):
+    resolution: {integrity: sha512-/33ZOYsRGJoldBRXcER3KqgWJMBfLpHD/nGOVnuglIrmaLa6ODZ9ZgYBboOYJCKLT0UnDjwQuPkf5DfUN4v/EQ==}
     peerDependencies:
-      '@lefun/core': 2.3.0-alpha.0
+      '@lefun/core': 2.4.0-alpha.0
     dependencies:
-      '@lefun/core': 2.3.0-alpha.0
+      '@lefun/core': 2.4.0-alpha.0
       lodash-es: 4.17.21
     dev: true
 
-  /@lefun/ui-testing@2.3.0-alpha.0(@lefun/ui@2.3.0-alpha.0)(@lingui/core@4.11.3)(@lingui/react@4.11.3)(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-5iW6KCE7mjjE/GBjsqhr8OHHljoa7L6+OpG8y8FEj/zeJNS1+lvTvy/hv+drGKwDaiP09TtIpWYgp5f10gnoGw==}
+  /@lefun/ui-testing@2.4.0-alpha.0(@lefun/ui@2.4.0-alpha.0)(@lingui/core@4.11.3)(@lingui/react@4.11.3)(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-2ijDZNCiedVNEtFggd4ZK8avj8mY7eb2toSMpwMKMoztlLSnEHtcOBRaElE7bxDyBDe1o9pO8ExqntxkVRIBmQ==}
     peerDependencies:
-      '@lefun/ui': 2.3.0-alpha.0
+      '@lefun/ui': 2.4.0-alpha.0
       '@lingui/core': ^4.7.1
       '@lingui/react': ^4.7.1
       react: '>=17.0.2'
       react-dom: '>=17.0.2'
     dependencies:
-      '@lefun/ui': 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)(@lefun/game@2.3.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
+      '@lefun/ui': 2.4.0-alpha.0(@lefun/core@2.4.0-alpha.0)(@lefun/game@2.4.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
       '@lingui/core': 4.11.3
       '@lingui/react': 4.11.3(react@18.3.1)
       '@testing-library/react': 16.0.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
@@ -521,16 +521,16 @@ packages:
       - immer
     dev: true
 
-  /@lefun/ui@2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)(@lefun/game@2.3.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-G+LDod50MNkgVDaTR6SwrD8oqmO3u75jV+vuk2cdpsG2lkjrtq1+ZSTA0OWxeMM1RifLvz7GBH4b0lUJvdtrLg==}
+  /@lefun/ui@2.4.0-alpha.0(@lefun/core@2.4.0-alpha.0)(@lefun/game@2.4.0-alpha.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-LHZUtPBtPQks0JYRw4U7PcqbTL74TCqPyDJImvxYlNi5WKS/5T5FZC3d4crS3qj+1P2EDEvRa9FRhFURT2DHQA==}
     peerDependencies:
-      '@lefun/core': 2.3.0-alpha.0
-      '@lefun/game': 2.3.0-alpha.0
+      '@lefun/core': 2.4.0-alpha.0
+      '@lefun/game': 2.4.0-alpha.0
       react: '>=17.0.2'
       react-dom: '>=17.0.2'
     dependencies:
-      '@lefun/core': 2.3.0-alpha.0
-      '@lefun/game': 2.3.0-alpha.0(@lefun/core@2.3.0-alpha.0)
+      '@lefun/core': 2.4.0-alpha.0
+      '@lefun/game': 2.4.0-alpha.0(@lefun/core@2.4.0-alpha.0)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       zustand: 4.5.5(@types/react@18.3.3)(react@18.3.1)
@@ -543,7 +543,7 @@ packages:
     resolution: {integrity: sha512-IjJxn0Kvzv+ICnGlMqn8wRIQLikCJVrolb1oyi6GqtbiuPiwKYeU0D6Hbe146lMaTN8juc3tOCBS+Fr02XqFIQ==}
     engines: {node: '>=16.0.0'}
     dependencies:
-      '@babel/runtime': 7.25.0
+      '@babel/runtime': 7.25.4
       '@lingui/message-utils': 4.11.3
       unraw: 3.0.0
     dev: true
@@ -562,7 +562,7 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@babel/runtime': 7.25.0
+      '@babel/runtime': 7.25.4
       '@lingui/core': 4.11.3
       react: 18.3.1
     dev: true
@@ -817,7 +817,7 @@ packages:
     engines: {node: '>=18'}
     dependencies:
       '@babel/code-frame': 7.24.7
-      '@babel/runtime': 7.25.0
+      '@babel/runtime': 7.25.4
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -841,7 +841,7 @@ packages:
       '@types/react-dom':
         optional: true
     dependencies:
-      '@babel/runtime': 7.25.0
+      '@babel/runtime': 7.25.4
       '@testing-library/dom': 10.4.0
       '@types/react': 18.3.3
       '@types/react-dom': 18.3.0

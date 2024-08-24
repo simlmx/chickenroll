@@ -3,5 +3,9 @@
   "private": true,
   "devDependencies": {
     "prettier": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+    }
   }
 }

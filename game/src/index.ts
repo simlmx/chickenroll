@@ -370,7 +370,7 @@ const gameSettings: GameSettings = [
     key: "sameSpace",
     label: "Egg overlap",
     options: [
-      { value: "share", label: "Allow", default: true },
+      { value: "share", label: "Allow", isDefault: true },
       { value: "jump", label: "Jump over", shortLabel: "Jump" },
       { value: "nostop", label: "Must roll" },
     ],
@@ -380,7 +380,7 @@ const gameSettings: GameSettings = [
     key: "mountainShape",
     label: "Column height",
     options: [
-      { value: "tall", label: "Modern", default: true },
+      { value: "tall", label: "Modern", isDefault: true },
       { value: "classic", label: "Classic" },
     ],
     help: "Height of the columns. Modern is taller and better calibrated than Classic.",
@@ -393,7 +393,7 @@ const gameSettings: GameSettings = [
       {
         value: "after",
         label: "End of the turn",
-        default: true,
+        isDefault: true,
       },
       { value: "never", label: "Never", shortLabel: "Probs: Never" },
     ],
@@ -926,8 +926,9 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
   }
 };
 
-const gamePlayerSettings: GamePlayerSettings = {
-  color: {
+const gamePlayerSettings: GamePlayerSettings = [
+  {
+    key: "color",
     label: "Color",
     options: [
       // NOTE those colors are duplicated in the game definition
@@ -942,7 +943,7 @@ const gamePlayerSettings: GamePlayerSettings = {
     type: "color",
     exclusive: true,
   },
-};
+];
 
 const playerStats: GameStats = [
   {
