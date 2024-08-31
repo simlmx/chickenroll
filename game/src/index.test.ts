@@ -1,4 +1,4 @@
-import { UserId } from "@lefun/core";
+import { MatchSettings, UserId } from "@lefun/core";
 import { MatchTester as _MatchTester, RandomMock } from "@lefun/game";
 import { expect, test } from "vitest";
 
@@ -17,12 +17,12 @@ import {
 
 class MatchTester extends _MatchTester<ChickenrollGameState, ChickenrollGame> {}
 
-test.each([
+test.each<["share" | "jump", CurrentPositions, CheckpointPositions, number]>([
   ["share", {}, {}, 1],
   ["jump", {}, {}, 1],
   ["share", { 7: 2 }, {}, 3],
   ["jump", { 7: 2 }, {}, 3],
-  ["share", { 7: 2 }, { 7: 3 }, 3],
+  ["share", { 7: 2 }, { 1: { 7: 3 } }, 3],
   ["jump", { 7: 2 }, { 1: { 7: 3 } }, 4],
   ["jump", { 7: 2 }, { 1: { 7: 4 } }, 3],
   ["jump", { 7: 2 }, { 1: { 7: 3 }, 2: { 7: 4 } }, 5],
@@ -149,6 +149,16 @@ test("happy path", () => {
   random.next([3, 3, 3, 3]);
   match.makeMove(p2, "roll");
   match.makeMove(p2, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+
+  // Make p2 win column 11.
+  for (let i = 0; i < 3; ++i) {
+    random.next([5, 6, 5, 6]);
+    match.makeMove(p2, "roll");
+    match.makeMove(p2, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
+    checkItsTheirTurn(p2);
+    match.board.moveHistory = [];
+  }
+
   match.makeMove(p2, "stop");
 
   expect(match.board.checkpointPositions).toEqual({
@@ -159,16 +169,36 @@ test("happy path", () => {
 
   checkItsTheirTurn(p0);
 
-  // Let's roll 3 double 3s
+  // Let's roll 3 double 3s so that p0 gets its 3rd column and wins.
   for (let i = 0; i < 3; ++i) {
     random.next([1, 2, 1, 2]);
     match.makeMove(p0, "roll");
     match.makeMove(p0, "pick", { diceSplitIndex: 0, choiceIndex: 0 });
     checkItsTheirTurn(p0);
+    match.board.moveHistory = [];
   }
   match.makeMove(p0, "stop");
 
+  expect(match.board.checkpointPositions).toEqual({
+    [p0]: {},
+    [p1]: { 7: 3, 6: 1, 8: 1 },
+    [p2]: { 6: 2 },
+  });
+
+  expect(match.board.blockedSums).toEqual({
+    2: p0,
+    12: p0,
+    11: p2,
+    3: p0,
+  });
+
   expect(match.matchHasEnded).toEqual(true);
+  expect(match.matchStats).toEqual([]);
+  expect(match.playerStats).toEqual({
+    [p0]: [{ key: "numCols", value: 3 }],
+    [p1]: [{ key: "numCols", value: 0 }],
+    [p2]: [{ key: "numCols", value: 1 }],
+  });
 });
 
 test("when only one step left because of jump, option is split", () => {
@@ -296,7 +326,7 @@ test("when only one step left because of jump, option is split - already climbin
   ]);
 });
 
-const botTestConfigs = [];
+const botTestConfigs: [number, MatchSettings][] = [];
 
 for (const numBots of [2, 3, 4, 5]) {
   for (const mountainShape of ["debug"]) {

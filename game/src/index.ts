@@ -656,7 +656,6 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
   const weights = strategy.split("/").map((x) => parseFloat(x));
   const weightsMoving = weights.splice(0, 10);
   const weightsRolling = weights;
-  // console.log("weights", weightsMoving, weightsRolling);
 
   const calculator = getOddsCalculator();
 
@@ -698,7 +697,6 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
       // Subset of `cols` that would be finished.
       const finishedCols = getFinishCols({ board, cols });
 
-      // console.log("old colset", Object.keys(board.currentPositions));
       // Build the final set of columns.
       const colSet = new Set(
         Object.keys(board.currentPositions).map((col) => parseInt(col)),
@@ -712,9 +710,6 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
           colSet.add(col);
         }
       });
-
-      // console.log("added col", newCols);
-      // console.log("final col", colSet);
 
       let even = 0;
       let avgProbCols = 0;
@@ -818,8 +813,6 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
       score: scoreCriteria(weightsMoving)(optionCriterias[i]),
     }));
 
-    // console.log(optionsWithCriteria);
-
     const bestOption = optionsWithCriteria.sort((a, b) => b.score - a.score)[0];
 
     return [
@@ -901,12 +894,6 @@ export const autoMove: AutoMove<ChickenrollGameState, ChickenrollGame> = ({
     }
     probHasToOverlap2 = calculator.oddsNoBust(Array.from(colsAtStepOne));
   }
-
-  // console.log("should we roll");
-  // console.log("progressSoFar * board.bustProb", progressSoFar * board.bustProb);
-  // console.log("numFinished * prob", numFinishedCol * board.bustProb);
-  // console.log("probHasToOverlap2", probHasToOverlap2);
-  // console.log("probHasToOverlap3", probHasToOverlap3);
 
   // Note that we combine progressSoFar with board.probBust, as a measure of "how much
   // do we stand to lose".
