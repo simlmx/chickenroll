@@ -22,10 +22,10 @@ importers:
         version: 2.5.1(@lefun/core@2.5.1)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
-        version: 21.1.0(rollup@2.79.1)
+        version: 21.1.0(rollup@2.79.2)
       '@rollup/plugin-node-resolve':
         specifier: ^13.0.6
-        version: 13.3.0(rollup@2.79.1)
+        version: 13.3.0(rollup@2.79.2)
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.11.0
         version: 7.15.0(@typescript-eslint/parser@7.15.0(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)(typescript@5.5.3)
@@ -45,11 +45,11 @@ importers:
         specifier: ^3.2.4
         version: 3.3.2
       rollup:
-        specifier: ^2.79.1
-        version: 2.79.1
+        specifier: ^2.79.2
+        version: 2.79.2
       rollup-plugin-typescript2:
         specifier: ^0.31.2
-        version: 0.31.2(rollup@2.79.1)(typescript@5.5.3)
+        version: 0.31.2(rollup@2.79.2)(typescript@5.5.3)
       tslib:
         specifier: ^2.3.1
         version: 2.6.3
@@ -86,13 +86,13 @@ importers:
         version: 2.5.1(@lefun/ui@2.5.1(@lefun/core@2.5.1)(@lefun/game@2.5.1(@lefun/core@2.5.1))(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@lingui/core@4.11.3)(@lingui/react@4.11.3(react@18.3.1))(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
-        version: 21.1.0(rollup@2.79.1)
+        version: 21.1.0(rollup@2.79.2)
       '@rollup/plugin-node-resolve':
         specifier: ^13.0.6
-        version: 13.3.0(rollup@2.79.1)
+        version: 13.3.0(rollup@2.79.2)
       '@rollup/plugin-typescript':
         specifier: ^11.1.5
-        version: 11.1.6(rollup@2.79.1)(tslib@2.6.3)(typescript@5.5.3)
+        version: 11.1.6(rollup@2.79.2)(tslib@2.6.3)(typescript@5.5.3)
       '@types/react':
         specifier: 18.3.3
         version: 18.3.3
@@ -148,8 +148,8 @@ importers:
         specifier: 4.1.2
         version: 4.1.2
       rollup:
-        specifier: ^2.60.1
-        version: 2.79.1
+        specifier: ^2.79.2
+        version: 2.79.2
       rollup-plugin-scss:
         specifier: ^3.0.0
         version: 3.0.0
@@ -1954,8 +1954,8 @@ packages:
   rollup-pluginutils@2.8.2:
     resolution: {integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==}
 
-  rollup@2.79.1:
-    resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
+  rollup@2.79.2:
+    resolution: {integrity: sha512-fS6iqSPZDs3dr/y7Od6y5nha8dW1YnbgtsyotCVvoFGKbERG++CVRFv1meyGDE1SNItQA8BrnCw7ScdAhRJ3XQ==}
     engines: {node: '>=10.0.0'}
     hasBin: true
 
@@ -2669,55 +2669,55 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@rollup/plugin-commonjs@21.1.0(rollup@2.79.1)':
+  '@rollup/plugin-commonjs@21.1.0(rollup@2.79.2)':
     dependencies:
-      '@rollup/pluginutils': 3.1.0(rollup@2.79.1)
+      '@rollup/pluginutils': 3.1.0(rollup@2.79.2)
       commondir: 1.0.1
       estree-walker: 2.0.2
       glob: 7.2.3
       is-reference: 1.2.1
       magic-string: 0.25.9
       resolve: 1.22.8
-      rollup: 2.79.1
+      rollup: 2.79.2
 
-  '@rollup/plugin-node-resolve@13.3.0(rollup@2.79.1)':
+  '@rollup/plugin-node-resolve@13.3.0(rollup@2.79.2)':
     dependencies:
-      '@rollup/pluginutils': 3.1.0(rollup@2.79.1)
+      '@rollup/pluginutils': 3.1.0(rollup@2.79.2)
       '@types/resolve': 1.17.1
       deepmerge: 4.3.1
       is-builtin-module: 3.2.1
       is-module: 1.0.0
       resolve: 1.22.8
-      rollup: 2.79.1
+      rollup: 2.79.2
 
-  '@rollup/plugin-typescript@11.1.6(rollup@2.79.1)(tslib@2.6.3)(typescript@5.5.3)':
+  '@rollup/plugin-typescript@11.1.6(rollup@2.79.2)(tslib@2.6.3)(typescript@5.5.3)':
     dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
+      '@rollup/pluginutils': 5.1.0(rollup@2.79.2)
       resolve: 1.22.8
       typescript: 5.5.3
     optionalDependencies:
-      rollup: 2.79.1
+      rollup: 2.79.2
       tslib: 2.6.3
 
-  '@rollup/pluginutils@3.1.0(rollup@2.79.1)':
+  '@rollup/pluginutils@3.1.0(rollup@2.79.2)':
     dependencies:
       '@types/estree': 0.0.39
       estree-walker: 1.0.1
       picomatch: 2.3.1
-      rollup: 2.79.1
+      rollup: 2.79.2
 
   '@rollup/pluginutils@4.2.1':
     dependencies:
       estree-walker: 2.0.2
       picomatch: 2.3.1
 
-  '@rollup/pluginutils@5.1.0(rollup@2.79.1)':
+  '@rollup/pluginutils@5.1.0(rollup@2.79.2)':
     dependencies:
       '@types/estree': 1.0.5
       estree-walker: 2.0.2
       picomatch: 2.3.1
     optionalDependencies:
-      rollup: 2.79.1
+      rollup: 2.79.2
 
   '@rollup/rollup-android-arm-eabi@4.34.9':
     optional: true
@@ -4043,14 +4043,14 @@ snapshots:
     dependencies:
       rollup-pluginutils: 2.8.2
 
-  rollup-plugin-typescript2@0.31.2(rollup@2.79.1)(typescript@5.5.3):
+  rollup-plugin-typescript2@0.31.2(rollup@2.79.2)(typescript@5.5.3):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       '@yarn-tool/resolve-package': 1.0.47
       find-cache-dir: 3.3.2
       fs-extra: 10.1.0
       resolve: 1.22.8
-      rollup: 2.79.1
+      rollup: 2.79.2
       tslib: 2.6.3
       typescript: 5.5.3
 
@@ -4058,7 +4058,7 @@ snapshots:
     dependencies:
       estree-walker: 0.6.1
 
-  rollup@2.79.1:
+  rollup@2.79.2:
     optionalDependencies:
       fsevents: 2.3.3
 
