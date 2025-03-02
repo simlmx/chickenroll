@@ -22,10 +22,10 @@ importers:
         version: 2.5.3(@lefun/core@2.5.3)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
-        version: 21.1.0(rollup@2.79.2)
+        version: 21.1.0(rollup@4.34.9)
       '@rollup/plugin-node-resolve':
         specifier: ^13.0.6
-        version: 13.3.0(rollup@2.79.2)
+        version: 13.3.0(rollup@4.34.9)
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.11.0
         version: 7.15.0(@typescript-eslint/parser@7.15.0(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)(typescript@5.5.3)
@@ -45,11 +45,11 @@ importers:
         specifier: ^3.2.4
         version: 3.3.2
       rollup:
-        specifier: ^2.79.2
-        version: 2.79.2
+        specifier: ^4.34.9
+        version: 4.34.9
       rollup-plugin-typescript2:
         specifier: ^0.31.2
-        version: 0.31.2(rollup@2.79.2)(typescript@5.5.3)
+        version: 0.31.2(rollup@4.34.9)(typescript@5.5.3)
       tslib:
         specifier: ^2.3.1
         version: 2.6.3
@@ -86,13 +86,13 @@ importers:
         version: 2.5.3(@lefun/ui@2.5.3(@lefun/core@2.5.3)(@lefun/game@2.5.3(@lefun/core@2.5.3))(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@lingui/core@4.11.3)(@lingui/react@4.11.3(react@18.3.1))(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
-        version: 21.1.0(rollup@2.79.2)
+        version: 21.1.0(rollup@4.34.9)
       '@rollup/plugin-node-resolve':
         specifier: ^13.0.6
-        version: 13.3.0(rollup@2.79.2)
+        version: 13.3.0(rollup@4.34.9)
       '@rollup/plugin-typescript':
         specifier: ^11.1.5
-        version: 11.1.6(rollup@2.79.2)(tslib@2.6.3)(typescript@5.5.3)
+        version: 11.1.6(rollup@4.34.9)(tslib@2.6.3)(typescript@5.5.3)
       '@types/react':
         specifier: 18.3.3
         version: 18.3.3
@@ -148,8 +148,8 @@ importers:
         specifier: 4.1.2
         version: 4.1.2
       rollup:
-        specifier: ^2.79.2
-        version: 2.79.2
+        specifier: ^4.34.9
+        version: 4.34.9
       rollup-plugin-scss:
         specifier: ^3.0.0
         version: 3.0.0
@@ -181,8 +181,16 @@ packages:
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/code-frame@7.26.2':
+    resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/helper-validator-identifier@7.24.7':
     resolution: {integrity: sha512-rR+PBcQ1SMQDDyF6X0wxtG8QyLCgUB0eRAGguqRLfkCA87l7yAP7ehq8SNj96OOGTO8OBV70KhuFYcIkHXOg0w==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-validator-identifier@7.25.9':
+    resolution: {integrity: sha512-Ed61U6XJc3CVRfkERJWDz4dJwKe7iLmmJsbOGu9wSloNSFttHV0I8g6UAgb7qnK5ly5bGLPd4oXZlxCdANBOWQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/highlight@7.24.7':
@@ -195,6 +203,10 @@ packages:
 
   '@babel/runtime@7.25.6':
     resolution: {integrity: sha512-VBj9MYyDb9tuLq7yzqjgzt6Q+IBQLrGZfdjOekyEirZPHxXWoTSGUTMrpsfi58Up73d13NfYLv8HT9vmznjzhQ==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.26.9':
+    resolution: {integrity: sha512-aA63XwOkcl4xxQa3HjPMqOP6LiK0ZDv3mUPYEFXkpHbaFjtGggE1A61FjFzJnB+p7/oy2gA8E+rcBNl/zC1tMg==}
     engines: {node: '>=6.9.0'}
 
   '@esbuild/aix-ppc64@0.21.5':
@@ -573,8 +585,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
-  '@messageformat/parser@5.1.0':
-    resolution: {integrity: sha512-jKlkls3Gewgw6qMjKZ9SFfHUpdzEVdovKFtW1qRhJ3WI4FW5R/NnGDqr8SDGz+krWDO3ki94boMmQvGke1HwUQ==}
+  '@messageformat/parser@5.1.1':
+    resolution: {integrity: sha512-3p0YRGCcTUCYvBKLIxtDDyrJ0YijGIwrTRu1DT8gIviIDZru8H23+FkY6MJBzM1n9n20CiM4VeDYuBsrrwnLjg==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1213,6 +1225,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.6.1:
@@ -1954,11 +1967,6 @@ packages:
   rollup-pluginutils@2.8.2:
     resolution: {integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==}
 
-  rollup@2.79.2:
-    resolution: {integrity: sha512-fS6iqSPZDs3dr/y7Od6y5nha8dW1YnbgtsyotCVvoFGKbERG++CVRFv1meyGDE1SNItQA8BrnCw7ScdAhRJ3XQ==}
-    engines: {node: '>=10.0.0'}
-    hasBin: true
-
   rollup@4.34.9:
     resolution: {integrity: sha512-nF5XYqWWp9hx/LrpC8sZvvvmq0TeTjQgaZHYmAgwysT9nh8sWnZhBnM8ZyVbbJFIQBLwHDNoMqsBZBbUo4U8sQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -2382,7 +2390,15 @@ snapshots:
       '@babel/highlight': 7.24.7
       picocolors: 1.0.1
 
+  '@babel/code-frame@7.26.2':
+    dependencies:
+      '@babel/helper-validator-identifier': 7.25.9
+      js-tokens: 4.0.0
+      picocolors: 1.1.1
+
   '@babel/helper-validator-identifier@7.24.7': {}
+
+  '@babel/helper-validator-identifier@7.25.9': {}
 
   '@babel/highlight@7.24.7':
     dependencies:
@@ -2396,6 +2412,10 @@ snapshots:
       regenerator-runtime: 0.14.1
 
   '@babel/runtime@7.25.6':
+    dependencies:
+      regenerator-runtime: 0.14.1
+
+  '@babel/runtime@7.26.9':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -2636,22 +2656,22 @@ snapshots:
 
   '@lingui/core@4.11.3':
     dependencies:
-      '@babel/runtime': 7.25.6
+      '@babel/runtime': 7.26.9
       '@lingui/message-utils': 4.11.3
       unraw: 3.0.0
 
   '@lingui/message-utils@4.11.3':
     dependencies:
-      '@messageformat/parser': 5.1.0
+      '@messageformat/parser': 5.1.1
       js-sha256: 0.10.1
 
   '@lingui/react@4.11.3(react@18.3.1)':
     dependencies:
-      '@babel/runtime': 7.25.6
+      '@babel/runtime': 7.26.9
       '@lingui/core': 4.11.3
       react: 18.3.1
 
-  '@messageformat/parser@5.1.0':
+  '@messageformat/parser@5.1.1':
     dependencies:
       moo: 0.5.2
 
@@ -2669,55 +2689,55 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@rollup/plugin-commonjs@21.1.0(rollup@2.79.2)':
+  '@rollup/plugin-commonjs@21.1.0(rollup@4.34.9)':
     dependencies:
-      '@rollup/pluginutils': 3.1.0(rollup@2.79.2)
+      '@rollup/pluginutils': 3.1.0(rollup@4.34.9)
       commondir: 1.0.1
       estree-walker: 2.0.2
       glob: 7.2.3
       is-reference: 1.2.1
       magic-string: 0.25.9
       resolve: 1.22.8
-      rollup: 2.79.2
+      rollup: 4.34.9
 
-  '@rollup/plugin-node-resolve@13.3.0(rollup@2.79.2)':
+  '@rollup/plugin-node-resolve@13.3.0(rollup@4.34.9)':
     dependencies:
-      '@rollup/pluginutils': 3.1.0(rollup@2.79.2)
+      '@rollup/pluginutils': 3.1.0(rollup@4.34.9)
       '@types/resolve': 1.17.1
       deepmerge: 4.3.1
       is-builtin-module: 3.2.1
       is-module: 1.0.0
       resolve: 1.22.8
-      rollup: 2.79.2
+      rollup: 4.34.9
 
-  '@rollup/plugin-typescript@11.1.6(rollup@2.79.2)(tslib@2.6.3)(typescript@5.5.3)':
+  '@rollup/plugin-typescript@11.1.6(rollup@4.34.9)(tslib@2.6.3)(typescript@5.5.3)':
     dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@2.79.2)
+      '@rollup/pluginutils': 5.1.0(rollup@4.34.9)
       resolve: 1.22.8
       typescript: 5.5.3
     optionalDependencies:
-      rollup: 2.79.2
+      rollup: 4.34.9
       tslib: 2.6.3
 
-  '@rollup/pluginutils@3.1.0(rollup@2.79.2)':
+  '@rollup/pluginutils@3.1.0(rollup@4.34.9)':
     dependencies:
       '@types/estree': 0.0.39
       estree-walker: 1.0.1
       picomatch: 2.3.1
-      rollup: 2.79.2
+      rollup: 4.34.9
 
   '@rollup/pluginutils@4.2.1':
     dependencies:
       estree-walker: 2.0.2
       picomatch: 2.3.1
 
-  '@rollup/pluginutils@5.1.0(rollup@2.79.2)':
+  '@rollup/pluginutils@5.1.0(rollup@4.34.9)':
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       estree-walker: 2.0.2
       picomatch: 2.3.1
     optionalDependencies:
-      rollup: 2.79.2
+      rollup: 4.34.9
 
   '@rollup/rollup-android-arm-eabi@4.34.9':
     optional: true
@@ -2780,8 +2800,8 @@ snapshots:
 
   '@testing-library/dom@10.4.0':
     dependencies:
-      '@babel/code-frame': 7.24.7
-      '@babel/runtime': 7.25.6
+      '@babel/code-frame': 7.26.2
+      '@babel/runtime': 7.26.9
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -4043,24 +4063,20 @@ snapshots:
     dependencies:
       rollup-pluginutils: 2.8.2
 
-  rollup-plugin-typescript2@0.31.2(rollup@2.79.2)(typescript@5.5.3):
+  rollup-plugin-typescript2@0.31.2(rollup@4.34.9)(typescript@5.5.3):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       '@yarn-tool/resolve-package': 1.0.47
       find-cache-dir: 3.3.2
       fs-extra: 10.1.0
       resolve: 1.22.8
-      rollup: 2.79.2
+      rollup: 4.34.9
       tslib: 2.6.3
       typescript: 5.5.3
 
   rollup-pluginutils@2.8.2:
     dependencies:
       estree-walker: 0.6.1
-
-  rollup@2.79.2:
-    optionalDependencies:
-      fsevents: 2.3.3
 
   rollup@4.34.9:
     dependencies:
