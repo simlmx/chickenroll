@@ -98,7 +98,7 @@ export const Info = ({
         <div>
           {itsYourTurnTag}
           <div>
-            {playerNameTag} <span className="badge badge-danger">cracked</span>
+            {playerNameTag} <span className="badge bg-danger">cracked</span>
           </div>
           {probMsg}
         </div>
@@ -109,7 +109,7 @@ export const Info = ({
         <div>
           {itsYourTurnTag}
           <div>
-            {playerNameTag} <span className="badge badge-success">stopped</span>
+            {playerNameTag} <span className="badge bg-success">stopped</span>
           </div>
           {probMsg}
         </div>
@@ -339,13 +339,11 @@ export const Board = () => {
             <h5 className="modal-title">Move History</h5>
             <button
               type="button"
-              className="close"
+              className="btn-close"
               data-dismiss="modal"
               aria-label="Close"
               onClick={() => setModal(undefined)}
-            >
-              <span aria-hidden="false">&times;</span>
-            </button>
+            ></button>
           </div>
           <div className="modal-body">
             <div className="moveHistoryWrap">

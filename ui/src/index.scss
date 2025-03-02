@@ -125,6 +125,12 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
     border: 1px solid transparent;
     border-color: $color;
   }
+  button.bgcolor#{$i - 1}:focus {
+    color: white !important;
+    background-color: $color !important;
+    border: 1px solid transparent !important;
+    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 20%) !important;
+  }
 
   .border#{$i - 1} {
     border-color: $color;
@@ -147,18 +153,23 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
 // when it's a background.
 @mixin setPaleColors($index) {
   .bgcolor#{$index} {
-    color: black;
-    border-color: black;
+    color: black !important;
+    border-color: black !important;
   }
 
   .textColor#{$index} {
-    color: black;
+    color: black !important;
   }
 
   button.bgcolor#{$index},
   button.bgcolor#{$index}:hover {
     color: black;
     border: 0.05rem solid black;
+  }
+
+  button.bgcolor#{$index}:focus {
+    color: black !important;
+    border: 0.05rem solid black !important;
   }
 
   .dotColor#{$index} {

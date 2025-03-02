@@ -176,7 +176,7 @@ const Rules = () => {
   );
 
   const bust = (
-    <span className="bust badge badge-danger">
+    <span className="bust badge bg-danger">
       <strong>crack</strong>
     </span>
   );
