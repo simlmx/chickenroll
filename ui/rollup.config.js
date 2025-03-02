@@ -15,7 +15,7 @@ export default {
     commonjs(),
     nodeResolve(),
     typescript({ tsconfig: "./tsconfig.json" }),
-    scss({ sass }),
+    scss({ sass, fileName: "index.css" }),
   ],
   external: ["@lefun/core", "@lefun/game", "@lefun/ui", "react", "react-redux"],
   exclude: ["src/main.tsx"],

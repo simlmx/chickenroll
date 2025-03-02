@@ -6,8 +6,8 @@ import { getSumOptions, SumOption } from "../math";
  * Convenient function to create a SumOption object
  */
 const so = (
-  d0,
-  d1,
+  d0: number,
+  d1: number,
   enabled0?: boolean,
   enabled1?: boolean,
   forceSplit = false,
@@ -21,7 +21,7 @@ const so = (
   return { diceSums, enabled, split: enabled0 !== enabled1 || forceSplit };
 };
 
-test.each([
+test.each<any[]>([
   [[1, 1, 2, 2], {}, {}, {}, [so(2, 4), so(3, 3), so(3, 3)]],
   [[1, 2, 3, 4], {}, {}, {}, [so(3, 7), so(4, 6), so(5, 5)]],
   [
