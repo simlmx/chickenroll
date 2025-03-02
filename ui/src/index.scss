@@ -44,6 +44,13 @@ $buttonsHeight: 175px;
   touch-action: manipulation;
 }
 
+// this is needed for @lefun/dev-server
+html,
+body,
+#home {
+  height: 100%;
+}
+
 body {
   font-family: Verdana, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

@@ -15,12 +15,14 @@
     "watch": "NODE_ENV=development rollup --config --watch",
     "test": "vitest run src",
     "format": "pnpm exec prettier --write . && pnpm exec eslint . --fix",
-    "check-format": "pnpm exec prettier --check . && pnpm exec eslint . --quiet"
+    "check-format": "pnpm exec prettier --check . && pnpm exec eslint . --quiet",
+    "dev": "pnpm exec vite --host"
   },
   "author": "Simon Lemieux",
   "license": "ISC",
   "devDependencies": {
     "@lefun/core": "2.5.1",
+    "@lefun/dev-server": "^2.5.3",
     "@lefun/game": "2.5.1",
     "@lefun/ui": "2.5.1",
     "@lefun/ui-testing": "2.5.1",
@@ -52,6 +54,7 @@
     "tslib": "^2.3.1",
     "typescript": "^5.4.5",
     "typescript-eslint-parser": "^22.0.0",
+    "vite": "^6.2.0",
     "vitest": "^1.2.1"
   },
   "dependencies": {

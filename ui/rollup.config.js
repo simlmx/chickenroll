@@ -18,4 +18,5 @@ export default {
     scss({ sass }),
   ],
   external: ["@lefun/core", "@lefun/game", "@lefun/ui", "react", "react-redux"],
+  exclude: ["src/main.tsx"],
 };
