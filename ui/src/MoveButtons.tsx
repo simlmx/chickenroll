@@ -184,12 +184,12 @@ const Possibilities = (props: {
                 type="button"
                 key={j}
                 onClick={() => {
-                  itsMe &&
-                    enabled &&
+                  if (itsMe && enabled) {
                     makeMove("pick", {
                       diceSplitIndex: i,
                       choiceIndex: j,
                     });
+                  }
                 }}
                 // Using mouse over and mouse out because the behaviour is
                 // nicer!
@@ -197,7 +197,9 @@ const Possibilities = (props: {
                   itsMe && enabled && !touch.current && onMouseEnter(i, j)
                 }
                 onMouseLeave={() => {
-                  itsMe && enabled && !touch.current && onMouseLeave();
+                  if (itsMe && enabled && !touch.current) {
+                    onMouseLeave();
+                  }
                 }}
                 onTouchStart={() => {
                   touch.current = true;
