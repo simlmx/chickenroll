@@ -38,6 +38,10 @@ $theme-colors: (
 $buttonsWidth: 150px;
 $buttonsHeight: 175px;
 
+// The default is 4.5 but we get a bunch of warnings.
+// This probably means we don't have enough contrast with our primary and secondary colors.
+$min-contrast-ratio: 4.2;
+
 @import "bootstrap/scss/bootstrap.scss";
 
 .manipulation {
@@ -340,7 +344,7 @@ p:last-child {
 }
 
 @mixin setDice($diceSize) {
-  $unit: $diceSize / 40;
+  $unit: calc($diceSize / 40);
 
   .die {
     width: $diceSize;
@@ -785,7 +789,7 @@ $diceSize: 3.4rem;
 // height /width for one cell
 $mountainRatio: 0.67;
 @mixin cellSize($height, $numCols: 11, $numRows: 13) {
-  $width: $height / $mountainRatio;
+  $width: calc($height / $mountainRatio);
 
   $neg-margin: $width * -0.1;
   $climberSize: $width * 0.36;
@@ -817,7 +821,7 @@ $mountainRatio: 0.67;
   .colFgBottom {
     width: $colNumWidth;
     height: $colNumWidth;
-    font-size: $width / 2.5;
+    font-size: calc($width / 2.5);
     font-weight: bold;
 
     border-radius: 999px;
@@ -837,8 +841,8 @@ $mountainRatio: 0.67;
 
   .colFgMiddle {
     border: none;
-    width: $height / 10;
-    height: $height / 10;
+    width: calc($height / 10);
+    height: calc($height / 10);
     border-radius: 999px;
   }
 
@@ -868,7 +872,7 @@ $mountainRatio: 0.67;
   }
 
   .twoDigits {
-    font-size: $width / 3.2;
+    font-size: calc($width / 3.2);
   }
 
   .twoDigits.colFgTop {
@@ -933,19 +937,19 @@ $mountainRatio: 0.67;
 // In that case we want the mountain to take the full width
 
 .classicMountainWrap {
-  $width: 96vw / 11;
+  $width: calc(96vw / 11);
   $height: $width * $mountainRatio;
   @include cellSize($height, 11, 13);
 }
 
 .tallMountainWrap {
-  $width: 96vw / 11;
+  $width: calc(96vw / 11);
   $height: $width * $mountainRatio;
   @include cellSize($height, 11, 16);
 }
 
 .debugMountainWrap {
-  $width: 50vw / 11;
+  $width: calc(50vw / 11);
   $height: $width * $mountainRatio;
   @include cellSize($height, 11, 3);
 }
@@ -960,10 +964,10 @@ $mountainRatio: 0.67;
 // as the side of our mountain square
 @media (min-aspect-ratio: 3/5) {
   .classicMountainWrap {
-    @include cellSize(50vh / 14, 11, 13);
+    @include cellSize(calc(50vh / 14), 11, 13);
   }
   .tallMountainWrap {
-    @include cellSize(50vh / 17, 11, 16);
+    @include cellSize(calc(50vh / 17), 11, 16);
   }
   @if $debug {
     * {
@@ -973,7 +977,7 @@ $mountainRatio: 0.67;
 }
 
 @media (min-aspect-ratio: 1/1) {
-  $width: 50vw / 11;
+  $width: calc(50vw / 11);
   $height: $width * $mountainRatio;
   .classicMountainWrap {
     @include cellSize($height, 11, 13);
@@ -1018,10 +1022,10 @@ $mountainRatio: 0.67;
 
 @media (min-aspect-ratio: 4/3) {
   .classicMountainWrap {
-    @include cellSize(80vh / 14, 11, 13);
+    @include cellSize(calc(80vh / 14), 11, 13);
   }
   .tallMountainWrap {
-    @include cellSize(80vh / 17, 11, 16);
+    @include cellSize(calc(80vh / 17), 11, 16);
   }
 
   @if $debug {
@@ -1033,10 +1037,10 @@ $mountainRatio: 0.67;
 
 @media (min-aspect-ratio: 6/2) {
   .classicMountainWrap {
-    @include cellSize(95vh / 14, 11, 13);
+    @include cellSize(calc(95vh / 14), 11, 13);
   }
   .tallMountainWrap {
-    @include cellSize(95vh / 17, 11, 16);
+    @include cellSize(calc(95vh / 17), 11, 16);
   }
 
   .diceButtons {
@@ -1071,10 +1075,10 @@ $mountainRatio: 0.67;
 
 @media (min-width: 1200px) and (min-height: 900px) and (min-aspect-ratio: 1/1) and (max-aspect-ratio: 7/3) {
   .classicMountainWrap {
-    @include cellSize(65vh / 14, 11, 13);
+    @include cellSize(calc(65vh / 14), 11, 13);
   }
   .tallMountainWrap {
-    @include cellSize(65vh / 17, 11, 16);
+    @include cellSize(calc(65vh / 17), 11, 16);
   }
   @if $debug {
     * {
