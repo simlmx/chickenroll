@@ -7,5 +7,6 @@
   "pnpm": {
     "overrides": {
     }
-  }
+  },
+  "packageManager": "pnpm@9.4.0"
 }
