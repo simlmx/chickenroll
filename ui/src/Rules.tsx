@@ -109,67 +109,57 @@ const Rules = () => {
   );
 
   const moveUpTable = (
-    <div className="container-fluid">
-      <div className="row movesWrap no-gutters">
-        <div className="col-sm-6">
-          <div className="movesBox">
-            <div className="movesLeft">
-              <p>
-                Add a new <strong>black egg</strong> at the bottom of a column.
-              </p>
-            </div>
-            <div className="movesRight">
-              {dice[0]}
-              {dice[3]} &nbsp;→&nbsp;
-              {placeAtBottom}
-            </div>
-          </div>
+    <div className="movesWrap ">
+      <div className="movesBox">
+        <div className="movesLeft">
+          <p>
+            Add a new <strong>black egg</strong> at the bottom of a column.
+          </p>
         </div>
-        <div className="col-sm-6">
-          <div className="movesBox">
-            <div className="movesLeft">
-              <p>
-                Continue right above one of your <strong>colored eggs</strong>.
-              </p>
-            </div>
-            <div className="movesRight">
-              {dice[1]}
-              {dice[2]} &nbsp;→&nbsp; {placeAfter}
-            </div>
-          </div>
+        <div className="movesRight">
+          {dice[0]}
+          {dice[3]} &nbsp;→&nbsp;
+          {placeAtBottom}
         </div>
-        <div className="col-sm-6">
-          <div className="movesBox">
-            <div className="movesLeft">
-              <p>
-                Move an already placed <strong>black egg</strong> up one step.
-              </p>
-            </div>
-            <div className="movesRight">
-              {dice[2]}
-              {dice[3]} &nbsp;→&nbsp;
-              {moveUp}
-            </div>
-          </div>
+      </div>
+      <div className="movesBox">
+        <div className="movesLeft">
+          <p>
+            Continue right above one of your <strong>colored eggs</strong>.
+          </p>
         </div>
-        <div className="col-sm-6">
-          <div className="movesBox">
-            <div className="movesLeft">
-              <p>If you can use both pairs, you must do it.</p>
+        <div className="movesRight">
+          {dice[1]}
+          {dice[2]} &nbsp;→&nbsp; {placeAfter}
+        </div>
+      </div>
+      <div className="movesBox">
+        <div className="movesLeft">
+          <p>
+            Move an already placed <strong>black egg</strong> up one step.
+          </p>
+        </div>
+        <div className="movesRight">
+          {dice[2]}
+          {dice[3]} &nbsp;→&nbsp;
+          {moveUp}
+        </div>
+      </div>
+      <div className="movesBox">
+        <div className="movesLeft">
+          <p>If you can use both pairs, you must do it.</p>
+        </div>
+        <div className="movesRight">
+          <div className="doubleDiceWrap">
+            <div className="doubleDiceRow">
+              {dice[1]} {dice[2]}
             </div>
-            <div className="movesRight">
-              <div className="doubleDiceWrap">
-                <div className="doubleDiceRow">
-                  {dice[1]} {dice[2]}
-                </div>
-                <hr />
-                <div className="doubleDiceRow">
-                  {dice[0]} {dice[3]}
-                </div>
-              </div>
-              &nbsp;→&nbsp; {both}
+            <hr />
+            <div className="doubleDiceRow">
+              {dice[0]} {dice[3]}
             </div>
           </div>
+          &nbsp;→&nbsp; {both}
         </div>
       </div>
     </div>

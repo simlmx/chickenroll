@@ -9,6 +9,12 @@ render({
     await import("../dist/index.css");
     return <Board />;
   },
+  rules: async () => {
+    const { default: Rules } = await import("./Rules");
+    // @ts-expect-error the import is there even if TS does not see it!
+    await import("../dist/index.css");
+    return <Rules />;
+  },
   game,
   messages: {},
   gameId: "chickenroll",
