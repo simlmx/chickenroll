@@ -45,6 +45,7 @@
     "@types/react-dom": "18.3.0",
     "@vitejs/plugin-react": "^4.4.1",
     "chickenroll-game": "workspace:^",
+    "eslint": "^9.25.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "identity-obj-proxy": "^3.0.0",
@@ -57,7 +58,7 @@
     "sass": "^1.43.5",
     "tslib": "^2.3.1",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^8.25.0",
+    "typescript-eslint": "^8.31.0",
     "vite": "^6.3.2",
     "vitest": "^3.1.2"
   },

@@ -1,9 +1,11 @@
 import eslint from "@eslint/js";
+import { globalIgnores } from "eslint/config";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
+  globalIgnores(["src/locales/*"]),
   {
     ignores: ["dist/"],
   },

@@ -1,7 +1,7 @@
 import { UserId } from "@lefun/core";
 import { makeUseMakeMove, makeUseSelector } from "@lefun/ui";
 import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   botMoveDuration,

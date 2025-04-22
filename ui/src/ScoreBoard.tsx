@@ -1,6 +1,5 @@
 import { UserId } from "@lefun/core";
 import { useUsernames } from "@lefun/ui";
-import React from "react";
 
 import { PlayerInfo } from "chickenroll-game";
 

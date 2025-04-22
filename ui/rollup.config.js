@@ -29,6 +29,7 @@ export default {
     "@lefun/ui",
     //
     //
+    "react",
     "react/jsx-runtime",
     "react-dom",
     //

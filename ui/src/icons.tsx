@@ -1,5 +1,3 @@
-import React from "react";
-
 import { DICE_INDICES } from "chickenroll-game";
 
 // From: https://github.com/tailwindlabs/heroicons/blob/master/src/solid/pencil.svg

@@ -1,4 +1,4 @@
-import React, { MouseEvent } from "react";
+import { MouseEvent } from "react";
 
 /*
  * Define the dots as circles in a 100x100 squre

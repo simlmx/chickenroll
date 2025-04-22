@@ -8,7 +8,7 @@ import {
   useIsPlayer,
   useUsername,
 } from "@lefun/ui";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 
 import {
   ChickenrollGame,

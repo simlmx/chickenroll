@@ -1,5 +1,4 @@
 import { UserId } from "@lefun/core";
-import React from "react";
 
 import { DICE_INDICES, Move, PlayerInfo } from "chickenroll-game";
 

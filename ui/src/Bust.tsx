@@ -1,5 +1,3 @@
-import React from "react";
-
 export const BustEmoji = () => {
   return (
     <span role="img" aria-label="crack">
