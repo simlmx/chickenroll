@@ -3,10 +3,11 @@
 
   "compilerOptions": {
     "strict": true,
-    "jsx": "react-jsx",
     "outDir": "dist",
-    "declarationDir": "dist/types"
+    "declarationDir": "dist/types",
+    "jsx": "preserve",
+    "moduleResolution": "bundler"
   },
 
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "lingui.config.ts"]
 }

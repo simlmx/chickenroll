@@ -1,8 +1,9 @@
+import { babel } from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import scss from "rollup-plugin-scss";
-import sass from "sass";
+import * as sass from "sass";
 
 export default {
   input: "src/index.ts",
@@ -16,7 +17,21 @@ export default {
     nodeResolve(),
     typescript({ tsconfig: "./tsconfig.json" }),
     scss({ sass, fileName: "index.css" }),
+    babel({
+      babelHelpers: "bundled",
+      extensions: [".tsx", ".ts"],
+    }),
   ],
-  external: ["@lefun/core", "@lefun/game", "@lefun/ui", "react", "react-redux"],
-  exclude: ["src/main.tsx"],
+  external: [
+    //
+    "@lefun/core",
+    "@lefun/game",
+    "@lefun/ui",
+    //
+    //
+    "react/jsx-runtime",
+    "react-dom",
+    //
+    "@lingui/react",
+  ],
 };

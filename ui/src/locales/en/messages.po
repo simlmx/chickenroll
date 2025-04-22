@@ -1,0 +1,143 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-04-22 13:41+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.name"
+msgstr "Chicken Roll"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.tagline"
+msgstr "A push-your-luck dice game"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.aka"
+msgstr "Can't Stop"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.seoAka"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.description"
+msgstr "Roll your dice to make progress on the board, but don't push your luck too far: you might lose everything! A game where there is a fine line between strategy and luck."
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.label"
+msgstr "Egg overlap"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.help"
+msgstr "What happens when two eggs end up on the same space."
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.options.share.label"
+msgstr "Allow"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.options.share.shortLabel"
+msgstr "Allow"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.options.jump.label"
+msgstr "Jump over"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.options.jump.shortLabel"
+msgstr "Jump"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.options.nostop.label"
+msgstr "Must roll"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.sameSpace.options.nostop.shortLabel"
+msgstr "Must roll"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.mountainShape.label"
+msgstr "Column height"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.mountainShape.help"
+msgstr "Height of the columns. \"Taller\" is better calibrated than the \"Classic\" height from the original game."
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.mountainShape.options.tall.label"
+msgstr "Tall"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.mountainShape.options.tall.shortLabel"
+msgstr "Tall"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.mountainShape.options.classic.label"
+msgstr "Classic"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.mountainShape.options.classic.shortLabel"
+msgstr "Classic"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.label"
+msgstr "Show probabilities"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.help"
+msgstr "When to show the probability of cracking."
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.options.before.label"
+msgstr "Always"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.options.before.shortLabel"
+msgstr "Probs: Always"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.options.after.label"
+msgstr "End of the turn"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.options.after.shortLabel"
+msgstr "End of the turn"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.options.never.label"
+msgstr "Never"
+
+#. js-lingui-explicit-id
+#: lefun
+msgid "lefun.settings.showProbs.options.never.shortLabel"
+msgstr "Probs: Never"

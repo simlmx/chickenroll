@@ -368,36 +368,26 @@ const pick: PlayerMove<ChickenrollGameState, PickPayload> =
 const gameSettings: GameSettings = [
   {
     key: "sameSpace",
-    label: "Egg overlap",
     options: [
-      { value: "share", label: "Allow", isDefault: true },
-      { value: "jump", label: "Jump over", shortLabel: "Jump" },
-      { value: "nostop", label: "Must roll" },
+      { value: "share", isDefault: true },
+      { value: "jump" },
+      { value: "nostop" },
     ],
-    help: "What happens when two eggs end up on the same space.",
   },
   {
     key: "mountainShape",
-    label: "Column height",
-    options: [
-      { value: "tall", label: "Modern", isDefault: true },
-      { value: "classic", label: "Classic" },
-    ],
-    help: "Height of the columns. Modern is taller and better calibrated than Classic.",
+    options: [{ value: "tall", isDefault: true }, { value: "classic" }],
   },
   {
     key: "showProbs",
-    label: "Show probabilities",
     options: [
-      { value: "before", label: "Always", shortLabel: "Probs: Always" },
+      { value: "before" },
       {
         value: "after",
-        label: "End of the turn",
         isDefault: true,
       },
-      { value: "never", label: "Never", shortLabel: "Probs: Never" },
+      { value: "never" },
     ],
-    help: "When to show the probability of cracking.",
   },
 ];
 
