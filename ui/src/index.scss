@@ -158,7 +158,6 @@ $colors: #07df9e, #01a4df, #ff7c36, #ffde0a, #c7233f, #f35076, #a32ea3;
 @mixin setPaleColors($index) {
   .bgcolor#{$index} {
     color: black !important;
-    border-color: black !important;
   }
 
   .textColor#{$index} {
