@@ -6,9 +6,9 @@ import scss from "rollup-plugin-scss";
 import * as sass from "sass";
 
 export default {
-  input: "src/index.ts",
+  input: { index: "src/index.ts", "locales/en": "src/locales/en/messages.mjs" },
   output: {
-    file: "dist/index.js",
+    dir: "dist",
     format: "esm",
     sourcemap: true,
   },
