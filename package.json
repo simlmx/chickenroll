@@ -6,6 +6,7 @@
   },
   "pnpm": {
     "overrides": {
+      "vite": "^6.3.5"
     }
   },
   "packageManager": "pnpm@9.4.0"
