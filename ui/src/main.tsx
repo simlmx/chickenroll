@@ -16,6 +16,5 @@ render({
     return <Rules />;
   },
   game,
-  messages: {},
   gameId: "chickenroll",
 });

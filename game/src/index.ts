@@ -211,7 +211,7 @@ const roll: PlayerMove<ChickenrollGameState> =
       // something.
     },
     execute({ board, random, turns }) {
-      const diceValues = random.d6(4);
+      const diceValues = random.d6({ size: 4 });
 
       const move: Move = { diceValues, userId: board.currentPlayer };
 
@@ -254,7 +254,7 @@ const roll: PlayerMove<ChickenrollGameState> =
       }
 
       if (busted) {
-        turns.end("all");
+        turns.endAll();
         turns.begin(board.currentPlayer);
       }
     },
@@ -311,7 +311,7 @@ const stop: PlayerMove<ChickenrollGameState> =
           logPlayerStat(userId, "numCols", score);
         }
       } else {
-        turns.end("all");
+        turns.endAll();
         turns.begin(board.currentPlayer);
       }
     },
@@ -345,7 +345,7 @@ const pick: PlayerMove<ChickenrollGameState, PickPayload> =
       } else {
         newDiceSums = diceSums;
         move.diceUsed = diceSums
-          .map((s, i) => (enabled[i] ? i : null))
+          .map((_, i) => (enabled[i] ? i : null))
           .filter((x) => x != null) as number[];
       }
       board.lastPickedDiceSumOption = [diceSplitIndex, choiceIndex];

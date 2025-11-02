@@ -20,13 +20,13 @@
   "author": "Simon Lemieux",
   "license": "ISC",
   "peerDependencies": {
-    "@lefun/core": "^2.5.3",
-    "@lefun/game": "^2.5.3"
+    "@lefun/core": "^3.0.0",
+    "@lefun/game": "^3.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@lefun/core": "2.5.3",
-    "@lefun/game": "2.5.3",
+    "@lefun/core": "3.0.0-alpha.3",
+    "@lefun/game": "3.0.0-alpha.3",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",

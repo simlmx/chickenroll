@@ -25,11 +25,11 @@
   "devDependencies": {
     "@babel/preset-react": "^7.26.3",
     "@eslint/js": "^9.21.0",
-    "@lefun/core": "2.5.3",
-    "@lefun/dev-server": "2.5.3",
-    "@lefun/game": "2.5.3",
-    "@lefun/ui": "2.5.3",
-    "@lefun/ui-testing": "2.5.3",
+    "@lefun/core": "3.0.0-alpha.3",
+    "@lefun/dev-server": "3.0.0-alpha.3",
+    "@lefun/game": "3.0.0-alpha.3",
+    "@lefun/ui": "3.0.0-alpha.3",
+    "@lefun/ui-testing": "3.0.0-alpha.3",
     "@lingui/cli": "^4.14.1",
     "@lingui/conf": "^4.14.1",
     "@lingui/core": "^4.14.1",
@@ -67,9 +67,9 @@
     "classnames": "^2.3.1"
   },
   "peerDependencies": {
-    "@lefun/core": "^2.5.3",
-    "@lefun/game": "^2.5.3",
-    "@lefun/ui": "^2.5.3",
+    "@lefun/core": "^3.0.0",
+    "@lefun/game": "^3.0.0",
+    "@lefun/ui": "^3.0.0",
     "chickenroll-game": "*",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"

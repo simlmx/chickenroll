@@ -76,10 +76,8 @@ test("happy path", () => {
 
   // We'll also check who's turn it is once in a while.
   const checkItsTheirTurn = (userId: UserId): void => {
-    match.meta.players.allIds.forEach((otherUserId) => {
-      expect(match.meta.players.byId[otherUserId].itsYourTurn).toBe(
-        userId === otherUserId,
-      );
+    match.players().forEach((otherUserId) => {
+      expect(match.hasTurn(otherUserId)).toBe(userId === otherUserId);
     });
   };
 
