@@ -14,8 +14,6 @@
     "compile": "pnpm run lingui:compile && rollup --config",
     "watch": "NODE_ENV=development rollup --config --watch",
     "test": "vitest run src",
-    "format": "pnpm exec prettier --write . && pnpm exec eslint . --fix",
-    "check-format": "pnpm exec prettier --check . && pnpm exec eslint . --quiet",
     "dev": "pnpm exec vite --host",
     "lingui:compile": "pnpm lingui compile",
     "lingui:extract": "pnpm lingui extract"
