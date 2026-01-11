@@ -1,7 +1,7 @@
 import { UserId } from "@lefun/core";
 import { makeUseMakeMove, makeUseSelector } from "@lefun/ui";
 import classNames from "classnames";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   botMoveDuration,
@@ -125,8 +125,6 @@ const Possibilities = (props: {
   imThePrevious: boolean;
   currentPlayerHasStarted: boolean;
 }) => {
-  const touch = useRef(false);
-
   const makeMove = useMakeMove();
 
   const {
@@ -191,21 +189,15 @@ const Possibilities = (props: {
                     });
                   }
                 }}
-                // Using mouse over and mouse out because the behaviour is
-                // nicer!
-                onMouseOver={() =>
-                  itsMe && enabled && !touch.current && onMouseEnter(i, j)
-                }
-                onMouseLeave={() => {
-                  if (itsMe && enabled && !touch.current) {
-                    onMouseLeave();
+                onPointerOver={(e) => {
+                  if (e.pointerType === "mouse" && itsMe && enabled) {
+                    onMouseEnter(i, j);
                   }
                 }}
-                onTouchStart={() => {
-                  touch.current = true;
-                }}
-                onTouchEnd={() => {
-                  touch.current = false;
+                onPointerLeave={() => {
+                  if (itsMe && enabled) {
+                    onMouseLeave();
+                  }
                 }}
                 disabled={!itsMe || !enabled}
                 {...{ className }}
