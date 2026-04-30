@@ -1,3 +1,4 @@
+import { formatter } from "@lingui/format-po";
 import { lefunExtractor } from "@lefun/ui/lefunExtractor";
 import type { LinguiConfig } from "@lingui/conf";
 
@@ -13,11 +14,8 @@ const config: LinguiConfig = {
       include: ["src"],
     },
   ],
-  format: "po",
+  format: formatter({ lineNumbers: false }),
   extractors: [lefunExtractor(game)],
-  formatOptions: {
-    lineNumbers: false,
-  },
 };
 
 export default config;
